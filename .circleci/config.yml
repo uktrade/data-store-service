@@ -8,9 +8,6 @@ job_defaults: &job_defaults
     postgres_image:
       type: string
 
-    redis_image:
-      type: string
-
     publish_coverage:
       type: boolean
       default: false
@@ -28,8 +25,6 @@ job_defaults: &job_defaults
     - image: <<parameters.python_image>>
 
     - image: <<parameters.postgres_image>>
-
-    - image: <<parameters.redis_image>>
 
   steps:
     - checkout
@@ -54,6 +49,20 @@ job_defaults: &job_defaults
         name: Run format checks
         command: |
           make check
+
+    - run:
+        name: Run tests
+        command: |
+          make run_tests COV='--cov=. --cov-report=html'
+
+    - when:
+        condition: <<parameters.publish_coverage>>
+        steps:
+          - run:
+              name: Publish coverage
+              command: |
+                wget -O codecov.sh https://codecov.io/bash
+                bash ./codecov.sh -t ${COV_TOKEN}
 
 
 jobs:
