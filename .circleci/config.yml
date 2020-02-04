@@ -55,6 +55,20 @@ job_defaults: &job_defaults
         command: |
           make check
 
+    - run:
+        name: Run tests
+        command: |
+          make run_tests COV='--cov=. --cov-report=html'
+
+    - when:
+        condition: <<parameters.publish_coverage>>
+        steps:
+          - run:
+              name: Publish coverage
+              command: |
+                wget -O codecov.sh https://codecov.io/bash
+                bash ./codecov.sh -t ${COV_TOKEN}
+
 
 jobs:
   build:
