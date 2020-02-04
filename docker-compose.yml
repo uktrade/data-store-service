@@ -1,0 +1,17 @@
+version: '3'
+services:
+  web:
+    build: .
+    env_file:
+      - ${ENV_FILE:-.env}
+    ports:
+      - ${PORT:-5050}:5050
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+
+  postgres:
+    image: "postgres"
+    ports:
+      - "5435:5432"

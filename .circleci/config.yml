@@ -1,0 +1,71 @@
+version: 2.1
+
+job_defaults: &job_defaults
+  parameters:
+    python_image:
+      type: string
+
+    postgres_image:
+      type: string
+
+    redis_image:
+      type: string
+
+    publish_coverage:
+      type: boolean
+      default: false
+
+  environment:
+    FLASK_ENV: test
+    DATABASE_URL: postgresql://postgres@localhost/
+    ABC_CLIENT_ID: dss_client_id
+    ABC_CLIENT_SECRET: dss_client_secret
+    APP_SECRET_KEY: dss_app_secret
+
+  working_directory: ~/app
+
+  docker:
+    - image: <<parameters.python_image>>
+
+    - image: <<parameters.postgres_image>>
+
+    - image: <<parameters.redis_image>>
+
+  steps:
+    - checkout
+    - restore_cache:
+         name: Restore pip cache
+         keys:
+           - dss-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+         paths:
+           - ~/cache/pip
+
+    - run:
+        name: Install dependencies
+        command: python -m pip install --cache-dir ~/cache/pip --progress-bar off -r requirements.txt
+
+    - save_cache:
+        name: Save pip cache
+        key: dss-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+        paths:
+          - ~/cache/pip
+
+    - run:
+        name: Run format checks
+        command: |
+          make check
+
+
+jobs:
+  build:
+    <<: *job_defaults
+
+workflows:
+  version: 2
+
+  Default build:
+    jobs:
+      - build:
+          publish_coverage: true
+          python_image: python:3.6.8
+          postgres_image: postgres:10.5
