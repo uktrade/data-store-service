@@ -6,7 +6,7 @@ from sqlalchemy.engine.url import make_url
 
 from app import config
 from app.commands.dev import cmd_group as dev_cmd
-
+from app.db.dbi import DBI
 
 logging_config = {
     'version': 1,
@@ -85,6 +85,7 @@ def _register_components(flask_app):
     sql_alchemy.session = sql_alchemy.create_scoped_session()
     sql_alchemy.init_app(flask_app)
     flask_app.db = sql_alchemy
+    flask_app.dbi = DBI(sql_alchemy)
 
     # API
     flask_app.register_blueprint(api)

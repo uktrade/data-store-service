@@ -1,12 +1,13 @@
 from app.db.models import (
     _col,
+    _date,
     _int,
     _text,
     BaseModel,
 )
 
 
-class Postcode(BaseModel):
+class ONSPostcodeDirectoryL1(BaseModel):
     """
     ONS Postcode data
 
@@ -14,15 +15,16 @@ class Postcode(BaseModel):
     Date formats are YYYYMM
     """
 
-    __tablename__ = 'postcodes'
-    __table_args__ = {'schema': 'public'}
+    __tablename__ = 'L1'
+    __table_args__ = {'schema': 'ons.postcode_directory'}
 
     id = _col(_int, primary_key=True, autoincrement=True)
+    data_source_row_id = _col(_int, unique=True)
     pcd = _col(_text)  # Postcode XXX[space]YYY or XXXYYYY
     pcd2 = _col(_text)  # Postcode XXX[space][space]YYY or XXX[space]YYYY
     pcds = _col(_text, index=True)  # Postcode XXX[space]YYY[space] or XXX[space]YYYY
-    dointr = _col(_text)  # Date of introduction YYYYMM
-    doterm = _col(_text)  # Date of termination YYYYMM
+    dointr = _col(_date)  # Date of introduction YYYYMM
+    doterm = _col(_date)  # Date of termination YYYYMM
     oscty = _col(_text)  # County E10
     ced = _col(_text)  # County Electoral Division E58
     oslaua = _col(_text)  # Local authority district (council) E06

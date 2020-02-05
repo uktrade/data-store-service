@@ -9,3 +9,10 @@ class BaseEnum(Enum):
     @classmethod
     def values(cls):
         return list(cls._value2member_map_.keys())
+
+
+class DatafileState(BaseEnum):
+    PROCESSING = 'processing'
+    FAILED = 'failed'
+    PROCESSED = 'processed'
+    IGNORED = 'ignored'

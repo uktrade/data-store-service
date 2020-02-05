@@ -4,9 +4,7 @@ import pytest
 import sqlalchemy_utils
 
 from app import application
-from app.db.db_utils import create_schemas
 from app.db.models.internal import HawkUsers
-
 
 pytest_plugins = [
     "tests.fixtures.add_to_db",
@@ -123,5 +121,4 @@ def _create_current_time_str():
 
 
 def create_tables(app):
-    create_schemas(app.db.engine)
     app.db.create_all()
