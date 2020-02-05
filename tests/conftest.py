@@ -5,7 +5,12 @@ import sqlalchemy_utils
 
 from app import application
 from app.db.db_utils import create_schemas
+from app.db.models.internal import HawkUsers
 
+
+pytest_plugins = [
+    "tests.fixtures.add_to_db",
+]
 
 TESTING_DB_NAME_TEMPLATE = 'dss_test_{}'
 
@@ -50,6 +55,39 @@ def app_with_db_module(app):
     app.db.session.remove()
     app.db.drop_all()
     sqlalchemy_utils.drop_database(app.config['SQLALCHEMY_DATABASE_URI'])
+
+
+@pytest.fixture(scope='function')
+def app_with_hawk_user(app_with_db):
+    app_with_db.config['access_control'].update(
+        {
+            'hawk_enabled': True,
+            'hawk_nonce_enabled': False,
+            'hawk_algorithm': 'sha256',
+            'hawk_accept_untrusted_content': True,
+            'hawk_localtime_offset_in_seconds': 0,
+            'hawk_timestamp_skew_in_seconds': 60,
+        }
+    )
+    HawkUsers.add_user(
+        client_id='iss1',
+        client_key='secret1',
+        client_scope=['mock_endpoint', 'get_ons_postcodes'],
+        description='test authorization 1',
+    )
+    HawkUsers.add_user(
+        client_id='iss2',
+        client_key='secret2',
+        client_scope=['invalid_scope'],
+        description='test authorization 2',
+    )
+    HawkUsers.add_user(
+        client_id='iss3',
+        client_key='secret3',
+        client_scope=['other_endpoint', 'mock_endpoint'],
+        description='test authorization 3',
+    )
+    yield app_with_db
 
 
 def _create_testing_db_name():

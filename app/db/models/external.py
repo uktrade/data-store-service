@@ -1,0 +1,63 @@
+from app.db.models import (
+    _col,
+    _int,
+    _text,
+    BaseModel,
+)
+
+
+class Postcode(BaseModel):
+    __tablename__ = 'postcodes'
+    __table_args__ = {'schema': 'public'}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    pcd = _col(_text)
+    pcd2 = _col(_text)
+    pcds = _col(_text, index=True)
+    dointr = _col(_text)
+    doterm = _col(_text)
+    oscty = _col(_text)
+    ced = _col(_text)
+    oslaua = _col(_text)
+    osward = _col(_text)
+    parish = _col(_text)
+    usertype = _col(_text)
+    oseast1m = _col(_text)
+    osnrth1m = _col(_text)
+    osgrdind = _col(_text)
+    oshlthau = _col(_text)
+    nhser = _col(_text)
+    ctry = _col(_text)
+    rgn = _col(_text)
+    streg = _col(_text)
+    pcon = _col(_text)
+    eer = _col(_text)
+    teclec = _col(_text)
+    ttwa = _col(_text)
+    pct = _col(_text)
+    nuts = _col(_text)
+    statsward = _col(_text)
+    oa01 = _col(_text)
+    casward = _col(_text)
+    park = _col(_text)
+    lsoa01 = _col(_text)
+    msoa01 = _col(_text)
+    ur01ind = _col(_text)
+    oac01 = _col(_text)
+    oa11 = _col(_text)
+    lsoa11 = _col(_text)
+    msoa11 = _col(_text)
+    wz11 = _col(_text)
+    ccg = _col(_text)
+    bua11 = _col(_text)
+    buasd11 = _col(_text)
+    ru11ind = _col(_text)
+    oac11 = _col(_text)
+    lat = _col(_text)
+    long = _col(_text)
+    lep1 = _col(_text)
+    lep2 = _col(_text)
+    pfa = _col(_text)
+    imd = _col(_text)
+    calncv = _col(_text)
+    stp = _col(_text)
