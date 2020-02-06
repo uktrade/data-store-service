@@ -18,6 +18,8 @@ An s3 bucket can be created using the Cloud Foundry command line tools, e.g.
 1. `cf create-service aws-s3-bucket default data-store-service-s3`
 2. `cf bind-service data-store-service data-store-service-s3`
 3. `cf restage data-store-service`
+4. To get access outside of PaaS you will need to create a service key, `cf create-service-key data-store-service-s3 s3-key -c '{"allow_external_access": true}'`
+5. To get the credentials for s3 use then command, `cf service-key data-store-service-s3 s3-key`
 
 Reference: 
 https://docs.cloud.service.gov.uk/deploying_services/s3/#connect-to-an-s3-bucket-from-your-app
