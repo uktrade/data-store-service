@@ -14,21 +14,9 @@ from app.db.models.internal import HawkUsers
 def mock_endpoint():
     return make_response('OK')
 
-
-class CacheMock:
-    cache = {}
-
-    def set(self, key, value, ex):
-        self.cache[key] = value
-
-    def get(self, key):
-        return self.cache.get(key, None)
-
-
 class TestAuthentication:
     @pytest.fixture(autouse=True)
-    def setup(self, app_with_db):
-        app_with_db.cache = CacheMock()
+    def setup(self, app_with_db, app_with_mock_cache):
         app_with_db.config['access_control'].update(
             {
                 'hawk_enabled': True,
@@ -188,7 +176,12 @@ class TestAuthentication:
 
 
 class TestAuthorization:
-    def test_successful_authorization(self, app_with_hawk_user):
+
+    @pytest.fixture(autouse=True)
+    def setup(self, app_with_hawk_user, app_with_mock_cache):
+        self.app = app_with_hawk_user
+    
+    def test_successful_authorization(self):
         sender = Sender(
             credentials={'id': 'iss1', 'key': 'secret1', 'algorithm': 'sha256'},
             url='http://localhost:80/test/',
@@ -196,12 +189,12 @@ class TestAuthorization:
             content='',
             content_type='',
         )
-        with app_with_hawk_user.test_client() as c:
+        with self.app.test_client() as c:
             response = c.get('/test/', headers={'Authorization': sender.request_header})
             assert response.status_code == 200
             assert response.get_data() == b'OK'
 
-    def test_invalid_scope(self, app_with_hawk_user):
+    def test_invalid_scope(self):
         sender = Sender(
             credentials={'id': 'iss2', 'key': 'secret2', 'algorithm': 'sha256'},
             url='http://localhost:80/test/',
@@ -209,12 +202,12 @@ class TestAuthorization:
             content='',
             content_type='',
         )
-        with app_with_hawk_user.test_client() as c:
+        with self.app.test_client() as c:
             response = c.get('/test/', headers={'Authorization': sender.request_header})
             assert response.status_code == 401
             assert response.get_data() == b''
 
-    def test_multiple_scopes(self, app_with_hawk_user):
+    def test_multiple_scopes(self):
         sender = Sender(
             credentials={'id': 'iss3', 'key': 'secret3', 'algorithm': 'sha256'},
             url='http://localhost:80/test/',
@@ -222,7 +215,7 @@ class TestAuthorization:
             content='',
             content_type='',
         )
-        with app_with_hawk_user.test_client() as c:
+        with self.app.test_client() as c:
             response = c.get('/test/', headers={'Authorization': sender.request_header})
             assert response.status_code == 200
             assert response.get_data() == b'OK'

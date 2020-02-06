@@ -78,7 +78,7 @@ def test_healthcheck_view(app_with_db):
     assert response.json == {'status': 'OK'}
 
 
-def test_get_ons_postcodes_when_no_data(app_with_hawk_user):
+def test_get_ons_postcodes_when_no_data(app_with_hawk_user, app_with_mock_cache):
     client = app_with_hawk_user.test_client()
     response = make_hawk_auth_request(client, '/api/v1/get-ons-postcodes/')
 
@@ -86,7 +86,7 @@ def test_get_ons_postcodes_when_no_data(app_with_hawk_user):
     assert response.json == {'headers': ONS_POSTCODE_FIELDS, 'next': None, 'values': []}
 
 
-def test_get_ons_postcodes(app_with_hawk_user, add_ons_postcode):
+def test_get_ons_postcodes(app_with_hawk_user, app_with_mock_cache, add_ons_postcode):
 
     postcode = 'AB1 1BA'
 
@@ -106,7 +106,7 @@ def test_get_ons_postcodes(app_with_hawk_user, add_ons_postcode):
     }
 
 
-def test_get_ons_postcodes_next_url(app_with_hawk_user, add_ons_postcode):
+def test_get_ons_postcodes_next_url(app_with_hawk_user, app_with_mock_cache, add_ons_postcode):
     app_with_hawk_user.config['app']['pagination_size'] = 1
     postcode_1 = 'AB1 1BA'
     postcode_2 = 'AB2 2BA'
@@ -126,7 +126,9 @@ def test_get_ons_postcodes_next_url(app_with_hawk_user, add_ons_postcode):
     }
 
 
-def test_get_ons_postcodes_when_next_id_specified(app_with_hawk_user, add_ons_postcode):
+def test_get_ons_postcodes_when_next_id_specified(
+        app_with_hawk_user, app_with_mock_cache, add_ons_postcode
+):
     app_with_hawk_user.config['app']['pagination_size'] = 1
     postcode_1 = 'AB1 1BA'
     postcode_2 = 'AB2 2BA'

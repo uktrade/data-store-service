@@ -62,7 +62,7 @@ def app_with_hawk_user(app_with_db):
     app_with_db.config['access_control'].update(
         {
             'hawk_enabled': True,
-            'hawk_nonce_enabled': False,
+            'hawk_nonce_enabled': True,
             'hawk_algorithm': 'sha256',
             'hawk_accept_untrusted_content': True,
             'hawk_localtime_offset_in_seconds': 0,
@@ -88,6 +88,29 @@ def app_with_hawk_user(app_with_db):
         description='test authorization 3',
     )
     yield app_with_db
+
+    
+@pytest.fixture
+def app_with_mock_cache(app):
+
+    class CacheMock:
+        cache = {}
+
+        def set(self, key, value, ex):
+            self.cache[key] = value
+            
+        def get(self, key):
+            return self.cache.get(key, None)
+
+    app_has_cache = hasattr(app, 'cache')
+    if app_has_cache:
+        original_cache = app
+    app.cache = CacheMock()
+    yield
+    if app_has_cache:
+        app.cache = original_cache
+    else:
+        del app.cache
 
 
 def _create_testing_db_name():
