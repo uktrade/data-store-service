@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 from flask import make_response
 from mohawk import Sender
@@ -18,6 +20,7 @@ def mock_endpoint():
 class TestAuthentication:
     @pytest.fixture(autouse=True)
     def setup(self, app_with_db, app_with_mock_cache):
+        original_config = copy.deepcopy(app_with_db.config)
         app_with_db.config['access_control'].update(
             {
                 'hawk_enabled': True,
@@ -43,6 +46,9 @@ class TestAuthentication:
             client_scope=self.client_scope,
             description=self.description,
         )
+        yield
+        HawkUsers.query.delete()
+        app_with_db.config = original_config
 
     def test_successful_authentication(self):
         sender = Sender(
