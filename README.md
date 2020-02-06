@@ -11,3 +11,6 @@ The backend is built in Python using the Flask framework. Authentication impleme
 2. `docker-compose build`
 3. `docker-compose up`
 4. Go to http://localhost:5050/healthcheck
+
+## Example dataset
+ONS Postcode directory: http://geoportal.statistics.gov.uk/datasets/ons-postcode-directory-may-2019
