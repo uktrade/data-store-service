@@ -89,16 +89,15 @@ def app_with_hawk_user(app_with_db):
     )
     yield app_with_db
 
-    
+
 @pytest.fixture
 def app_with_mock_cache(app):
-
     class CacheMock:
         cache = {}
 
         def set(self, key, value, ex):
             self.cache[key] = value
-            
+
         def get(self, key):
             return self.cache.get(key, None)
 

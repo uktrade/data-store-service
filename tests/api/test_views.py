@@ -127,7 +127,7 @@ def test_get_ons_postcodes_next_url(app_with_hawk_user, app_with_mock_cache, add
 
 
 def test_get_ons_postcodes_when_next_id_specified(
-        app_with_hawk_user, app_with_mock_cache, add_ons_postcode
+    app_with_hawk_user, app_with_mock_cache, add_ons_postcode
 ):
     app_with_hawk_user.config['app']['pagination_size'] = 1
     postcode_1 = 'AB1 1BA'

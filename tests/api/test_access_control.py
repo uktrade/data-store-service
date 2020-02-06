@@ -14,6 +14,7 @@ from app.db.models.internal import HawkUsers
 def mock_endpoint():
     return make_response('OK')
 
+
 class TestAuthentication:
     @pytest.fixture(autouse=True)
     def setup(self, app_with_db, app_with_mock_cache):
@@ -176,11 +177,10 @@ class TestAuthentication:
 
 
 class TestAuthorization:
-
     @pytest.fixture(autouse=True)
     def setup(self, app_with_hawk_user, app_with_mock_cache):
         self.app = app_with_hawk_user
-    
+
     def test_successful_authorization(self):
         sender = Sender(
             credentials={'id': 'iss1', 'key': 'secret1', 'algorithm': 'sha256'},
