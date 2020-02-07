@@ -1,6 +1,6 @@
 import pytest
 
-from app.db.models.external import Postcode
+from app.db.models.external import ONSPostcodeDirectoryL1
 
 
 @pytest.fixture(scope='module')
@@ -10,7 +10,7 @@ def add_ons_postcode(app):
             defaults = {
                 'pcds': record.get('postcode'),
             }
-            Postcode.get_or_create(
+            ONSPostcodeDirectoryL1.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
 

@@ -2,11 +2,10 @@ import click
 import sqlalchemy_utils
 from flask import current_app as app
 from flask.cli import AppGroup, with_appcontext
-from sqlalchemy import create_engine
 
-from app.db.db_utils import create_schemas
 from app.db.models.internal import HawkUsers
-
+from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
+from app.etl.manager import Manager as PipelineManager
 
 cmd_group = AppGroup('dev', help='Commands to build database')
 
@@ -48,8 +47,6 @@ def db(create, drop, drop_tables, create_tables, recreate_tables):
             click.echo('Drop DB tables')
             app.db.drop_all()
         if create or create_tables or recreate_tables:
-            engine = create_engine(db_url)
-            create_schemas(engine)
             click.echo('Creating DB tables')
             app.db.create_all()
 
@@ -81,3 +78,39 @@ def add_hawk_user(client_id, client_key, client_scope, description):
             client_scope=client_scope_list,
             description=description,
         )
+
+
+arg_to_pipeline_config_list = {
+    # format:  {'command option': [(pipeline, dataset subdir)]}
+    # pipeline processing is grouped by data_source,
+    # except when multiple format versions are supported or
+    # pipelines are dependent on other pipelines
+    ONSPostcodeDirectoryPipeline.data_source: [
+        (ONSPostcodeDirectoryPipeline, 'ons/postcodes_directory/')
+    ],
+}
+
+
+@cmd_group.command('datafiles_to_events_by_source')
+@click.option('--all', is_flag=True, help='all datafiles to events')
+def datafiles_to_events_by_source(**kwargs):
+    manager = PipelineManager(storage=app.config['inputs']['source-folder'], dbi=app.dbi)
+    for arg, pipeline_info_list in arg_to_pipeline_config_list.items():
+        arg = arg.replace(".", "__")
+        if kwargs['all'] or kwargs[arg]:
+            for pipeline, sub_dir in pipeline_info_list:
+                manager.pipeline_register(pipeline=pipeline, sub_directory=sub_dir)
+    manager.pipeline_process_all()
+
+
+def _pipeline_option(option_name):
+    return click.option(
+        f'--{option_name}',
+        f'{option_name.replace(".", "__")}',
+        is_flag=True,
+        help=f'{option_name} data to events',
+    )
+
+
+for k in arg_to_pipeline_config_list.keys():
+    datafiles_to_events_by_source = _pipeline_option(k)(datafiles_to_events_by_source)

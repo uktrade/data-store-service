@@ -1,4 +1,7 @@
+import pandas as pd
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import DDL, event
+from sqlalchemy.orm import load_only
 from sqlalchemy.sql import ClauseElement
 
 
@@ -16,6 +19,7 @@ _bool = db.Boolean
 _num = db.Numeric
 _array = _sa.ARRAY
 _date = _sa.Date
+_enum = _sa.Enum
 
 
 class BaseModel(db.Model):
@@ -71,3 +75,21 @@ class BaseModel(db.Model):
             instance = cls(**params)
             instance.save()
             return instance, True
+
+    @classmethod
+    def get_dataframe(cls, columns=None):
+        query = cls.query
+        if columns:
+            query = query.options(load_only(*columns))
+        return pd.read_sql(query.statement, cls.query.session.bind, index_col=cls.id.description)
+
+
+def create_schemas(*args, **kwargs):
+    schemas = ['operations', 'admin', 'ons.postcode_directory']
+    for schema in schemas:
+        _sa.engine.execute(DDL(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
+
+    _sa.session.commit()
+
+
+event.listen(BaseModel.metadata, 'before_create', create_schemas)
