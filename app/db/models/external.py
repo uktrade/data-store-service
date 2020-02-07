@@ -5,6 +5,7 @@ from app.db.models import (
     _text,
     BaseModel,
 )
+from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 
 
 class ONSPostcodeDirectoryL1(BaseModel):
@@ -16,7 +17,7 @@ class ONSPostcodeDirectoryL1(BaseModel):
     """
 
     __tablename__ = 'L1'
-    __table_args__ = {'schema': 'ons.postcode_directory'}
+    __table_args__ = {'schema': ONSPostcodeDirectoryPipeline.schema}
 
     id = _col(_int, primary_key=True, autoincrement=True)
     data_source_row_id = _col(_int, unique=True)

@@ -1,4 +1,4 @@
-from app.etl.snapshot_data_pipeline import SnapshotDataPipeline
+from app.etl.etl_snapshot_data import SnapshotDataPipeline
 
 
 class ONSPostcodeDirectoryPipeline(SnapshotDataPipeline):
