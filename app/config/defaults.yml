@@ -22,3 +22,5 @@ access_control:
   hawk_timestamp_skew_in_seconds: $ENV{DSS_HAWK_TIMESTAMP_SKEW_IN_SECONDS, 60}
 session:
   secret_key: $ENV{DSS_SESSION_SECRET_KEY, _dss_authbroker_token}
+inputs:
+  source-folder: $ENV{INPUTS_SOURCE_FOLDER, inputs/source/}

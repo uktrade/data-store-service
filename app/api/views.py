@@ -8,10 +8,9 @@ from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 from app.api.access_control import AccessControl
 from app.api.utils import response_orientation_decorator, to_web_dict
-from app.db.db_utils import execute_query
-from app.db.models.external import Postcode
+from app.db.models.external import ONSPostcodeDirectoryL1
 from app.db.models.internal import HawkUsers
-
+from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 
 api = Blueprint(name="api", import_name=__name__)
 ac = AccessControl()
@@ -97,13 +96,16 @@ def get_ons_postcodes(orientation):
         values = [next_id]
 
     sql_query = f'''
-        select * from {Postcode.get_fq_table_name()}
+        select id, {','.join(
+            [field for field, _ in ONSPostcodeDirectoryPipeline._l1_data_column_types]
+        )}
+        from {ONSPostcodeDirectoryL1.get_fq_table_name()}
         {where}
         order by id
         limit {pagination_size} + 1
     '''
 
-    df = execute_query(sql_query, data=values)
+    df = flask_app.dbi.execute_query(sql_query, data=values, df=True)
     if len(df) == pagination_size + 1:
         next_ = '{}{}?'.format(request.host_url[:-1], request.path)
         next_ += '&' if next_[-1] != '?' else ''
