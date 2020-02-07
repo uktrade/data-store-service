@@ -12,6 +12,9 @@ The backend is built in Python using the Flask framework. Authentication impleme
 3. `docker-compose up`
 4. Go to http://localhost:5050/healthcheck
 
+## Example dataset
+ONS Postcode directory: http://geoportal.statistics.gov.uk/datasets/ons-postcode-directory-november-2019
+
 ## Creating an S3 bucket
 An s3 bucket can be created using the Cloud Foundry command line tools, e.g.
 
