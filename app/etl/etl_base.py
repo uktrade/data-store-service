@@ -49,7 +49,7 @@ class DataPipeline(metaclass=ABCMeta):
             self.dbi.execute_statement(
                 "SET statement_timeout TO '20h' "
             )  # If a query takes longer over 20hours, stop it!
-            self._create_schema_if_not_exists(self._schema)
+            self._create_schema_if_not_exists(self.schema)
 
     def __str__(self):
         return f'<{self.__class__.__name__}>'
@@ -91,8 +91,8 @@ class DataPipeline(metaclass=ABCMeta):
         """ Takes a datatools.io.fileinfo.FileInfo object """
         ...
 
-    @property
-    def _schema(self):
+    @classproperty
+    def schema(self):
         return (
             f'{self.organisation}.{self.dataset}'
             f"{('.' + self.subdataset) if self.subdataset else ''}"
@@ -106,4 +106,4 @@ class DataPipeline(metaclass=ABCMeta):
     def _fully_qualified(self, table):
         if table[0] == table[-1] == '"':
             return table
-        return f'"{self._schema}"."{table}"'
+        return f'"{self.schema}"."{table}"'
