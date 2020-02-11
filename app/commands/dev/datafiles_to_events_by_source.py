@@ -1,5 +1,6 @@
 import click
 from flask import current_app as app
+from flask.cli import with_appcontext
 
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 from app.etl.manager import Manager as PipelineManager
@@ -16,6 +17,7 @@ arg_to_pipeline_config_list = {
 
 
 @click.command('datafiles_to_events_by_source')
+@with_appcontext
 @click.option('--all', is_flag=True, help='all datafiles to events')
 def datafiles_to_events_by_source(**kwargs):
     """
