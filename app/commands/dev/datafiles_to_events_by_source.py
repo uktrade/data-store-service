@@ -11,7 +11,7 @@ arg_to_pipeline_config_list = {
     # except when multiple format versions are supported or
     # pipelines are dependent on other pipelines
     ONSPostcodeDirectoryPipeline.data_source: [
-        (ONSPostcodeDirectoryPipeline, 'ons/postcodes_directory/')
+        (ONSPostcodeDirectoryPipeline, 'ons/postcode_directory/')
     ],
 }
 
