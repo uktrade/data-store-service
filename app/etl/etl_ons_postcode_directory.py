@@ -1,3 +1,5 @@
+from io import BytesIO
+
 from app.etl.etl_snapshot_data import SnapshotDataPipeline
 
 
@@ -59,8 +61,9 @@ class ONSPostcodeDirectoryPipeline(SnapshotDataPipeline):
     ]
 
     def _datafile_to_l0_temp(self, file_info):
+        csv_data_no_empty_quotes = BytesIO(file_info.data.read().replace(b'""', b''))
         self.dbi.dsv_buffer_to_table(
-            file_info.data, self._l0_temp_table, has_header=True, sep=',', quote='"',
+            csv_data_no_empty_quotes, self._l0_temp_table, has_header=True, sep=',', quote='"',
         )
 
     _l1_data_column_types = (
