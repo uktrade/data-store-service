@@ -1,7 +1,6 @@
 from unittest import mock
 
-from app.commands.dev.s3 import s3
-from app.commands.dev.s3 import delete_object, list_objects, move_object, upload_object
+from app.commands.dev.s3 import delete_object, list_objects, move_object, s3, upload_object
 
 
 class TestDeleteObject:
