@@ -15,3 +15,9 @@ services:
     image: "postgres"
     ports:
       - "5435:5432"
+
+  dss_redis:
+    image: redis:3.2
+    restart: always
+    ports:
+      - "6375:6379"

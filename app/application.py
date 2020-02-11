@@ -1,6 +1,8 @@
 import os
 from logging.config import dictConfig
 
+import certifi
+import redis
 from flask import Flask, json
 from sqlalchemy.engine.url import make_url
 
@@ -93,7 +95,24 @@ def _register_components(flask_app):
     # API
     flask_app.register_blueprint(api)
 
+    # Cache
+    redis_uri = _get_redis_url(flask_app)
+    flask_app.cache = redis.from_url(redis_uri)
     return flask_app
+
+
+def _get_redis_url(flask_app):
+    redis_uri = _load_uri_from_vcap_services('redis')
+    if not redis_uri:
+        password = flask_app.config['cache'].get('password')
+        redis_uri = (
+            f"user:{password}"
+            if password
+            else "" f"{flask_app.config['cache']['host']}:" f"{flask_app.config['cache']['port']}"
+        )
+    if redis_uri.startswith('rediss://'):
+        return f"{redis_uri}?ssl_ca_certs={certifi.where()}"
+    return redis_uri
 
 
 def _load_uri_from_vcap_services(service_type):
