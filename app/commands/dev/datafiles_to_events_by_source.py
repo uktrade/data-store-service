@@ -3,7 +3,9 @@ from flask import current_app as app
 from flask.cli import with_appcontext
 
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
+from app.etl.etl_ons_reference_postcode_directory import ONSReferencePostcodeDirectoryPipeline
 from app.etl.manager import Manager as PipelineManager
+
 
 arg_to_pipeline_config_list = {
     # format:  {'command option': [(pipeline, dataset subdir)]}
@@ -12,6 +14,9 @@ arg_to_pipeline_config_list = {
     # pipelines are dependent on other pipelines
     ONSPostcodeDirectoryPipeline.data_source: [
         (ONSPostcodeDirectoryPipeline, 'ons/postcode_directory/')
+    ],
+    ONSReferencePostcodeDirectoryPipeline.data_source: [
+        (ONSReferencePostcodeDirectoryPipeline, 'data_workspace/reference_postcodes')
     ],
 }
 
