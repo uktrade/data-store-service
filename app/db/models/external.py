@@ -85,7 +85,7 @@ class ReferencePostcodesL1(BaseModel):
 
     id = _col(_int, primary_key=True, autoincrement=True)
     data_source_row_id = _col(_int, unique=True)
-    post_code = _col(_text)
+    postcode = _col(_text)
     local_authority_district_code = _col(_text)
     local_authority_district_name = _col(_text)
     local_enterprise_partnership_lep1_code = _col(_text)

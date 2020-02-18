@@ -70,7 +70,7 @@ def app_with_hawk_user(app_with_db):
     HawkUsers.add_user(
         client_id='iss1',
         client_key='secret1',
-        client_scope=['mock_endpoint', 'get_ons_postcodes'],
+        client_scope=['*'],
         description='test authorization 1',
     )
     HawkUsers.add_user(
