@@ -53,6 +53,7 @@ ONS_POSTCODE_FIELDS = [
     'stp',
 ]
 
+
 def test_get_ons_postcodes_when_no_data(app_with_hawk_user, app_with_mock_cache):
     client = app_with_hawk_user.test_client()
     response = make_hawk_auth_request(client, '/api/v1/get-ons-postcodes/')

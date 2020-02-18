@@ -17,6 +17,7 @@ def add_ons_postcode(app):
 
     return _method
 
+
 @pytest.fixture(scope='module')
 def add_reference_postcodes(app):
     def _method(records):

@@ -1,5 +1,6 @@
 from mohawk import Sender
 
+
 def get_mohawk_sender(url):
     sender = Sender(
         credentials={'id': 'iss1', 'key': 'secret1', 'algorithm': 'sha256'},

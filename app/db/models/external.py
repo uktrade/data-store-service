@@ -8,6 +8,7 @@ from app.db.models import (
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 from app.etl.etl_reference_postcodes import ReferencePostcodesPipeline
 
+
 class ONSPostcodeDirectoryL1(BaseModel):
     """
     ONS Postcode data
@@ -72,7 +73,7 @@ class ONSPostcodeDirectoryL1(BaseModel):
     calncv = _col(_text)  # Cancer Alliance E56
     stp = _col(_text)  # Sustainability and Transformation Partnership E54
 
-    
+
 class ReferencePostcodesL1(BaseModel):
     """
     Reference Postcode data

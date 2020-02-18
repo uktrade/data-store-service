@@ -87,7 +87,12 @@ class BaseModel(db.Model):
 
 
 def create_schemas(*args, **kwargs):
-    schemas = ['operations', 'admin', ONSPostcodeDirectoryPipeline.schema, ReferencePostcodesPipeline.schema]
+    schemas = [
+        'operations',
+        'admin',
+        ONSPostcodeDirectoryPipeline.schema,
+        ReferencePostcodesPipeline.schema,
+    ]
     for schema in schemas:
         _sa.engine.execute(DDL(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
 
