@@ -6,11 +6,15 @@ This data is then pushed to data workspaces for analysts to use.
 ## Installation
 The backend is built in Python using the Flask framework. Authentication implemented using Hawk and OAUTH2(SSO) authentication. The majority of the functionality is through API calls but a light front end is provided for documentation and dashboarding. This front end uses React and d3 and uses the webpack javascript module bundler. 
 
-### local Docker installation
-1. Create a file called `.env`
+### Docker installation
+1. Copy `.envs/docker.env` to `.env`
 2. `docker-compose build`
 3. `docker-compose up`
 4. Go to http://localhost:5050/healthcheck
+
+### Docker run tests
+1. `docker exec -it data_dss_web_1 make run_tests`
+
 
 ## Example dataset
 ONS Postcode directory: http://geoportal.statistics.gov.uk/datasets/ons-postcode-directory-november-2019
