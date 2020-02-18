@@ -3,7 +3,7 @@ from io import BytesIO
 from app.etl.etl_snapshot_data import SnapshotDataPipeline
 
 
-class ONSReferencePostcodeDirectoryPipeline(SnapshotDataPipeline):
+class ReferencePostcodesPipeline(SnapshotDataPipeline):
     organisation = 'data_workspace'
     dataset = 'reference_postcodes'
 
