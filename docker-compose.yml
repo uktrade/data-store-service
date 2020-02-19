@@ -2,6 +2,8 @@ version: '3'
 services:
   dss_web:
     build: .
+    environment:
+      - DOCKER=1
     env_file:
       - ${ENV_FILE:-.env}
     ports:
