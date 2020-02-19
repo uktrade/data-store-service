@@ -168,12 +168,13 @@ def get_reference_postcodes(orientation):
 @ac.authorization_required
 def get_reference_postcode(orientation):
     postcode = request.args.get('reference-postcode')
+    postcode = postcode.replace(' ', '').lower()
     sql_query = f'''
         select {','.join(
             [field for field, _ in ReferencePostcodesPipeline._l1_data_column_types]
         )}
         from {ReferencePostcodesL1.get_fq_table_name()}
-        where postcode = %s
+        where lower(replace(postcode, ' ', '')) = %s
         limit 1
     '''
     df = flask_app.dbi.execute_query(sql_query, data=[postcode], df=True)
