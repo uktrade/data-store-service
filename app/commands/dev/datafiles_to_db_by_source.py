@@ -21,10 +21,10 @@ arg_to_pipeline_config_list = {
 }
 
 
-@click.command('datafiles_to_events_by_source')
+@click.command('datafiles_to_db_by_source')
 @with_appcontext
-@click.option('--all', is_flag=True, help='all datafiles to events')
-def datafiles_to_events_by_source(**kwargs):
+@click.option('--all', is_flag=True, help='ingest datafile into the DB')
+def datafiles_to_db_by_source(**kwargs):
     """
     Populate tables with source files
     """
@@ -42,9 +42,9 @@ def _pipeline_option(option_name):
         f'--{option_name}',
         f'{option_name.replace(".", "__")}',
         is_flag=True,
-        help=f'{option_name} data to events',
+        help=f'{option_name} data ingestion',
     )
 
 
 for k in arg_to_pipeline_config_list.keys():
-    datafiles_to_events_by_source = _pipeline_option(k)(datafiles_to_events_by_source)
+    datafiles_to_db_by_source = _pipeline_option(k)(datafiles_to_db_by_source)
