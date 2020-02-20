@@ -6,6 +6,7 @@ from sqlalchemy.sql import ClauseElement
 
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
+from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
 
 db = SQLAlchemy()
 sql_alchemy = db
@@ -22,6 +23,7 @@ _num = db.Numeric
 _array = _sa.ARRAY
 _date = _sa.Date
 _enum = _sa.Enum
+_float = _sa.Float
 
 
 class BaseModel(db.Model):
@@ -92,6 +94,7 @@ def create_schemas(*args, **kwargs):
         'admin',
         ONSPostcodeDirectoryPipeline.schema,
         DITReferencePostcodesPipeline.schema,
+        WorldBankTariffPipeline.schema,
     ]
     for schema in schemas:
         _sa.engine.execute(DDL(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
