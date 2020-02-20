@@ -5,8 +5,8 @@ from app.db.models import (
     _text,
     BaseModel,
 )
+from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_reference_postcodes import ReferencePostcodesPipeline
 
 
 class ONSPostcodeDirectoryL1(BaseModel):
@@ -74,7 +74,7 @@ class ONSPostcodeDirectoryL1(BaseModel):
     stp = _col(_text)  # Sustainability and Transformation Partnership E54
 
 
-class ReferencePostcodesL1(BaseModel):
+class DITReferencePostcodesL1(BaseModel):
     """
     Reference Postcode data
 
@@ -82,7 +82,7 @@ class ReferencePostcodesL1(BaseModel):
     """
 
     __tablename__ = 'L1'
-    __table_args__ = {'schema': ReferencePostcodesPipeline.schema}
+    __table_args__ = {'schema': DITReferencePostcodesPipeline.schema}
 
     id = _col(_int, primary_key=True, autoincrement=True)
     data_source_row_id = _col(_int, unique=True)

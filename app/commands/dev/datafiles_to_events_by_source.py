@@ -2,8 +2,8 @@ import click
 from flask import current_app as app
 from flask.cli import with_appcontext
 
+from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_reference_postcodes import ReferencePostcodesPipeline
 from app.etl.manager import Manager as PipelineManager
 
 
@@ -15,8 +15,8 @@ arg_to_pipeline_config_list = {
     ONSPostcodeDirectoryPipeline.data_source: [
         (ONSPostcodeDirectoryPipeline, 'ons/postcode_directory/')
     ],
-    ReferencePostcodesPipeline.data_source: [
-        (ReferencePostcodesPipeline, 'data_workspace/reference_postcodes')
+    DITReferencePostcodesPipeline.data_source: [
+        (DITReferencePostcodesPipeline, 'data_workspace/reference_postcodes')
     ],
 }
 
