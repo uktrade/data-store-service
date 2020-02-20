@@ -1,9 +1,7 @@
 from tests.api.views import make_hawk_auth_request
 
 
-def test_alias_postcode_route(
-    add_dit_reference_postcodes, app_with_hawk_user, app_with_mock_cache
-):
+def test_alias_postcode_route(add_dit_reference_postcodes, app_with_hawk_user, app_with_mock_cache):
     postcodes = [
         {'postcode': 'AB10 1AA', 'local_authority_district_code': 'asdf'},
         {'postcode': 'ZZ10 1ZZ', 'local_authority_district_code': 'zzzz'},
