@@ -5,7 +5,6 @@ from app.db.models import (
     _text,
     BaseModel,
 )
-from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 
 
@@ -72,30 +71,3 @@ class ONSPostcodeDirectoryL1(BaseModel):
     imd = _col(_text)  # Index of Multiple Deprivation (Numeric)
     calncv = _col(_text)  # Cancer Alliance E56
     stp = _col(_text)  # Sustainability and Transformation Partnership E54
-
-
-class DITReferencePostcodesL1(BaseModel):
-    """
-    Reference Postcode data
-
-    A enriched view of the ONS postcode data with Data Engineering reference data
-    """
-
-    __tablename__ = 'L1'
-    __table_args__ = {'schema': DITReferencePostcodesPipeline.schema}
-
-    id = _col(_int, primary_key=True, autoincrement=True)
-    data_source_row_id = _col(_int, unique=True)
-    postcode = _col(_text)
-    local_authority_district_code = _col(_text)
-    local_authority_district_name = _col(_text)
-    local_enterprise_partnership_lep1_code = _col(_text)
-    local_enterprise_partnership_lep1_name = _col(_text)
-    local_enterprise_partnership_lep2_code = _col(_text)
-    local_enterprise_partnership_lep2_name = _col(_text)
-    region_code = _col(_text)
-    region_name = _col(_text)
-    national_grid_ref_easting = _col(_text)
-    national_grid_ref_northing = _col(_text)
-    date_of_introduction = _col(_date)
-    date_of_termination = _col(_date)
