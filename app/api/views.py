@@ -161,6 +161,7 @@ def get_reference_postcodes(orientation):
     return flask_app.make_response(web_dict)
 
 
+@api.route('/api/v1/get-postcode-data/', methods=['GET'])
 @api.route('/api/v1/get-dit-reference-postcode/', methods=['GET'])
 @json_error
 @response_orientation_decorator
