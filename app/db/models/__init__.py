@@ -4,7 +4,6 @@ from sqlalchemy import DDL, event
 from sqlalchemy.orm import load_only
 from sqlalchemy.sql import ClauseElement
 
-from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 
 db = SQLAlchemy()
@@ -87,12 +86,7 @@ class BaseModel(db.Model):
 
 
 def create_schemas(*args, **kwargs):
-    schemas = [
-        'operations',
-        'admin',
-        ONSPostcodeDirectoryPipeline.schema,
-        DITReferencePostcodesPipeline.schema,
-    ]
+    schemas = ['operations', 'admin', ONSPostcodeDirectoryPipeline.schema]
     for schema in schemas:
         _sa.engine.execute(DDL(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
 

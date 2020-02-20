@@ -8,10 +8,8 @@ from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 from app.api.access_control import AccessControl
 from app.api.utils import response_orientation_decorator, to_web_dict
-from app.db.models.external import DITReferencePostcodesL1
 from app.db.models.external import ONSPostcodeDirectoryL1
 from app.db.models.internal import HawkUsers
-from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 
 api = Blueprint(name="api", import_name=__name__)
