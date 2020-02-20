@@ -1,6 +1,7 @@
 from app.db.models import (
     _col,
     _date,
+    _float,
     _int,
     _text,
     BaseModel,
@@ -99,3 +100,62 @@ class DITReferencePostcodesL1(BaseModel):
     national_grid_ref_northing = _col(_text)
     date_of_introduction = _col(_date)
     date_of_termination = _col(_date)
+
+
+class ProductMixin:
+
+    selected_nomen = _col(_text)
+    native_nomen = _col(_text)
+    reporter = _col(_text)
+    reporter_name = _col(_text)
+    product = _col(_text)
+    product_name = _col(_text)
+    partner = _col(_text)
+    partner_name = _col(_text)
+    tariff_year = _col(_text)
+    trade_year = _col(_text)
+    trade_source = _col(_text)
+    duty_type = _col(_text)
+    simple_average = _col(_float)
+    weighted_average = _col(_float)
+    standard_deviation = _col(_float)
+    minimum_rate = _col(_float)
+    maximum_rate = _col(_float)
+    nbr_of_total_lines = _col(_int)
+    nbr_of_domestic_peaks = _col(_int)
+    nbr_of_international_peaks = _col(_int)
+    imports_value_in_1000_usd = _col(_float)
+    binding_coverage = _col(_int)
+    simple_tariff_line_average = _col(_float)
+    variance = _col(_float)
+    sum_of_rates = _col(_float)
+    sum_of_s_avg_rates = _col(_float)
+    count_of_s_avg_rates_cases = _col(_int)
+    sum_of_squared_rates = _col(_float)
+    nbr_of_ave_lines = _col(_int)
+    nbr_of_na_lines = _col(_int)
+    nbr_of_free_lines = _col(_int)
+    nbr_of_dutiable_lines = _col(_int)
+    nbr_line_0_to_5 = _col(_int)
+    nbr_line_5_to_10 = _col(_int)
+    nbr_line_10_to_20 = _col(_int)
+    nbr_line_20_to_50 = _col(_int)
+    nbr_line_50_to_100 = _col(_int)
+    nbr_line_more_than_100 = _col(_int)
+    sum_rate_by_wght_trd_value = _col(_float)
+    sum_wght_trd_value_for_not_null = _col(_float)
+    free_imports_in_1000_USD = _col(_float)
+    dutiable_imports_in_1000_USD = _col(_float)
+    specific_duty_imports_in_1000_USD = _col(_float)
+    id = _col('id', _int, primary_key=True, autoincrement=True)
+
+
+class Product040110(ProductMixin, BaseModel):
+    __tablename__ = 'product_040110'
+    __table_args__ = {'schema': 'public'}
+
+
+class Product0201(ProductMixin, BaseModel):
+    __tablename__ = 'product_0201'
+    __table_args__ = {'schema': 'public'}
+
