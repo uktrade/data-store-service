@@ -7,7 +7,7 @@ class SnapshotDataPipeline(DataPipeline):
     """ Abstract class for standard pipelines that ingest data snapshots
 
     This class implements the abstract process method of a CleanDataPipeline as:
-        1) parse file_info object into L0.temp (_datafile_to_L0_temp)
+        1) parse file_info object into L0.temp (_datafile_to_l0_temp)
         2) update L0 data with L0.temp snapshot data (_l0_temp_to_l0)
         3) standardise L0 data and copy into L1 (_l0_to_l1)
         4) clean up L0.temp
