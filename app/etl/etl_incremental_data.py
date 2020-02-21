@@ -25,7 +25,7 @@ class IncrementalDataPipeline(DataPipeline):
 
     @property
     def _l0_sequence(self):
-        return f'"{self._schema}"."{self.L0_TABLE}_SEQUENCE"'
+        return f'"{self.schema}"."{self.L0_TABLE}_SEQUENCE"'
 
     @property
     def _l1_temp_table(self):
@@ -33,7 +33,7 @@ class IncrementalDataPipeline(DataPipeline):
 
     @property
     def _l1_sequence(self):
-        return f'"{self._schema}"."{self.L1_TABLE}_SEQUENCE"'
+        return f'"{self.schema}"."{self.L1_TABLE}_SEQUENCE"'
 
     @property
     @abstractmethod
