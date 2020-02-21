@@ -74,8 +74,6 @@ def _table_to_rows(dbi, table):
         rows = [r[4:] for r in rows]
     elif 'L1' in table:
         rows = [r[2:] for r in rows]
-    elif '"events"' in table:
-        rows = [(r[2],) + r[4:] for r in rows]
 
     def _format(value):
         if isinstance(value, datetime.datetime):
