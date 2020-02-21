@@ -209,12 +209,13 @@ class DBI:
 
     def dsv_buffer_to_table(
         self,
+        *,
         csv_buffer,
         fq_table_name,
+        columns,
         has_header=False,
         null='',
         sep='\t',
-        columns=None,
         quote=None,
         encoding=None,
     ):
