@@ -55,7 +55,7 @@ class DataPipeline(metaclass=ABCMeta):
         return f'<{self.__class__.__name__}>'
 
     def __getattr__(self, name):
-        pat = re.compile('_l([0-9])_table')
+        pat = re.compile('_l([0-9])_(sequence|table)')
         match = pat.match(name)
         if match:
             num = match.group(1)
