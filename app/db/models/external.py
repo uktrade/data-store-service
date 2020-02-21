@@ -150,6 +150,21 @@ class ProductMixin:
     id = _col('id', _int, primary_key=True, autoincrement=True)
 
 
+class WITSCleanedDataMixin:
+    id = _col('id', _int, primary_key=True, autoincrement=True)
+    product = _col(_text)
+    reporter = _col(_text)
+    partner = _col(_text)
+    year = _col(_text)
+    assumed_tariff = _col(_float)
+    app_rate = _col(_text)
+    mfn_rate = _col(_text)
+    prf_rate = _col(_text)
+    bnd_rate = _col(_text)
+    country_average = _col(_text)
+    world_average = _col(_float)
+
+
 class Product040110(ProductMixin, BaseModel):
     __tablename__ = 'product_040110'
     __table_args__ = {'schema': 'public'}
@@ -159,3 +174,12 @@ class Product0201(ProductMixin, BaseModel):
     __tablename__ = 'product_0201'
     __table_args__ = {'schema': 'public'}
 
+
+class WITSCleanedDataExample(WITSCleanedDataMixin, BaseModel):
+    __tablename = 'wits_cleaned_data_example'
+    __table_args__ = {'schema': 'public'}
+
+
+class WITSCleanedData(WITSCleanedDataMixin, BaseModel):
+    __tablename = 'wits_cleaned_data'
+    __table_args__ = {'schema': 'public'}
