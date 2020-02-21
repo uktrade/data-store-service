@@ -22,6 +22,16 @@ class SnapshotDataPipeline(DataPipeline):
     """
 
     @property
+    def l0_helper_columns(self):
+        return [
+            ('id', 'serial primary key'),  # primary key
+            ('datafile_created', 'text'),  # first snapshot containing record
+            ('datafile_updated', 'text'),  # last snapshot containing record
+            ('data_hash', 'text'),         # md5 hash of the data column values, used to determine the
+                                        # uniqueness of the record
+        ]
+
+    @property
     def _l0_temp_table(self):
         return self._fully_qualified(f'{self.L0_TABLE}.temp')
 
@@ -39,17 +49,7 @@ class SnapshotDataPipeline(DataPipeline):
 
     @property
     def _l0_column_types(self):
-        """ Include id (primary key), datafile_created (first snapshot containing record),
-            datafile_updated (last snapshot containing record) columns,
-            data_hash (md5 hash of the data column values, used to determine the
-            uniqueness of the record)
-        """
-        return [
-            ('id', 'serial primary key'),
-            ('datafile_created', 'text'),
-            ('datafile_updated', 'text'),
-            ('data_hash', 'text'),
-        ] + self._l0_data_column_types
+        return self.l0_helper_columns + self._l0_data_column_types
 
     @property
     @abstractmethod
@@ -61,11 +61,7 @@ class SnapshotDataPipeline(DataPipeline):
 
     @property
     def _l1_column_types(self):
-        """ Include id (primary key), data_source_row_id (reference to L0 id column) """
-        return [
-            ('id', 'serial primary key'),
-            ('data_source_row_id', 'int'),
-        ] + self._l1_data_column_types
+        return self.l1_helper_columns + self._l1_data_column_types
 
     def process(self, file_info, delete_previous=False):
         datafile_name = file_info.name.split('/')[-1]

@@ -24,8 +24,8 @@ def rows_equal_query_results(dbi, expected_rows, query, order_matters=False):
     return expected_rows == db_rows
 
 
-def rows_equal_table(dbi, expected_rows, table, order_matters=False, top_rows=None):
-    db_rows = _table_to_rows(dbi, table)
+def rows_equal_table(dbi, expected_rows, table, pipeline, order_matters=False, top_rows=None):
+    db_rows = _table_to_rows(dbi, table, pipeline)
 
     if not order_matters:
         expected_rows.sort(key=_row_to_sortable_tuple)
@@ -64,16 +64,16 @@ def _query_result_to_rows(dbi, query):
     return [tuple(_format(value) for value in r) for r in rows]
 
 
-def _table_to_rows(dbi, table):
+def _table_to_rows(dbi, table, pipeline):
     query = f"""
        SELECT * FROM {table}
     """
     rows = dbi.execute_query(query)
     # strip columns that are not required for validation
     if 'L0' in table:
-        rows = [r[4:] for r in rows]
+        rows = [r[len(pipeline.l0_helper_columns):] for r in rows]
     elif 'L1' in table:
-        rows = [r[2:] for r in rows]
+        rows = [r[len(pipeline.l1_helper_columns):] for r in rows]
 
     def _format(value):
         if isinstance(value, datetime.datetime):

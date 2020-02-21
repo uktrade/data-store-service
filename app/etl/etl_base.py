@@ -38,6 +38,13 @@ class DataPipeline(metaclass=ABCMeta):
     L1_TABLE = 'L1'
     L2_TABLE = 'L2'
 
+    @property
+    def l1_helper_columns(self):
+        return [
+            ('id', 'serial primary key'),   # primary key
+            ('data_source_row_id', 'int'),  # reference to L0 id column
+        ]
+
     def __init__(self, dbi):
         self.dbi = dbi
         if not dbi:
