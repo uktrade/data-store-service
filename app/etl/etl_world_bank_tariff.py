@@ -81,13 +81,8 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
 
     _l0_l1_data_transformations = {}
 
-<<<<<<< HEAD
     def _l0_to_l1(self):
         stmt = CleanWorldBankTariff(
             self._l0_temp_table, self._l1_temp_table
         ).get_sql()
         self.dbi.execute_statement(stmt)
-=======
-    def _l0_to_l1(self, datafile_name):
-        pass
->>>>>>> L1 table definition
