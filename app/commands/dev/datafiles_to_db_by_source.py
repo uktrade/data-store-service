@@ -4,6 +4,7 @@ from flask.cli import with_appcontext
 
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
+from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
 from app.etl.manager import Manager as PipelineManager
 
 
@@ -18,6 +19,9 @@ arg_to_pipeline_config_list = {
     DITReferencePostcodesPipeline.data_source: [
         (DITReferencePostcodesPipeline, 'data_workspace/reference_postcodes')
     ],
+    WorldBankTariffPipeline.data_source: [
+        (WorldBankTariffPipeline, 'world_bank/tariff')
+    ]
 }
 
 
