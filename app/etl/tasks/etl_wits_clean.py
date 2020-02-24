@@ -30,6 +30,9 @@ class CleanWITSProduct:
                     {year} as year,
                      0 as assumed_tariff
                   from {self.db_model.get_fq_table_name()}
+             where tariff_year::int >= {year}
+             and product is not null
+             and partner != reporter
             """)
         return sql
 
@@ -143,7 +146,7 @@ class CleanWITSProduct:
         obj = ETLTask(
             sql, WITSCleanedData, drop_table=True
         )
-        obj()
+        return obj()
 
     def main(self):
-        self.transform_data()
+        return self.transform_data()
