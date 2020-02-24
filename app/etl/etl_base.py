@@ -41,7 +41,7 @@ class DataPipeline(metaclass=ABCMeta):
     @property
     def l1_helper_columns(self):
         return [
-            ('id', 'serial primary key'),   # primary key
+            ('id', 'serial primary key'),  # primary key
             ('data_source_row_id', 'int'),  # reference to L0 id column
         ]
 

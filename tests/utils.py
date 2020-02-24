@@ -71,9 +71,9 @@ def _table_to_rows(dbi, table, pipeline):
     rows = dbi.execute_query(query)
     # strip columns that are not required for validation
     if 'L0' in table:
-        rows = [r[len(pipeline.l0_helper_columns):] for r in rows]
+        rows = [r[len(pipeline.l0_helper_columns) :] for r in rows]
     elif 'L1' in table:
-        rows = [r[len(pipeline.l1_helper_columns):] for r in rows]
+        rows = [r[len(pipeline.l1_helper_columns) :] for r in rows]
 
     def _format(value):
         if isinstance(value, datetime.datetime):
