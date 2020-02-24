@@ -12,8 +12,36 @@ The backend is built in Python using the Flask framework. Authentication impleme
 3. `docker-compose up`
 4. Go to http://localhost:5050/healthcheck
 
+Running postgres in docker now requires a mandatory environment variable called POSTGRES_PASSWORD. This must be added to your .env file.
+
 ### Docker run tests
 1. `docker exec -it data_dss_web_1 make run_tests`
+
+### Running tests locally
+
+`make run_tests_local`
+
+### to run tests for a specific directory, do,
+
+`make run_tests_local TEST=<tests/test_directory>`
+
+### Running tests the same way as circle ci:
+
+`make run_tests`
+
+## Config
+
+### When using docker-compose
+Place environment variables in .env file.
+
+### When using host machine
+Config variables can be specified in a few ways and are loaded using the following order of priority:
+
+1. Look for variable in existing System environment variables
+2. If not found in step 1, look for variable in `.env` (this only works if USE_DOTENV is set to 1)
+3. If not found in step 2, look for variable in `local_testing.yml` (this only works if TESTING is set to 1)
+4. If not found in step 3, look for variable in `local.yml` (this only works if TESTING is set to 0)
+5. If not found in step 4, look for variable in `default.yml`
 
 
 ## Example dataset
