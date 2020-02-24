@@ -1,14 +1,14 @@
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_wits_tariff_data import WitsTariffDataPipeline
+from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
 from tests.utils import rows_equal_table
 
-file_1 = 'tests/fixtures/wits/Product0201.csv'
+file_1 = 'tests/fixtures/world_bank/tariff.csv'
 
 
-class TestWitsTariffDataPipeline:
+class TestWorldBankTariffPipeline:
     def test_one_datafile(self, app_with_db):
-        pipeline = WitsTariffDataPipeline(app_with_db.dbi)
+        pipeline = WorldBankTariffPipeline(app_with_db.dbi)
         fi = FileInfo.from_path(file_1)
         pipeline.process(fi)
         # check L0

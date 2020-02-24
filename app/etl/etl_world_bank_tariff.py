@@ -3,9 +3,9 @@ from io import BytesIO
 from app.etl.etl_incremental_data import IncrementalDataPipeline
 
 
-class WitsTariffDataPipeline(IncrementalDataPipeline):
+class WorldBankTariffPipeline(IncrementalDataPipeline):
     organisation = 'world_bank'
-    dataset = 'tariff_data'
+    dataset = 'tariff'
 
     _l0_data_column_types = [
         ('selected_nomen', 'text'),
