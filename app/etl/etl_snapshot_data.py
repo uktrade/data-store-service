@@ -7,7 +7,7 @@ class SnapshotDataPipeline(DataPipeline):
     """ Abstract class for standard pipelines that ingest data snapshots
 
     This class implements the abstract process method of a CleanDataPipeline as:
-        1) parse file_info object into L0.temp (_datafile_to_L0_temp)
+        1) parse file_info object into L0.temp (_datafile_to_l0_temp)
         2) update L0 data with L0.temp snapshot data (_l0_temp_to_l0)
         3) standardise L0 data and copy into L1 (_l0_to_l1)
         4) clean up L0.temp
@@ -20,6 +20,16 @@ class SnapshotDataPipeline(DataPipeline):
             snapshot file in which the record was present
         - L1 records are linked to L0 records by the data_source_row_id column
     """
+
+    @property
+    def l0_helper_columns(self):
+        return [
+            ('id', 'serial primary key'),  # primary key
+            ('datafile_created', 'text'),  # first snapshot containing record
+            ('datafile_updated', 'text'),  # last snapshot containing record
+            ('data_hash', 'text'),  # md5 hash of the data column values, used to determine
+            # the uniqueness of the record
+        ]
 
     @property
     def _l0_temp_table(self):
@@ -39,17 +49,7 @@ class SnapshotDataPipeline(DataPipeline):
 
     @property
     def _l0_column_types(self):
-        """ Include id (primary key), datafile_created (first snapshot containing record),
-            datafile_updated (last snapshot containing record) columns,
-            data_hash (md5 hash of the data column values, used to determine the
-            uniqueness of the record)
-        """
-        return [
-            ('id', 'serial primary key'),
-            ('datafile_created', 'text'),
-            ('datafile_updated', 'text'),
-            ('data_hash', 'text'),
-        ] + self._l0_data_column_types
+        return self.l0_helper_columns + self._l0_data_column_types
 
     @property
     @abstractmethod
@@ -61,11 +61,7 @@ class SnapshotDataPipeline(DataPipeline):
 
     @property
     def _l1_column_types(self):
-        """ Include id (primary key), data_source_row_id (reference to L0 id column) """
-        return [
-            ('id', 'serial primary key'),
-            ('data_source_row_id', 'int'),
-        ] + self._l1_data_column_types
+        return self.l1_helper_columns + self._l1_data_column_types
 
     def process(self, file_info, delete_previous=False):
         datafile_name = file_info.name.split('/')[-1]

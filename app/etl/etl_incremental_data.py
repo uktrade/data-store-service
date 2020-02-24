@@ -20,12 +20,19 @@ class IncrementalDataPipeline(DataPipeline):
     """
 
     @property
+    def l0_helper_columns(self):
+        return [
+            ('id', f"int primary key default nextval('{self._l0_sequence}')"),  # primary key
+            ('datafile_created', 'text'),  # datafile_created
+        ]
+
+    @property
     def _l0_temp_table(self):
         return self._fully_qualified(f'{self.L0_TABLE}.temp')
 
     @property
     def _l0_sequence(self):
-        return f'"{self._schema}"."{self.L0_TABLE}_SEQUENCE"'
+        return f'"{self.schema}"."{self.L0_TABLE}_SEQUENCE"'
 
     @property
     def _l1_temp_table(self):
@@ -33,7 +40,7 @@ class IncrementalDataPipeline(DataPipeline):
 
     @property
     def _l1_sequence(self):
-        return f'"{self._schema}"."{self.L1_TABLE}_SEQUENCE"'
+        return f'"{self.schema}"."{self.L1_TABLE}_SEQUENCE"'
 
     @property
     @abstractmethod
@@ -45,12 +52,7 @@ class IncrementalDataPipeline(DataPipeline):
 
     @property
     def _l0_column_types(self):
-        """ Include id (primary key), datafile_created
-        """
-        return [
-            ('id', f"int primary key default nextval('{self._l0_sequence}')"),
-            ('datafile_created', 'text'),
-        ] + self._l0_data_column_types
+        return self.l0_helper_columns + self._l0_data_column_types
 
     @property
     @abstractmethod
@@ -62,11 +64,7 @@ class IncrementalDataPipeline(DataPipeline):
 
     @property
     def _l1_column_types(self):
-        """ Include id (primary key), data_source_row_id (reference to L0 id column) """
-        return [
-            ('id', 'int primary key'),
-            ('data_source_row_id', 'int'),
-        ] + self._l1_data_column_types
+        return self.l1_helper_columns + self._l1_data_column_types
 
     def process(self, file_info=None):
         self._create_sequence(self._l0_sequence)

@@ -120,7 +120,7 @@ class TestONSPostcodeDirectoryPipeline:
                 'S99999999',
             ),
         ]
-        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l0_table)
+        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l0_table, pipeline)
 
         # check L1
         expected_rows = [
@@ -229,7 +229,7 @@ class TestONSPostcodeDirectoryPipeline:
                 'S99999999',
             ),
         ]
-        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table)
+        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table, pipeline)
 
     def test_same_data(self, app_with_db):
         pipeline = ONSPostcodeDirectoryPipeline(app_with_db.dbi)
@@ -346,7 +346,7 @@ class TestONSPostcodeDirectoryPipeline:
                 'S99999999',
             ),
         ]
-        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l0_table)
+        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l0_table, pipeline)
 
         # check L1
         expected_rows = [
@@ -455,7 +455,7 @@ class TestONSPostcodeDirectoryPipeline:
                 'S99999999',
             ),
         ]
-        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table)
+        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table, pipeline)
 
     def test_new_data(self, app_with_db):
         pipeline = ONSPostcodeDirectoryPipeline(app_with_db.dbi)
@@ -623,7 +623,7 @@ class TestONSPostcodeDirectoryPipeline:
                 'S99999999',
             ),
         ]
-        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l0_table)
+        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l0_table, pipeline)
 
         # check L1
         expected_rows = [
@@ -784,4 +784,4 @@ class TestONSPostcodeDirectoryPipeline:
                 'S99999999',
             ),
         ]
-        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table)
+        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table, pipeline)
