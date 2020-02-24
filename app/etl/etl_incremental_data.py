@@ -66,7 +66,7 @@ class IncrementalDataPipeline(DataPipeline):
     def _l1_column_types(self):
         return self.l1_helper_columns + self._l1_data_column_types
 
-    def process(self, file_info=None):
+    def create_tables(self):
         self._create_sequence(self._l0_sequence)
         self._create_sequence(self._l1_sequence)
 
@@ -75,6 +75,8 @@ class IncrementalDataPipeline(DataPipeline):
         self._create_table(self._l0_temp_table, self._l0_column_types, drop_existing=True)
         self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=True)
 
+    def process(self, file_info=None, drop_source=True):
+        self.create_tables()
         self._datafile_to_l0_temp(file_info)
         self._l0_to_l1()
 
