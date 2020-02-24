@@ -38,7 +38,7 @@ Place environment variables in .env file.
 Config variables can be specified in a few ways and are loaded using the following order of priority:
 
 1. Look for variable in existing System environment variables
-2. If not found in step 1, look for variable in `.env` (this only works if USE_DOTENV is set to 1)
+2. If not found in step 1, look for variable in `.env` (this only works if USE_DOTENV is set to 1, see .envs/sample.env for an example file)
 3. If not found in step 2, look for variable in `local_testing.yml` (this only works if TESTING is set to 1)
 4. If not found in step 3, look for variable in `local.yml` (this only works if TESTING is set to 0)
 5. If not found in step 4, look for variable in `default.yml`
