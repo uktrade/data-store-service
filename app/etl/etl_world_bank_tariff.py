@@ -53,7 +53,19 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
         ('specific_duty_imports_in_1000_usd', 'decimal'),
     ]
 
-    _l1_data_column_types = []
+    _l1_data_column_types = [
+        ('product', 'integer'),
+        ('reporter', 'integer'),
+        ('partner', 'integer'),
+        ('year', 'integer'),
+        ('assumed_tariff', 'decimal'),
+        ('app_rate', 'decimal'),
+        ('mfn_rate', 'decimal'),
+        ('prf_rate', 'decimal'),
+        ('bnd_rate', 'decimal'),
+        ('country_average', 'decimal'),
+        ('world_average', 'decimal')
+    ]
 
     def _datafile_to_l0_temp(self, file_info):
         csv_data_no_empty_quotes = BytesIO(file_info.data.read().replace(b'""', b''))
@@ -67,3 +79,6 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
         )
 
     _l0_l1_data_transformations = {}
+
+    def _l0_to_l1(self, datafile_name):
+        pass
