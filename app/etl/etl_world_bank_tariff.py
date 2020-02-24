@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from app.etl.etl_incremental_data import IncrementalDataPipeline
+from app.etl.transforms.world_bank_tariff import CleanWorldBankTariff
 
 
 class WorldBankTariffPipeline(IncrementalDataPipeline):
@@ -59,10 +60,10 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
         ('partner', 'integer'),
         ('year', 'integer'),
         ('assumed_tariff', 'decimal'),
-        ('app_rate', 'decimal'),
-        ('mfn_rate', 'decimal'),
-        ('prf_rate', 'decimal'),
-        ('bnd_rate', 'decimal'),
+        ('app_rate', 'text'),
+        ('mfn_rate', 'text'),
+        ('prf_rate', 'text'),
+        ('bnd_rate', 'text'),
         ('country_average', 'decimal'),
         ('world_average', 'decimal')
     ]
@@ -80,5 +81,8 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
 
     _l0_l1_data_transformations = {}
 
-    def _l0_to_l1(self, datafile_name):
-        pass
+    def _l0_to_l1(self):
+        stmt = CleanWorldBankTariff(
+            self._l0_temp_table, self._l1_temp_table
+        ).get_sql()
+        self.dbi.execute_statement(stmt)

@@ -1,23 +1,11 @@
-from app.etl.tasks import ETLTask
-
-from app.db.models.external import (
-    Product0201,
-    Product040110,
-    WITSCleanedData,
-)
-
-HS_MODEL_MAPPING = {
-    '0201': Product0201,
-    '040110': Product040110
-}
 
 
-class CleanWITSProduct:
+class CleanWorldBankTariff:
 
-    def __init__(self, hs_code):
+    def __init__(self, l0_db_model, l1_db_model):
         self.years = [i for i in range(2013, 2019)]
-        self.hs_code = hs_code
-        self.db_model = HS_MODEL_MAPPING[hs_code]
+        self.l0_db_model = l0_db_model
+        self.l1_db_model = l1_db_model
 
     def year_fill(self):
         sql = []
@@ -29,7 +17,7 @@ class CleanWITSProduct:
                     reporter,
                     {year} as year,
                      0 as assumed_tariff
-                  from {self.db_model.get_fq_table_name()}
+                  from {self.l0_db_model}
              where tariff_year::int >= {year}
              and product is not null
              and partner != reporter
@@ -61,13 +49,13 @@ class CleanWITSProduct:
                  when mfn.simple_average is not null then mfn.simple_average::text else 'NA'::text
                end as mfn_rate
               from {query_from} p 
-            left join {self.db_model.get_fq_table_name()} bnd on p.partner = bnd.partner and 
+            left join {self.l0_db_model} bnd on p.partner = bnd.partner and 
                  p.reporter = bnd.reporter and bnd.duty_type = 'BND' and p.year::text = bnd.tariff_year::text
-            left join {self.db_model.get_fq_table_name()} prf on p.partner = prf.partner and 
+            left join {self.l0_db_model} prf on p.partner = prf.partner and 
                 p.reporter = prf.reporter and prf.duty_type = 'PRF' and p.year::text = prf.tariff_year::text
-            left join {self.db_model.get_fq_table_name()} mfn on p.partner = mfn.partner and 
+            left join {self.l0_db_model} mfn on p.partner = mfn.partner and 
                 p.reporter = mfn.reporter and mfn.duty_type = 'MFN' and p.year::text = mfn.tariff_year::text
-            left join {self.db_model.get_fq_table_name()} ash on p.partner = ash.partner and 
+            left join {self.l0_db_model} ash on p.partner = ash.partner and 
                 p.reporter = ash.reporter and ash.duty_type = 'AHS' and p.year::text = ash.tariff_year::text
         )
         """
@@ -103,7 +91,7 @@ class CleanWITSProduct:
 
     def insert_data_to_L1(self, query_from):
         return f"""
-        insert into {WITSCleanedData.get_fq_table_name()} (
+        insert into {self.l1_db_model} (
             product,
             reporter,
             partner,
@@ -129,7 +117,7 @@ class CleanWITSProduct:
         from {query_from}
         """
 
-    def transform_data(self):
+    def get_sql(self):
         initial_query_name = 'base_product'
         country_average_table_name = 'country_average'
         intermediate_table_name = 'products_with_rate_averages'
@@ -143,10 +131,4 @@ class CleanWITSProduct:
         {self.insert_data_to_L1(final_table)}
 
         """
-        obj = ETLTask(
-            sql, WITSCleanedData, drop_table=True
-        )
-        return obj()
-
-    def main(self):
-        return self.transform_data()
+        return sql
