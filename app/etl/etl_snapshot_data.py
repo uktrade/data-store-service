@@ -27,8 +27,8 @@ class SnapshotDataPipeline(DataPipeline):
             ('id', 'serial primary key'),  # primary key
             ('datafile_created', 'text'),  # first snapshot containing record
             ('datafile_updated', 'text'),  # last snapshot containing record
-            ('data_hash', 'text'),         # md5 hash of the data column values, used to determine the
-                                        # uniqueness of the record
+            ('data_hash', 'text'),         # md5 hash of the data column values, used to determine
+                                           # the uniqueness of the record
         ]
 
     @property

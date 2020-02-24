@@ -60,7 +60,7 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
         self.dbi.dsv_buffer_to_table(
             csv_buffer=csv_data_no_empty_quotes,
             fq_table_name=self._l0_temp_table,
-            columns=[c for c,_ in self._l0_data_column_types],
+            columns=[c for c, _ in self._l0_data_column_types],
             has_header=True,
             sep=',',
             quote='"',
