@@ -107,7 +107,7 @@ class WorldBankTariffL1(BaseModel):
     """
     World bank tariff data
     """
-    __tablename__ = 'L1_a'
+    __tablename__ = 'L1'
     __table_args__ = {'schema': WorldBankTariffPipeline.schema}
 
     id = _col('id', _int, primary_key=True, autoincrement=True)
