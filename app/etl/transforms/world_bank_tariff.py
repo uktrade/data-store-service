@@ -1,9 +1,8 @@
 
-
 class CleanWorldBankTariff:
 
-    def __init__(self, l0_db_model, l1_db_model):
-        self.years = [i for i in range(2013, 2019)]
+    def __init__(self, l0_db_model, l1_db_model, start_year=1998, end_year=2019):
+        self.years = [i for i in range(start_year, end_year)]
         self.l0_db_model = l0_db_model
         self.l1_db_model = l1_db_model
 
@@ -11,22 +10,30 @@ class CleanWorldBankTariff:
         sql = []
         for year in self.years:
             sql .append(f"""
-            select distinct
+            select max(tariff_year) as max_tariff,
                     product,
                     partner,
                     reporter,
-                    {year} as year,
-                     0 as assumed_tariff
-                  from {self.l0_db_model} a
+                    {year} as year
+                  from {self.l0_db_model}
              where product is not null
              and partner != reporter
-            """)
+             group by product, partner, reporter, year
+             """)
         return sql
 
     def get_partner_reporter_combinations_for_each_year(self, query_name):
         return f"""
-        {query_name} as (
+        temp_year_table as (
              {'UNION ALL'.join(self.year_fill())}
+        ),
+        
+        {query_name} as (
+        select *,
+        0 as country_average,
+        0 as world_average
+        from temp_year_table 
+        where year >= max_tariff
         )
         """
 
