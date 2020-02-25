@@ -18,9 +18,7 @@ class CleanWorldBankTariff:
                     {year} as year,
                      0 as assumed_tariff
                   from {self.l0_db_model} a
-             where (select max(tariff_year) from {self.l0_db_model} q where 
-            q.reporter = a.reporter and q.partner = a.partner) <= {year}
-             and product is not null
+             where product is not null
              and partner != reporter
             """)
         return sql
