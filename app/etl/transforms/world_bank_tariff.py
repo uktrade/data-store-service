@@ -30,8 +30,7 @@ class CleanWorldBankTariff:
         
         {query_name} as (
         select *,
-        0 as country_average,
-        0 as world_average
+        0 as assumed_tariff
         from temp_year_table 
         where year >= max_tariff
         )
