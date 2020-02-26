@@ -8,7 +8,7 @@ file_1 = 'tests/fixtures/world_bank/tariff.csv'
 
 class TestWorldBankTariffPipeline:
     def test_one_datafile(self, app_with_db):
-        pipeline = WorldBankTariffPipeline(app_with_db.dbi)
+        pipeline = WorldBankTariffPipeline(app_with_db.dbi, False)
         fi = FileInfo.from_path(file_1)
         pipeline.process(fi)
         # check L0
