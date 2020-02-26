@@ -24,6 +24,7 @@ arg_to_pipeline_config_list = {
 @click.command('datafiles_to_db_by_source')
 @with_appcontext
 @click.option('--all', is_flag=True, help='ingest datafile into the DB')
+@click.option('--force', is_flag=True, help='Force pipeline')
 def datafiles_to_db_by_source(**kwargs):
     """
     Populate tables with source files
@@ -33,7 +34,9 @@ def datafiles_to_db_by_source(**kwargs):
         arg = arg.replace(".", "__")
         if kwargs['all'] or kwargs[arg]:
             for pipeline, sub_dir in pipeline_info_list:
-                manager.pipeline_register(pipeline=pipeline, sub_directory=sub_dir)
+                manager.pipeline_register(
+                    pipeline=pipeline, sub_directory=sub_dir, force=kwargs['force']
+                )
     manager.pipeline_process_all()
 
 

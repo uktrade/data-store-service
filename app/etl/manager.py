@@ -9,7 +9,7 @@ from tqdm import tqdm
 from app.constants import DatafileState
 from app.db.models.internal import DatafileRegistryModel
 
-PipelineConfig = namedtuple('PipelineConfig', 'pipeline sub_directory')
+PipelineConfig = namedtuple('PipelineConfig', 'pipeline sub_directory force')
 
 
 class Manager:
@@ -55,7 +55,10 @@ class Manager:
             pipeline_id
         )
         for file_name in dfp.get_file_names():
-            if file_name in processed_and_ignored_files[pipeline_id]:
+            if (
+                file_name in processed_and_ignored_files[pipeline_id]
+                and pipeline_config.force is False
+            ):
                 continue
             if progress_bar:
                 progress_bar.set_postfix(str=file_name)
@@ -88,7 +91,7 @@ class Manager:
             progress.set_description(pipeline_id)
             self.pipeline_process(pipeline_id, progress_bar=progress)
 
-    def pipeline_register(self, pipeline, sub_directory=None, pipeline_id=None):
+    def pipeline_register(self, pipeline, sub_directory=None, pipeline_id=None, force=False):
         """ Register a clean pipeline for the manager to use
 
         Args:
@@ -106,14 +109,14 @@ class Manager:
         Returns:
             None
         """
-        po = pipeline(dbi=self.dbi) if inspect.isclass(pipeline) else pipeline
+        po = pipeline(dbi=self.dbi, force=force) if inspect.isclass(pipeline) else pipeline
 
         pipeline_id = pipeline_id or po.id
         if pipeline_id in self._pipelines:
             raise ValueError(f'{po.id} pipeline is already registered')
         if sub_directory is None:
             sub_directory = f'{po.organisation}/{po.dataset}'
-        self._pipelines[pipeline_id] = PipelineConfig(po, sub_directory)
+        self._pipelines[pipeline_id] = PipelineConfig(po, sub_directory, force)
 
     def pipeline_remove(self, pipeline):
         """ Remove this pipeline.

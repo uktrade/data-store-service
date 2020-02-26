@@ -45,8 +45,9 @@ class DataPipeline(metaclass=ABCMeta):
             ('data_source_row_id', 'int'),  # reference to L0 id column
         ]
 
-    def __init__(self, dbi):
+    def __init__(self, dbi, force):
         self.dbi = dbi
+        self.force = force
         if not dbi:
             flask_app.logger.error(
                 f'warning: dbi ({dbi}) is not valid; '

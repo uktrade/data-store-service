@@ -70,8 +70,8 @@ class IncrementalDataPipeline(DataPipeline):
         self._create_sequence(self._l0_sequence)
         self._create_sequence(self._l1_sequence)
 
-        self._create_table(self._l0_table, self._l0_column_types)
-        self._create_table(self._l1_table, self._l1_column_types)
+        self._create_table(self._l0_table, self._l0_column_types, drop_existing=self.force)
+        self._create_table(self._l1_table, self._l1_column_types, drop_existing=self.force)
         self._create_table(self._l0_temp_table, self._l0_column_types, drop_existing=True)
         self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=True)
 
