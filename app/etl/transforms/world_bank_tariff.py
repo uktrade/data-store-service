@@ -27,12 +27,13 @@ class CleanWorldBankTariff:
         temp_year_table as (
              {'UNION ALL'.join(self.year_fill())}
         ),
-        
+
         {query_name} as (
-        select *,
-        0 as assumed_tariff
-        from temp_year_table 
-        where year >= max_tariff
+        select
+           *,
+           0 as assumed_tariff
+        from temp_year_table
+           where year >= max_tariff
         )
         """
 
@@ -41,27 +42,31 @@ class CleanWorldBankTariff:
         {query_name} as (
             select distinct
                p.*,
-               case 
+               case
                  when bnd.simple_average is not null then bnd.simple_average::text else 'NA'::text
                end as bnd_rate,
-               case 
+               case
                  when prf.simple_average is not null then prf.simple_average::text else 'NA'::text
                end as prf_rate,
-               case 
+               case
                  when ash.simple_average is not null then ash.simple_average::text else 'NA'::text
                end as app_rate,
-               case 
+               case
                  when mfn.simple_average is not null then mfn.simple_average::text else 'NA'::text
                end as mfn_rate
-              from {query_from} p 
-            left join {self.l0_db_model} bnd on p.partner = bnd.partner and 
-                 p.reporter = bnd.reporter and bnd.duty_type = 'BND' and p.year::text = bnd.tariff_year::text
-            left join {self.l0_db_model} prf on p.partner = prf.partner and 
-                p.reporter = prf.reporter and prf.duty_type = 'PRF' and p.year::text = prf.tariff_year::text
-            left join {self.l0_db_model} mfn on p.partner = mfn.partner and 
-                p.reporter = mfn.reporter and mfn.duty_type = 'MFN' and p.year::text = mfn.tariff_year::text
-            left join {self.l0_db_model} ash on p.partner = ash.partner and 
-                p.reporter = ash.reporter and ash.duty_type = 'AHS' and p.year::text = ash.tariff_year::text
+            from {query_from} p
+            left join {self.l0_db_model} bnd on p.partner = bnd.partner and
+                 p.reporter = bnd.reporter and bnd.duty_type = 'BND'
+                 and p.year::text = bnd.tariff_year::text
+            left join {self.l0_db_model} prf on p.partner = prf.partner and
+                p.reporter = prf.reporter and prf.duty_type = 'PRF'
+                and p.year::text = prf.tariff_year::text
+            left join {self.l0_db_model} mfn on p.partner = mfn.partner and
+                p.reporter = mfn.reporter and mfn.duty_type = 'MFN'
+                and p.year::text = mfn.tariff_year::text
+            left join {self.l0_db_model} ash on p.partner = ash.partner and
+                p.reporter = ash.reporter and ash.duty_type = 'AHS'
+                and p.year::text = ash.tariff_year::text
         )
         """
 
@@ -69,14 +74,11 @@ class CleanWorldBankTariff:
         return f"""
         {query_name} as (
             select
-            p.reporter,
-            AVG (p.app_rate::float) as country_average
+               p.reporter,
+               AVG (p.app_rate::float) as country_average
             from {query_from} p
-            where
-            p.app_rate != 'NA'
-            group
-            by
-            p.reporter
+               where p.app_rate != 'NA'
+            group by p.reporter
         )
         """
 
@@ -84,13 +86,12 @@ class CleanWorldBankTariff:
         return f"""
         {query_name} as (
             select
-            p.*,
-            s.country_average as country_average,
-            (select AVG(app_rate::float) from {query_from} where app_rate != 'NA') 
-            as world_average
+               p.*,
+               s.country_average as country_average,
+               (select AVG(app_rate::float) from {query_from} where app_rate != 'NA')
+               as world_average
             from {query_from} p
-            left join country_average s
-            on s.reporter = p.reporter
+            left join country_average s on s.reporter = p.reporter
         )
         """
 
@@ -118,7 +119,7 @@ class CleanWorldBankTariff:
             prf_rate,
             bnd_rate,
             country_average,
-            world_average 
+            world_average
         from {query_from}
         """
 
