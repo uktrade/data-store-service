@@ -1,6 +1,4 @@
-
 class CleanWorldBankTariff:
-
     def __init__(self, l0_db_model, l1_db_model, start_year=1998, end_year=2019):
         self.years = [i for i in range(start_year, end_year)]
         self.l0_db_model = l0_db_model
@@ -9,7 +7,8 @@ class CleanWorldBankTariff:
     def year_fill(self):
         sql = []
         for year in self.years:
-            sql .append(f"""
+            sql.append(
+                f"""
             select max(tariff_year) as max_tariff,
                     product,
                     partner,
@@ -19,7 +18,8 @@ class CleanWorldBankTariff:
              where product is not null
              and partner != reporter
              group by product, partner, reporter, year
-             """)
+             """
+            )
         return sql
 
     def get_partner_reporter_combinations_for_each_year(self, query_name):

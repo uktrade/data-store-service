@@ -65,7 +65,7 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
         ('prf_rate', 'text'),
         ('bnd_rate', 'text'),
         ('country_average', 'decimal'),
-        ('world_average', 'decimal')
+        ('world_average', 'decimal'),
     ]
 
     def _datafile_to_l0_temp(self, file_info):
@@ -82,7 +82,5 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
     _l0_l1_data_transformations = {}
 
     def _l0_to_l1(self):
-        stmt = CleanWorldBankTariff(
-            self._l0_temp_table, self._l1_temp_table
-        ).get_sql()
+        stmt = CleanWorldBankTariff(self._l0_temp_table, self._l1_temp_table).get_sql()
         self.dbi.execute_statement(stmt)

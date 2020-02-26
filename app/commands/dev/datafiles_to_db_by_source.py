@@ -19,9 +19,7 @@ arg_to_pipeline_config_list = {
     DITReferencePostcodesPipeline.data_source: [
         (DITReferencePostcodesPipeline, 'data_workspace/reference_postcodes')
     ],
-    WorldBankTariffPipeline.data_source: [
-        (WorldBankTariffPipeline, 'world_bank/tariff')
-    ]
+    WorldBankTariffPipeline.data_source: [(WorldBankTariffPipeline, 'world_bank/tariff')],
 }
 
 
