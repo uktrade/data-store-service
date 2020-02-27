@@ -1,3 +1,5 @@
+import pytest
+
 from unittest import mock
 
 from datatools.io.fileinfo import FileInfo
@@ -7,7 +9,7 @@ from app.etl.transforms.world_bank_tariff import CleanWorldBankTariff
 from tests.utils import rows_equal_table
 
 file_1 = 'tests/fixtures/world_bank/tariff.csv'
-simple_eu_to_eu_file = 'tests/fixtures/world_bank/simple_eu_to_eu.csv'
+eu_country_to_eu_country_file = 'tests/fixtures/world_bank/eu_country_to_eu_country.csv'
 
 
 class TestWorldBankTariffTransform:
@@ -141,18 +143,24 @@ class TestWorldBankTariffPipeline:
             app_with_db.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1
         )
 
+    @pytest.mark.parametrize(
+        'file_name,years,expected_rows',
+        (
+            (
+                eu_country_to_eu_country_file,
+                [2014],
+                [(201, 705, 381, 2014, '76.51', '76.51', '76.53', '76.54', 'NA', 76.51, 76.51)],
+                # Italy has incorrect id 380 in product file and has to be fixed by the
+                # cleaning process and updated to 381
+            ),
+        ),
+    )
     @mock.patch("app.etl.transforms.world_bank_tariff.CleanWorldBankTariff.get_years")
-    def test_transform_with_simple_eu_country_to_eu_country_datafile(
-        self, mock_get_years, app_with_db
+    def test_transform_of_datafile(
+        self, mock_get_years, app_with_db, file_name, years, expected_rows
     ):
-        mock_get_years.return_value = [2014]
+        mock_get_years.return_value = years
         pipeline = WorldBankTariffPipeline(app_with_db.dbi, True)
-        fi = FileInfo.from_path(simple_eu_to_eu_file)
+        fi = FileInfo.from_path(eu_country_to_eu_country_file)
         pipeline.process(fi)
-
-        expected_rows = [
-            (201, 705, 381, 2014, '76.51', '76.51', '76.53', '76.54', 'NA', 76.51, 76.51)
-        ]
-        # Italy has incorrect id 380 in product file and has to be fixed by the cleaning process
-        # and updated to 381
         assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table, pipeline)
