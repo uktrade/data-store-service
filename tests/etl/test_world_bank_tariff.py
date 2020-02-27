@@ -8,8 +8,11 @@ from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
 from app.etl.transforms.world_bank_tariff import CleanWorldBankTariff
 from tests.utils import rows_equal_table
 
-file_1 = 'tests/fixtures/world_bank/tariff.csv'
-eu_country_to_eu_country_file = 'tests/fixtures/world_bank/eu_country_to_eu_country.csv'
+fixture_path = 'tests/fixtures/world_bank'
+
+file_1 = f'{fixture_path}/tariff.csv'
+eu_country_to_eu_country_file = f'{fixture_path}/eu_country_to_eu_country.csv'
+eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
 
 
 class TestWorldBankTariffTransform:
@@ -153,6 +156,12 @@ class TestWorldBankTariffPipeline:
                 # Italy has incorrect id 380 in product file and has to be fixed by the
                 # cleaning process and updated to 381
             ),
+            (
+                eu_to_country_file,
+                [2014],
+                [(201, 918, 36, 2014, '81.96', '81.96', '81.96', '81.96', '83.03', 81.96, 81.96)],
+                # When the reporter is EU it remains EU
+            ),
         ),
     )
     @mock.patch("app.etl.transforms.world_bank_tariff.CleanWorldBankTariff.get_years")
@@ -161,6 +170,6 @@ class TestWorldBankTariffPipeline:
     ):
         mock_get_years.return_value = years
         pipeline = WorldBankTariffPipeline(app_with_db.dbi, True)
-        fi = FileInfo.from_path(eu_country_to_eu_country_file)
+        fi = FileInfo.from_path(file_name)
         pipeline.process(fi)
         assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table, pipeline)
