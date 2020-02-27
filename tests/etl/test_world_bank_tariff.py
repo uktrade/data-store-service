@@ -1,3 +1,5 @@
+from unittest import mock
+
 from datatools.io.fileinfo import FileInfo
 
 from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
@@ -5,6 +7,7 @@ from app.etl.transforms.world_bank_tariff import CleanWorldBankTariff
 from tests.utils import rows_equal_table
 
 file_1 = 'tests/fixtures/world_bank/tariff.csv'
+simple_eu_to_eu_file = 'tests/fixtures/world_bank/simple_eu_to_eu.csv'
 
 
 class TestWorldBankTariffTransform:
@@ -60,15 +63,15 @@ class TestWorldBankTariffTransform:
             (3, 2, 2018),
         ]
 
-    def test_get_rate_averages(self, app_with_db):
+    @mock.patch("app.etl.transforms.world_bank_tariff.CleanWorldBankTariff.get_years")
+    def test_get_rate_averages(self, mock_get_years, app_with_db):
+        mock_get_years.return_value = [2016]
         pipeline = WorldBankTariffPipeline(app_with_db.dbi, False)
         pipeline.dbi.append_table(pipeline._l0_temp_table, pipeline._l0_table, drop_source=True)
         pipeline.create_tables()
         self.add_rows(app_with_db, pipeline)
 
-        clean_bank = CleanWorldBankTariff(
-            pipeline._l0_temp_table, pipeline._l1_temp_table, end_year=2017
-        )
+        clean_bank = CleanWorldBankTariff(pipeline._l0_temp_table, pipeline._l1_temp_table)
 
         year_sql = clean_bank.get_partner_reporter_combinations_for_each_year('table_1')
         sql = clean_bank.get_rate_averages('table_2', 'table_1')
@@ -82,7 +85,7 @@ class TestWorldBankTariffTransform:
 
 class TestWorldBankTariffPipeline:
     def test_one_datafile(self, app_with_db):
-        pipeline = WorldBankTariffPipeline(app_with_db.dbi, False)
+        pipeline = WorldBankTariffPipeline(app_with_db.dbi, True)
         fi = FileInfo.from_path(file_1)
         pipeline.process(fi)
         # check L0
@@ -137,3 +140,19 @@ class TestWorldBankTariffPipeline:
         assert rows_equal_table(
             app_with_db.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1
         )
+
+    @mock.patch("app.etl.transforms.world_bank_tariff.CleanWorldBankTariff.get_years")
+    def test_transform_with_simple_eu_country_to_eu_country_datafile(
+        self, mock_get_years, app_with_db
+    ):
+        mock_get_years.return_value = [2014]
+        pipeline = WorldBankTariffPipeline(app_with_db.dbi, True)
+        fi = FileInfo.from_path(simple_eu_to_eu_file)
+        pipeline.process(fi)
+
+        expected_rows = [
+            (201, 705, 381, 2014, '76.51', '76.51', '76.53', '76.54', 'NA', 76.51, 76.51)
+        ]
+        # Italy has incorrect id 380 in product file and has to be fixed by the cleaning process
+        # and updated to 381
+        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table, pipeline)

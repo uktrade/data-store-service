@@ -38,7 +38,10 @@ def rows_equal_table(dbi, expected_rows, table, pipeline, order_matters=False, t
         print(f'Number of rows are not equal: {len(expected_rows)} expected, db has {len(db_rows)}')
         return False
 
-    return expected_rows == db_rows
+    result = expected_rows == db_rows
+    if not result:
+        print(f'Rows do not match:\nEXPECTED: {list(expected_rows)}\nACT   DB: {list(db_rows)}')
+    return result
 
 
 def _query_result_to_rows(dbi, query):
