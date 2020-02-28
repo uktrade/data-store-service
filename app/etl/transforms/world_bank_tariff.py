@@ -1,8 +1,14 @@
 class CleanWorldBankTariff:
-    def __init__(self, l0_db_model, l1_db_model, start_year=1998, end_year=2019):
-        self.years = [i for i in range(start_year, end_year)]
+    START_YEAR = 1998
+    END_YEAR = 2019
+
+    def __init__(self, l0_db_model, l1_db_model):
+        self.years = self.get_years()
         self.l0_db_model = l0_db_model
         self.l1_db_model = l1_db_model
+
+    def get_years(self):
+        return [i for i in range(self.START_YEAR, self.END_YEAR)]
 
     def year_fill(self):
         sql = []
