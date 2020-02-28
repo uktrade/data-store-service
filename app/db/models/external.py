@@ -1,12 +1,14 @@
 from app.db.models import (
     _col,
     _date,
+    _float,
     _int,
     _text,
     BaseModel,
 )
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
+from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
 
 
 class ONSPostcodeDirectoryL1(BaseModel):
@@ -99,3 +101,26 @@ class DITReferencePostcodesL1(BaseModel):
     national_grid_ref_northing = _col(_text)
     date_of_introduction = _col(_date)
     date_of_termination = _col(_date)
+
+
+class WorldBankTariffL1(BaseModel):
+    """
+    World bank tariff data
+    """
+
+    __tablename__ = 'L1'
+    __table_args__ = {'schema': WorldBankTariffPipeline.schema}
+
+    id = _col('id', _int, primary_key=True, autoincrement=True)
+    data_source_row_id = _col(_int, unique=True)
+    product = _col(_int)
+    reporter = _col(_int)
+    partner = _col(_int)
+    year = _col(_int)
+    assumed_tariff = _col(_float)
+    app_rate = _col(_text)
+    mfn_rate = _col(_text)
+    prf_rate = _col(_text)
+    bnd_rate = _col(_text)
+    country_average = _col(_float)
+    world_average = _col(_float)
