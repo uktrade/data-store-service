@@ -10,6 +10,7 @@ file_1 = f'{fixture_path}/tariff.csv'
 eu_country_to_eu_country_file = f'{fixture_path}/eu_country_to_eu_country.csv'
 eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
 country_to_world_file = f'{fixture_path}/country_to_world.csv'
+countries_expanding_file = f'{fixture_path}/countries_expanding.csv'
 
 comtrade_countries = [
     {'id': 1, 'cty_code': 0, 'cty_name_english': 'World', 'iso3_digit_alp': 'WLD'},
@@ -122,9 +123,9 @@ class TestWorldBankTariffPipeline:
                 country_to_world_file,
                 [2018],
                 [
-                    (201, 12, 76,  2018, '21', '21', 'NA', 'NA', 'NA', 21, 15.5),
+                    (201, 12, 76, 2018, '21', '21', 'NA', 'NA', 'NA', 21, 15.5),
                     (201, 12, 710, 2018, '21', 'NA', 'NA', 'NA', 'NA', 21, 15.5),
-                    (201, 24, 76,  2018, '10', 'NA', 'NA', 'NA', 'NA', 10, 15.5),
+                    (201, 24, 76, 2018, '10', 'NA', 'NA', 'NA', 'NA', 10, 15.5),
                     (201, 24, 710, 2018, '10', '10', 'NA', 'NA', 'NA', 10, 15.5)
                 ]
                 # Algeria (12) has a tariff specified with World & Brazil (76)
@@ -132,7 +133,26 @@ class TestWorldBankTariffPipeline:
                 # Result:
                 # Algeria has a tariff for both Brazil & South Africa
                 # Angola has a tariff for both Brazil & South Africa
-            )
+            ),
+            (
+                countries_expanding_file,
+                [2018],
+                [
+                    (201, 12, 76, 2018, '21', '21', 'NA', 'NA', 'NA', 21, 16.3333333333333),
+                    (201, 12, 372, 2018, '21', 'NA', 'NA', 'NA', 'NA', 21, 16.3333333333333),
+                    (201, 12, 710, 2018, '21', 'NA', 'NA', 'NA', 'NA', 21, 16.3333333333333),
+                    (201, 24, 76, 2018, '10', 'NA', 'NA', 'NA', 'NA', 10, 16.3333333333333),
+                    (201, 24, 372, 2018, '10', 'NA', 'NA', 'NA', 'NA', 10, 16.3333333333333),
+                    (201, 24, 710, 2018, '10', '10', 'NA', 'NA', 'NA', 10, 16.3333333333333),
+                    (201, 704, 76, 2018, '18', 'NA', 'NA', 'NA', 'NA', 18, 16.3333333333333),
+                    (201, 704, 372, 2018, '18', '18', 'NA', '9', 'NA', 18, 16.3333333333333),
+                    (201, 704, 710, 2018, '18', 'NA', 'NA', 'NA', 'NA', 18, 16.3333333333333),
+                ]
+                # Same as country_to_world file with World entries removed and a
+                # tariff between Vietnam (704) to Ireland (372) and a PRF rate
+                # added, different world average
+            ),
+
         ),
     )
     def test_transform_of_datafile(self, file_name, years, expected_rows):
