@@ -11,6 +11,7 @@ eu_country_to_eu_country_file = f'{fixture_path}/eu_country_to_eu_country.csv'
 eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
 country_to_world_file = f'{fixture_path}/country_to_world.csv'
 countries_expanding_file = f'{fixture_path}/countries_expanding.csv'
+country_to_country_two_years = f'{fixture_path}/country_to_country_two_years.csv'
 
 comtrade_countries = [
     {'id': 1, 'cty_code': 0, 'cty_name_english': 'World', 'iso3_digit_alp': 'WLD'},
@@ -135,6 +136,20 @@ class TestWorldBankTariffPipeline:
                 # Angola has a tariff for both Brazil & South Africa
             ),
             (
+                country_to_country_two_years,
+                [2017, 2018],
+                [
+                    (201, 12, 76, 2017, '21', 'NA', 'NA', 'NA', 'NA', 21, 15.5),
+                    (201, 12, 76, 2018, '21', '21', 'NA', 'NA', 'NA', 21, 15.5),
+                    (201, 12, 710, 2017, '21', 'NA', 'NA', 'NA', 'NA', 21, 15.5),
+                    (201, 12, 710, 2018, '21', 'NA', 'NA', 'NA', 'NA', 21, 15.5),
+                    (201, 24, 76, 2017, '10', 'NA', 'NA', 'NA', 'NA', 10, 15.5),
+                    (201, 24, 76, 2018, '10', 'NA', 'NA', 'NA', 'NA', 10, 15.5),
+                    (201, 24, 710, 2017, '10', '10', 'NA', 'NA', 'NA', 10, 15.5),
+                    (201, 24, 710, 2018, '10', 'NA', 'NA', 'NA', 'NA', 10, 15.5),
+                ]
+            ),
+            (
                 countries_expanding_file,
                 [2018],
                 [
@@ -152,6 +167,7 @@ class TestWorldBankTariffPipeline:
                 # tariff between Vietnam (704) to Ireland (372) and a PRF rate
                 # added, different world average
             ),
+
 
         ),
     )
