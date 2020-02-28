@@ -82,7 +82,7 @@ def _create_base_app():
 
 
 def _register_components(flask_app):
-    from app.api.views import api
+    from app.api.views import api, dit_reference_postcodes, ons_postcodes, world_bank_tariffs
 
     # Postgres DB
     from app.db import sql_alchemy
@@ -94,6 +94,9 @@ def _register_components(flask_app):
 
     # API
     flask_app.register_blueprint(api)
+    flask_app.register_blueprint(dit_reference_postcodes.api)
+    flask_app.register_blueprint(ons_postcodes.api)
+    flask_app.register_blueprint(world_bank_tariffs.api)
 
     # Cache
     redis_uri = _get_redis_url(flask_app)
