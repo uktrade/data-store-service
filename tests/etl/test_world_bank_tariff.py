@@ -9,6 +9,7 @@ fixture_path = 'tests/fixtures/world_bank'
 file_1 = f'{fixture_path}/tariff.csv'
 eu_country_to_eu_country_file = f'{fixture_path}/eu_country_to_eu_country.csv'
 eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
+country_to_world_file = f'{fixture_path}/country_to_world.csv'
 
 comtrade_countries = [
     {'id': 1, 'cty_code': 0, 'cty_name_english': 'World', 'iso3_digit_alp': 'WLD'},
@@ -117,6 +118,21 @@ class TestWorldBankTariffPipeline:
                 [(201, 918, 36, 2014, 81.96, 81.96, 81.96, 81.96, 83.03, 81.96, 81.96)],
                 # When the reporter is EU it remains EU
             ),
+            (
+                country_to_world_file,
+                [2018],
+                [
+                    (201, 12, 76,  2018, '21', '21', 'NA', 'NA', 'NA', 21, 15.5),
+                    (201, 12, 710, 2018, '21', 'NA', 'NA', 'NA', 'NA', 21, 15.5),
+                    (201, 24, 76,  2018, '10', 'NA', 'NA', 'NA', 'NA', 10, 15.5),
+                    (201, 24, 710, 2018, '10', '10', 'NA', 'NA', 'NA', 10, 15.5)
+                ]
+                # Algeria (12) has a tariff specified with World & Brazil (76)
+                # Angola (24) has a tariff specified with World & South Africa (710)
+                # Result:
+                # Algeria has a tariff for both Brazil & South Africa
+                # Angola has a tariff for both Brazil & South Africa
+            )
         ),
     )
     def test_transform_of_datafile(self, file_name, years, expected_rows):
