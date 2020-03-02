@@ -1,4 +1,4 @@
-"Selected Nomen","Native Nomen","Reporter","Reporter Name","Product","Product Name","Partner","Partner Name","Tariff Year","Trade Year","Trade Source","DutyType","Simple Average","Weighted Average","Standard Deviation","Minimum Rate","Maximum Rate","Nbr of Total Lines","Nbr of DomesticPeaks","Nbr of InternationalPeaks","Imports Value in 1000 USD","Binding Coverage","Simple Tariff Line Average","Variance","Sum Of Rates","Sum Of SAvgRates","Count_Of_SAvgRates_Cases","Sum_Of_Squared_Rates","Nbr of AVE Lines","Nbr of NA Lines","Nbr of Free Lines","Nbr of Dutiable Lines","Nbr Line 0 to 5","Nbr Line 5 to 10","Nbr Line 10 to 20","Nbr Line 20 to 50","Nbr Line 50 to 100","Nbr Line more than 100","SumRateByWghtTrdValue","SumWghtTrdValue4NotNull","Free Imports in 1000 USD","Dutiable Imports in 1000 USD","Specific Duty Imports in 1000 USD"
-"HS","H0","048","Bahrain","0201","Meat of bovine animals, fresh or chilled.","000"," World",1999,1999,"WTO","AHS",5,5,0,5,5,20,0,0,1649.213,,5,0,100,100,20,500,0,0,0,20,20,0,0,0,0,0,8246.063,1649.213,0,1649.213,0
-"HS","H0","262","Djibouti","0201","Meat of bovine animals, fresh or chilled.","380","Italy",2005,2009,"CMT","BND",40,40,0,40,40,2,0,2,1.823,100,40,0,80,40,1,3200,0,0,0,2,0,0,0,2,0,0,72.92,1.823,0,1.823,0
-"HS","H0","266","Gabon","0201","Meat of bovine animals, fresh or chilled.","000"," World",1998,1998,"CMT","AHS",20,20,0,20,20,8,0,8,1335.287,,20,0,160,160,8,3200,0,0,0,8,0,0,8,0,0,0,26705.74,1335.287,0,1335.287,0
+Reporter_ISO_N,Year,ProductCode,Partner_ISO_N,DutyType,SimpleAverage,Nbr_Total_Lines
+"048", 1999, "0201","000","AHS",5,20
+"262", 2005, "0201","380","BND",40,40
+"266", 1998, "0201","000","AHS",20,20

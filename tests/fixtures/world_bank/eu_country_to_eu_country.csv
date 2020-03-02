@@ -1,5 +1,5 @@
-"Selected Nomen","Native Nomen","Reporter","Reporter Name","Product","Product Name","Partner","Partner Name","Tariff Year","Trade Year","Trade Source","DutyType","Simple Average","Weighted Average","Standard Deviation","Minimum Rate","Maximum Rate","Nbr of Total Lines","Nbr of DomesticPeaks","Nbr of InternationalPeaks","Imports Value in 1000 USD","Binding Coverage","Simple Tariff Line Average","Variance","Sum Of Rates","Sum Of SAvgRates","Count_Of_SAvgRates_Cases","Sum_Of_Squared_Rates","Nbr of AVE Lines","Nbr of NA Lines","Nbr of Free Lines","Nbr of Dutiable Lines","Nbr Line 0 to 5","Nbr Line 5 to 10","Nbr Line 10 to 20","Nbr Line 20 to 50","Nbr Line 50 to 100","Nbr Line more than 100","SumRateByWghtTrdValue","SumWghtTrdValue4NotNull","Free Imports in 1000 USD","Dutiable Imports in 1000 USD","Specific Duty Imports in 1000 USD"
-"HS","H2","705","Slovenia","0201","Meat of bovine animals, fresh or chilled.","380","Italy",2014,2014,"CMT","AHS",76.51,76.59,0.83,75.75,77.42,8,8,8,14.564,,76.59,0.69,612.68,76.59,1,46928.13,8,0,0,0,0,0,0,0,8,0,1115.39,14.564,0,14.564,0
-"HS","H2","705","Slovenia","0201","Meat of bovine animals, fresh or chilled.","380","Italy",2014,2014,"CMT","BND",,,,,,,,,14.564,0,,,,0,0,,,,,,,,,,,,0,0,0,14.564,0
-"HS","H2","705","Slovenia","0201","Meat of bovine animals, fresh or chilled.","380","Italy",2014,2014,"CMT","MFN",76.53,76.59,0.83,75.75,77.42,8,8,8,14.564,,76.59,0.69,612.68,76.59,1,46928.13,8,0,0,0,0,0,0,0,8,0,1115.39,14.564,0,14.564,0
-"HS","H2","705","Slovenia","0201","Meat of bovine animals, fresh or chilled.","380","Italy",2014,2014,"CMT","PRF",76.54,76.59,0.83,75.75,77.42,8,8,8,14.564,,76.59,0.69,612.68,76.59,1,46928.13,8,0,0,0,0,0,0,0,8,0,1115.39,14.564,0,14.564,0
+Reporter_ISO_N,Year,ProductCode,Partner_ISO_N,DutyType,SimpleAverage,Nbr_Total_Lines
+"705",2014,"0201","380","AHS",76.51,8
+"705",2014,"0201","380","BND",,
+"705",2014,"0201","380","MFN",76.53,8
+"705",2014,"0201","380","PRF",76.54,8

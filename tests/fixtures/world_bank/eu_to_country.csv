@@ -1,5 +1,5 @@
-"Selected Nomen","Native Nomen","Reporter","Reporter Name","Product","Product Name","Partner","Partner Name","Tariff Year","Trade Year","Trade Source","DutyType","Simple Average","Weighted Average","Standard Deviation","Minimum Rate","Maximum Rate","Nbr of Total Lines","Nbr of DomesticPeaks","Nbr of InternationalPeaks","Imports Value in 1000 USD","Binding Coverage","Simple Tariff Line Average","Variance","Sum Of Rates","Sum Of SAvgRates","Count_Of_SAvgRates_Cases","Sum_Of_Squared_Rates","Nbr of AVE Lines","Nbr of NA Lines","Nbr of Free Lines","Nbr of Dutiable Lines","Nbr Line 0 to 5","Nbr Line 5 to 10","Nbr Line 10 to 20","Nbr Line 20 to 50","Nbr Line 50 to 100","Nbr Line more than 100","SumRateByWghtTrdValue","SumWghtTrdValue4NotNull","Free Imports in 1000 USD","Dutiable Imports in 1000 USD","Specific Duty Imports in 1000 USD"
-"HS","H1","918","European Union","0201","Meat of bovine animals, fresh or chilled.","036","Australia",2014,2014,"CMT","AHS",81.96,82.5,14.06,63.1,107.13,13,13,13,23747.757,,81.58,197.8,1060.49,163.92,2,89082.11,13,0,0,0,0,0,0,0,11,2,1959283.169,23747.757,0,23747.757,0
-"HS","H1","918","European Union","0201","Meat of bovine animals, fresh or chilled.","036","Australia",2014,2014,"CMT","BND",83.03,82.52,14.56,63.1,107.13,5,1,5,23747.757,100,83.34,211.91,416.71,166.06,2,35789.23,0,0,0,5,0,0,0,0,4,1,1959577.688,23747.757,0,23747.757,0
-"HS","H1","918","European Union","0201","Meat of bovine animals, fresh or chilled.","036","Australia",2014,2014,"CMT","MFN",81.96,82.5,14.06,63.1,107.13,13,13,13,23747.757,,81.58,197.8,1060.49,163.92,2,89082.11,13,0,0,0,0,0,0,0,11,2,1959283.169,23747.757,0,23747.757,0
-"HS","H1","918","European Union","0201","Meat of bovine animals, fresh or chilled.","036","Australia",2014,2014,"CMT","PRF",81.96,82.5,14.06,63.1,107.13,13,13,13,23747.757,,81.58,197.8,1060.49,163.92,2,89082.11,13,0,0,0,0,0,0,0,11,2,1959283.169,23747.757,0,23747.757,0
+Reporter_ISO_N,Year,ProductCode,Partner_ISO_N,DutyType,SimpleAverage,Nbr_Total_Lines
+"918",2014,"0201","036","AHS",81.96,13
+"918",2014,"0201","036","BND",83.03,5
+"918",2014,"0201","036","MFN",81.96,13
+"918",2014,"0201","036","PRF",81.96,13
