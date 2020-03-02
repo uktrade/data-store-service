@@ -210,7 +210,7 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
                 world_average
             )
             select
-                nnextval('{self._l1_sequence}') as id,
+                nextval('{self._l1_sequence}') as id,
                 product,
                 reporter,
                 partner,
