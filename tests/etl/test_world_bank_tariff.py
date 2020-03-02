@@ -9,6 +9,9 @@ fixture_path = 'tests/fixtures/world_bank'
 file_1 = f'{fixture_path}/tariff.csv'
 eu_country_to_eu_country_file = f'{fixture_path}/eu_country_to_eu_country.csv'
 eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
+country_to_world_file = f'{fixture_path}/country_to_world.csv'
+countries_expanding_file = f'{fixture_path}/countries_expanding.csv'
+country_to_country_two_years = f'{fixture_path}/country_to_country_two_years.csv'
 
 comtrade_countries = [
     {'id': 1, 'cty_code': 0, 'cty_name_english': 'World', 'iso3_digit_alp': 'WLD'},
@@ -116,6 +119,53 @@ class TestWorldBankTariffPipeline:
                 [2014],
                 [(201, 918, 36, 2014, 81.96, 81.96, 81.96, 81.96, 83.03, 81.96, 81.96)],
                 # When the reporter is EU it remains EU
+            ),
+            (
+                country_to_world_file,
+                [2018],
+                [
+                    (201, 12, 76, 2018, 21, 21, None, None, None, 21, 15.5),
+                    (201, 12, 710, 2018, 21, None, None, None, None, 21, 15.5),
+                    (201, 24, 76, 2018, 10, None, None, None, None, 10, 15.5),
+                    (201, 24, 710, 2018, 10, 10, None, None, None, 10, 15.5),
+                ]
+                # Algeria (12) has a tariff specified with World & Brazil (76)
+                # Angola (24) has a tariff specified with World & South Africa (710)
+                # Result:
+                # Algeria has a tariff for both Brazil & South Africa
+                # Angola has a tariff for both Brazil & South Africa
+            ),
+            (
+                country_to_country_two_years,
+                [2017, 2018],
+                [
+                    (201, 12, 76, 2017, 21, None, None, None, None, 21, 15.5),
+                    (201, 12, 76, 2018, 21, 21, None, None, None, 21, 15.5),
+                    (201, 12, 710, 2017, 21, None, None, None, None, 21, 15.5),
+                    (201, 12, 710, 2018, 21, None, None, None, None, 21, 15.5),
+                    (201, 24, 76, 2017, 10, None, None, None, None, 10, 15.5),
+                    (201, 24, 76, 2018, 10, None, None, None, None, 10, 15.5),
+                    (201, 24, 710, 2017, 10, 10, None, None, None, 10, 15.5),
+                    (201, 24, 710, 2018, 10, None, None, None, None, 10, 15.5),
+                ],
+            ),
+            (
+                countries_expanding_file,
+                [2018],
+                [
+                    (201, 12, 76, 2018, 21, 21, None, None, None, 21, 16.333333333333332),
+                    (201, 12, 372, 2018, 21, None, None, None, None, 21, 16.333333333333332),
+                    (201, 12, 710, 2018, 21, None, None, None, None, 21, 16.333333333333332),
+                    (201, 24, 76, 2018, 10, None, None, None, None, 10, 16.333333333333332),
+                    (201, 24, 372, 2018, 10, None, None, None, None, 10, 16.333333333333332),
+                    (201, 24, 710, 2018, 10, 10, None, None, None, 10, 16.333333333333332),
+                    (201, 704, 76, 2018, 18, None, None, None, None, 18, 16.333333333333332),
+                    (201, 704, 372, 2018, 18, 18, None, 9, None, 18, 16.333333333333332),
+                    (201, 704, 710, 2018, 18, None, None, None, None, 18, 16.333333333333332),
+                ]
+                # Same as country_to_world file with World entries removed and a
+                # tariff between Vietnam (704) to Ireland (372) and a PRF rate
+                # added, different world average
             ),
         ),
     )
