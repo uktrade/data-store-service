@@ -45,7 +45,7 @@ class DataPipeline(metaclass=ABCMeta):
             ('data_source_row_id', 'int'),  # reference to L0 id column
         ]
 
-    def __init__(self, dbi, force):
+    def __init__(self, dbi, force=False):
         self.dbi = dbi
         self.force = force
         if not dbi:

@@ -2,6 +2,8 @@ import click
 from flask import current_app as app
 from flask.cli import with_appcontext
 
+from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
+from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
@@ -18,6 +20,12 @@ arg_to_pipeline_config_list = {
     ],
     DITReferencePostcodesPipeline.data_source: [
         (DITReferencePostcodesPipeline, 'data_workspace/reference_postcodes')
+    ],
+    ComtradeCountryCodeAndISOPipeline.data_source: [
+        (ComtradeCountryCodeAndISOPipeline, 'comtrade/country_code_and_iso')
+    ],
+    DITEUCountryMembershipPipeline.data_source: [
+        (DITEUCountryMembershipPipeline, 'dit/eu_country_membership')
     ],
     WorldBankTariffPipeline.data_source: [(WorldBankTariffPipeline, 'world_bank/tariff')],
 }
