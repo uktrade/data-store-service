@@ -14,7 +14,7 @@ services:
       - .:/app
 
   dss_postgres:
-    image: "postgres"
+    image: postgres:10
     env_file:
       - ${ENV_FILE:-.env}
     ports:
