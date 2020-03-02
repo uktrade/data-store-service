@@ -149,7 +149,7 @@ class AccessControl:
                     authorization_header = request.headers['Authorization']
                     attributes = parse_authorization_header(authorization_header)
                     id = attributes['id']
-                except AttributeError or KeyError:
+                except (AttributeError, KeyError):
                     raise Unauthorized('Invalid authorization header.')
                 scopes = self._client_scope_loader_func(id)
                 if '*' in scopes or view_func.__name__ in scopes:

@@ -39,11 +39,3 @@ def to_tabular_web_dict(df):
         values = [v[0] for v in values]
     return {'headers': headers, 'values': values}
 
-
-def response_orientation_decorator(view, *args, **kwargs):
-    def wrapper(*args, **kwargs):
-        orientation = request.args.get('orientation', 'tabular')
-        return view(orientation, *args, **kwargs)
-
-    wrapper.__name__ = view.__name__
-    return wrapper
