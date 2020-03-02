@@ -7,7 +7,7 @@ from app.etl.etl_incremental_data import IncrementalDataPipeline
 
 class WorldBankTariffPipeline(IncrementalDataPipeline):
     organisation = 'world_bank'
-    dataset = 'tariff'
+    dataset = 'bulk'
 
     _l0_data_column_types = [
         ('reporter', 'integer'),
