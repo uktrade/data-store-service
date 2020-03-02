@@ -1,7 +1,6 @@
 from flask.blueprints import Blueprint
 
-from app.api.views import ac, json_error
-from app.api.views import base
+from app.api.views import ac, base, json_error
 from app.db.models.external import WorldBankTariffL1
 from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
 
