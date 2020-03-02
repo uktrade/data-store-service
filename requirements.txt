@@ -84,7 +84,7 @@ pytest-cov==2.8.1         # via -r requirements.in (line 23)
 pytest-mock==2.0.0        # via -r requirements.in (line 24)
 pytest==5.3.5             # via -r requirements.in (line 25), pytest-cov, pytest-mock
 python-dateutil==2.8.1    # via botocore, freezegun, pandas
-python-dotenv==0.11.0     # via -r requirements.in (line 26)
+python-dotenv==0.12.0     # via -r requirements.in (line 26)
 pytz==2019.3              # via apscheduler, babel, celery, pandas, tzlocal
 pyyaml==5.3               # via -r requirements.in (line 27)
 redis==3.4.1              # via -r requirements.in (line 28)
