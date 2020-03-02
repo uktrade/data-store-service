@@ -38,4 +38,3 @@ def to_tabular_web_dict(df):
     if len(headers) == 1:
         values = [v[0] for v in values]
     return {'headers': headers, 'values': values}
-

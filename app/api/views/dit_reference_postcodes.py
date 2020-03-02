@@ -14,11 +14,7 @@ api = Blueprint(name="dir_reference_postcodes_api", import_name=__name__)
 
 class DitReferencePostcodeListView(base.PaginatedListView):
 
-    decorators = [
-        json_error,
-        ac.authentication_required,
-        ac.authorization_required
-    ]
+    decorators = [json_error, ac.authentication_required, ac.authorization_required]
 
     pipeline = DITReferencePostcodesPipeline
     model = DITReferencePostcodesL1
@@ -26,11 +22,7 @@ class DitReferencePostcodeListView(base.PaginatedListView):
 
 class DitReferencePostcodeView(base.SingleResourceView):
 
-    decorators = [
-        json_error,
-        ac.authentication_required,
-        ac.authorization_required
-    ]
+    decorators = [json_error, ac.authentication_required, ac.authorization_required]
 
     pipeline = DITReferencePostcodesPipeline
     model = DITReferencePostcodesL1

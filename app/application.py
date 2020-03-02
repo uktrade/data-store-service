@@ -96,11 +96,32 @@ def _register_components(flask_app):
     flask_app.register_blueprint(api)
 
     # Routes
-    flask_app.add_url_rule('/api/v1/get-dit-reference-postcodes/', view_func=dit_reference_postcodes.DitReferencePostcodeListView.as_view('list_dit_reference_postcodes'))
-    flask_app.add_url_rule('/api/v1/get-postcode-data/', view_func=dit_reference_postcodes.DitReferencePostcodeView.as_view('dit_reference_postcode1'))
-    flask_app.add_url_rule('/api/v1/get-dit-reference-postcode/', view_func=dit_reference_postcodes.DitReferencePostcodeView.as_view('dit_reference_postcode2'))
-    flask_app.add_url_rule('/api/v1/get-ons-postcodes/', view_func=ons_postcodes.OnsPostcodeListView.as_view('list_ons_postcodes'))
-    flask_app.add_url_rule('/api/v1/get-world-bank-tariffs/', view_func=world_bank_tariffs.WorldBankTariffListView.as_view('list_world_data_tariffs'))
+    flask_app.add_url_rule(
+        '/api/v1/get-dit-reference-postcodes/',
+        view_func=dit_reference_postcodes.DitReferencePostcodeListView.as_view(
+            'list_dit_reference_postcodes'
+        ),
+    )
+    flask_app.add_url_rule(
+        '/api/v1/get-postcode-data/',
+        view_func=dit_reference_postcodes.DitReferencePostcodeView.as_view(
+            'dit_reference_postcode1'
+        ),
+    )
+    flask_app.add_url_rule(
+        '/api/v1/get-dit-reference-postcode/',
+        view_func=dit_reference_postcodes.DitReferencePostcodeView.as_view(
+            'dit_reference_postcode2'
+        ),
+    )
+    flask_app.add_url_rule(
+        '/api/v1/get-ons-postcodes/',
+        view_func=ons_postcodes.OnsPostcodeListView.as_view('list_ons_postcodes'),
+    )
+    flask_app.add_url_rule(
+        '/api/v1/get-world-bank-tariffs/',
+        view_func=world_bank_tariffs.WorldBankTariffListView.as_view('list_world_data_tariffs'),
+    )
 
     # Cache
     redis_uri = _get_redis_url(flask_app)

@@ -10,11 +10,7 @@ api = Blueprint(name="ons_postcodes_api", import_name=__name__)
 
 class OnsPostcodeListView(base.PaginatedListView):
 
-    decorators = [
-        json_error,
-        ac.authentication_required,
-        ac.authorization_required
-    ]
+    decorators = [json_error, ac.authentication_required, ac.authorization_required]
 
     pipeline = ONSPostcodeDirectoryPipeline
     model = ONSPostcodeDirectoryL1

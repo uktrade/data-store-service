@@ -10,11 +10,7 @@ api = Blueprint(name="world_bank_tariffs_api", import_name=__name__)
 
 class WorldBankTariffListView(base.PaginatedListView):
 
-    decorators = [
-        json_error,
-        ac.authentication_required,
-        ac.authorization_required
-    ]
+    decorators = [json_error, ac.authentication_required, ac.authorization_required]
 
     pipeline = WorldBankTariffPipeline
     model = WorldBankTariffL1

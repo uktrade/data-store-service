@@ -6,7 +6,6 @@ from app.api.utils import to_web_dict
 
 
 class PaginatedListView(View):
-
     def dispatch_request(self):
         orientation = request.args.get('orientation', 'tabular')
         pagination_size = flask_app.config['app']['pagination_size']
@@ -44,7 +43,6 @@ class PaginatedListView(View):
 
 
 class SingleResourceView(View):
-
     def dispatch_request(self):
         postcode = request.args.get('postcode')
         orientation = request.args.get('orientation', 'tabular')

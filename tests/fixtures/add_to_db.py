@@ -4,7 +4,7 @@ from app.db.models.external import (
     ComtradeCountryCodeAndISOL1,
     DITEUCountryMembershipL1,
     DITReferencePostcodesL1,
-    WorldBankTariffL1
+    WorldBankTariffL1,
 )
 from app.db.models.external import ONSPostcodeDirectoryL1
 
