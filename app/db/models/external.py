@@ -6,6 +6,8 @@ from app.db.models import (
     _text,
     BaseModel,
 )
+from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
+from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
@@ -111,7 +113,7 @@ class WorldBankTariffL1(BaseModel):
     __tablename__ = 'L1'
     __table_args__ = {'schema': WorldBankTariffPipeline.schema}
 
-    id = _col('id', _int, primary_key=True, autoincrement=True)
+    id = _col(_int, primary_key=True, autoincrement=True)
     data_source_row_id = _col(_int, unique=True)
     product = _col(_int)
     reporter = _col(_int)
@@ -124,3 +126,34 @@ class WorldBankTariffL1(BaseModel):
     bnd_rate = _col(_text)
     country_average = _col(_float)
     world_average = _col(_float)
+
+
+class ComtradeCountryCodeAndISOL1(BaseModel):
+
+    __tablename__ = 'L1'
+    __table_args__ = {'schema': ComtradeCountryCodeAndISOPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    data_source_row_id = _col(_int, unique=True)
+    cty_code = _col(_int)
+    cty_name_english = _col(_text)
+    cty_fullname_english = _col(_text)
+    cty_abbreviation = _col(_text)
+    cty_comments = _col(_text)
+    iso2_digit_alpha = _col(_text)
+    iso3_digit_alpha = _col(_text)
+    start_valid_year = _col(_text)
+    end_valid_year = _col(_text)
+
+
+class DITEUCountryMembershipL1(BaseModel):
+
+    __tablename__ = 'L1'
+    __table_args__ = {'schema': DITEUCountryMembershipPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    data_source_row_id = _col(_int, unique=True)
+    country = _col(_text)
+    iso3 = _col(_text)
+    year = _col(_int)
+    tariff_code = _col(_text)

@@ -4,6 +4,8 @@ from sqlalchemy import DDL, event
 from sqlalchemy.orm import load_only
 from sqlalchemy.sql import ClauseElement
 
+from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
+from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
@@ -95,6 +97,8 @@ def create_schemas(*args, **kwargs):
         ONSPostcodeDirectoryPipeline.schema,
         DITReferencePostcodesPipeline.schema,
         WorldBankTariffPipeline.schema,
+        ComtradeCountryCodeAndISOPipeline.schema,
+        DITEUCountryMembershipPipeline.schema,
     ]
     for schema in schemas:
         _sa.engine.execute(DDL(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))

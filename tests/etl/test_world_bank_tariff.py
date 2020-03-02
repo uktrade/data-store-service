@@ -1,10 +1,7 @@
-from unittest import mock
-
 import pytest
 from datatools.io.fileinfo import FileInfo
 
 from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
-from app.etl.transforms.world_bank_tariff import CleanWorldBankTariff
 from tests.utils import rows_equal_table
 
 fixture_path = 'tests/fixtures/world_bank'
@@ -13,85 +10,43 @@ file_1 = f'{fixture_path}/tariff.csv'
 eu_country_to_eu_country_file = f'{fixture_path}/eu_country_to_eu_country.csv'
 eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
 
-
-class TestWorldBankTariffTransform:
-    def add_basic_rows(self, _app, pipeline):
-        sql = (
-            f"insert into {pipeline._l0_temp_table} (product, reporter, partner, tariff_year) "
-            f"values (1, 1, 2, 2016), (1, 1, 2, 2016), (1, 2, 2, 2014), (1, 3, 2, 2014)"
-        )
-        self.execute_sql(_app, sql)
-
-    def add_rows(self, _app, pipeline):
-        sql = (
-            f"insert into {pipeline._l0_temp_table} (product, reporter, partner, tariff_year, "
-            f"duty_type, simple_average"
-            f") "
-            f"values (1, 1, 2, 2016, 'BND', 1.5)"
-        )
-        self.execute_sql(_app, sql)
-
-    def execute_sql(self, _app, sql, return_results=False):
-        connection = _app.db.engine.raw_connection()
-        cur = connection.cursor()
-        cur.execute(sql)
-        results = []
-        if return_results:
-            results = cur.fetchall()
-        connection.commit()
-        cur.close()
-        connection.close()
-        return [r for r in results]
-
-    def test_get_partner_reporter_combinations_for_each_year(self, app_with_db):
-        pipeline = WorldBankTariffPipeline(app_with_db.dbi, False)
-        pipeline.dbi.append_table(pipeline._l0_temp_table, pipeline._l0_table, drop_source=True)
-        pipeline.create_tables()
-        self.add_basic_rows(app_with_db, pipeline)
-
-        clean_bank = CleanWorldBankTariff(pipeline._l0_temp_table, pipeline._l1_temp_table)
-
-        sql = clean_bank.get_partner_reporter_combinations_for_each_year('table_1')
-        wrapped_sql = (
-            f'with {sql} select reporter,partner,year from table_1 order by reporter, ' f'year'
-        )
-        results = self.execute_sql(app_with_db, wrapped_sql, return_results=True)
-        assert results == [
-            (1, 2, 2016),
-            (1, 2, 2017),
-            (1, 2, 2018),
-            (3, 2, 2014),
-            (3, 2, 2015),
-            (3, 2, 2016),
-            (3, 2, 2017),
-            (3, 2, 2018),
-        ]
-
-    @mock.patch("app.etl.transforms.world_bank_tariff.CleanWorldBankTariff.get_years")
-    def test_get_rate_averages(self, mock_get_years, app_with_db):
-        mock_get_years.return_value = [2016]
-        pipeline = WorldBankTariffPipeline(app_with_db.dbi, False)
-        pipeline.dbi.append_table(pipeline._l0_temp_table, pipeline._l0_table, drop_source=True)
-        pipeline.create_tables()
-        self.add_rows(app_with_db, pipeline)
-
-        clean_bank = CleanWorldBankTariff(pipeline._l0_temp_table, pipeline._l1_temp_table)
-
-        year_sql = clean_bank.get_partner_reporter_combinations_for_each_year('table_1')
-        sql = clean_bank.get_rate_averages('table_2', 'table_1')
-        wrapped_sql = (
-            f'with {year_sql}, {sql} select reporter, partner, year, bnd_rate from ' f'table_2'
-        )
-
-        results = self.execute_sql(app_with_db, wrapped_sql, return_results=True)
-        assert results == [(1, 2, 2016, '1.5')]
+comtrade_countries = [
+    {'id': 1, 'cty_code': 0, 'cty_name_english': 'World', 'iso3_digit_alp': 'WLD'},
+    {'id': 2, 'cty_code': 48, 'cty_name_english': 'Bahrain', 'iso3_digit_alp': 'BHR'},
+    {'id': 3, 'cty_code': 262, 'cty_name_english': 'Djibouti', 'iso3_digit_alp': 'DJI'},
+    {'id': 4, 'cty_code': 266, 'cty_name_english': 'Gabon', 'iso3_digit_alp': 'GAB'},
+    {'id': 5, 'cty_code': 381, 'cty_name_english': 'Italy', 'iso3_digit_alp': 'ITA'},
+    {'id': 6, 'cty_code': 918, 'cty_name_english': 'European Union', 'iso3_digit_alp': 'EU'},
+    {'id': 7, 'cty_code': 36, 'cty_name_english': 'Australia', 'iso3_digit_alp': 'AUS'},
+    {'id': 8, 'cty_code': 705, 'cty_name_english': 'Slovenia', 'iso3_digit_alp': 'SVN'},
+]
+eu_country_memberships = [
+    {'id': i, 'country': 'Italy', 'iso3': 'ITA', 'year': year, 'tariff_code': 'EUN'}
+    for i, year in enumerate(range(1958, 2018), 1)
+] + [
+    {
+        'id': i,
+        'country': 'Slovenia',
+        'iso3': 'ITA',
+        'year': year,
+        'tariff_code': 'EUN' if year >= 2004 else None,
+    }
+    for i, year in enumerate(range(1958, 2018), 61)
+]
 
 
 class TestWorldBankTariffPipeline:
-    def test_one_datafile(self, app_with_db):
-        pipeline = WorldBankTariffPipeline(app_with_db.dbi, True)
+    @pytest.fixture(autouse=True, scope='function')
+    def setup(self, app_with_db, add_comtrade_country_code_and_iso, add_dit_eu_country_membership):
+        self.dbi = app_with_db.dbi
+        add_comtrade_country_code_and_iso(comtrade_countries)
+        add_dit_eu_country_membership(eu_country_memberships)
+
+    def test_pipeline(self):
+        pipeline = WorldBankTariffPipeline(self.dbi, True)
         fi = FileInfo.from_path(file_1)
         pipeline.process(fi)
+
         # check L0
         expected_rows = [
             (
@@ -141,35 +96,31 @@ class TestWorldBankTariffPipeline:
             )
         ]
 
-        assert rows_equal_table(
-            app_with_db.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1
-        )
+        assert rows_equal_table(self.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1)
 
-    @pytest.mark.skip(reason="Transform functionality incomplete")
+        # check L1
+        assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline, top_rows=1)
+
     @pytest.mark.parametrize(
         'file_name,years,expected_rows',
         (
             (
                 eu_country_to_eu_country_file,
                 [2014],
-                [(201, 705, 381, 2014, '76.51', '76.51', '76.53', '76.54', 'NA', 76.51, 76.51)],
+                [(201, 705, 381, 2014, 76.51, 76.51, 76.53, 76.54, None, 76.51, 76.51)],
                 # Italy has incorrect id 380 in product file and has to be fixed by the
                 # cleaning process and updated to 381
             ),
             (
                 eu_to_country_file,
                 [2014],
-                [(201, 918, 36, 2014, '81.96', '81.96', '81.96', '81.96', '83.03', 81.96, 81.96)],
+                [(201, 918, 36, 2014, 81.96, 81.96, 81.96, 81.96, 83.03, 81.96, 81.96)],
                 # When the reporter is EU it remains EU
             ),
         ),
     )
-    @mock.patch("app.etl.transforms.world_bank_tariff.CleanWorldBankTariff.get_years")
-    def test_transform_of_datafile(
-        self, mock_get_years, app_with_db, file_name, years, expected_rows
-    ):
-        mock_get_years.return_value = years
-        pipeline = WorldBankTariffPipeline(app_with_db.dbi, True)
+    def test_transform_of_datafile(self, file_name, years, expected_rows):
+        pipeline = WorldBankTariffPipeline(self.dbi, True)
         fi = FileInfo.from_path(file_name)
         pipeline.process(fi)
-        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table, pipeline)
+        assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
