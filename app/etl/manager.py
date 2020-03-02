@@ -13,9 +13,7 @@ PipelineConfig = namedtuple('PipelineConfig', 'pipeline sub_directory force')
 
 
 class DSSDatafileProvider(DatafileProvider):
-    ignore_filename_patterns = [
-        '[Content_Types].xml'
-    ] + DatafileProvider.ignore_filename_patterns
+    ignore_filename_patterns = ['[Content_Types].xml'] + DatafileProvider.ignore_filename_patterns
 
 
 class Manager:
