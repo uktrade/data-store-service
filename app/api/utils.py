@@ -1,6 +1,3 @@
-from flask import request
-
-
 def to_camel_case(word):
     word = word.lstrip('_').rstrip('_')
     index = 1
