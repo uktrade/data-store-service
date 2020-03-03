@@ -82,8 +82,6 @@ def _create_base_app():
 
 
 def _register_components(flask_app):
-    from app.api.views import api
-
     # Postgres DB
     from app.db import sql_alchemy
 
@@ -92,8 +90,11 @@ def _register_components(flask_app):
     flask_app.db = sql_alchemy
     flask_app.dbi = DBI(sql_alchemy)
 
-    # API
-    flask_app.register_blueprint(api)
+    # Routes
+    from app.api import routes
+
+    for rule, view_func in routes.RULES:
+        flask_app.add_url_rule(rule, view_func=view_func)
 
     # Cache
     redis_uri = _get_redis_url(flask_app)

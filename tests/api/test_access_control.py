@@ -1,20 +1,10 @@
 import copy
 
 import pytest
-from flask import make_response
 from mohawk import Sender
 from mohawk.util import utc_now
 
-from app.api.views import ac, api, json_error
 from app.db.models.internal import HawkUsers
-
-
-@api.route('/test/', methods=["GET"])
-@json_error
-@ac.authentication_required
-@ac.authorization_required
-def mock_endpoint():
-    return make_response('OK')
 
 
 class TestAuthentication:

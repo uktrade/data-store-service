@@ -4,6 +4,7 @@ from app.db.models.external import (
     ComtradeCountryCodeAndISOL1,
     DITEUCountryMembershipL1,
     DITReferencePostcodesL1,
+    WorldBankTariffL1,
 )
 from app.db.models.external import ONSPostcodeDirectoryL1
 
@@ -72,6 +73,31 @@ def add_dit_eu_country_membership(app):
                 'tariff_code': record.get('tariff_code'),
             }
             DITEUCountryMembershipL1.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_world_bank_tariff(app):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'data_source_row_id': record.get('data_source_row_id'),
+                'product': record.get('product'),
+                'reporter': record.get('reporter'),
+                'partner': record.get('partner'),
+                'year': record.get('year'),
+                'assumed_tariff': record.get('assumed_tariff'),
+                'app_rate': record.get('app_rate'),
+                'mfn_rate': record.get('mfn_rate'),
+                'prf_rate': record.get('prf_rate'),
+                'bnd_rate': record.get('bnd_rate'),
+                'country_average': record.get('country_average'),
+                'world_average': record.get('world_average'),
+            }
+            WorldBankTariffL1.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
 

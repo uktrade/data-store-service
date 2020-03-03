@@ -1,4 +1,5 @@
 import datetime
+import decimal
 import logging
 
 import json_log_formatter
@@ -11,16 +12,15 @@ class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
-
         if pd.isnull(obj):
             return None
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
-
         if isinstance(obj, np.integer):
             return int(obj)
-
         if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, decimal.Decimal):
             return float(obj)
         return str(obj)
 

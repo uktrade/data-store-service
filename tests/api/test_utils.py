@@ -85,12 +85,3 @@ class TestToTabularWebDict(unittest.TestCase):
             'values': [0, 3],
         }
         self.assertEqual(output, expected)
-
-
-def test_response_orientation_dectorator(app):
-    with app.test_request_context('/?orientation=your orientation'):
-        view = unittest.mock.Mock(__name__='asdf')
-        wrapped = utils.response_orientation_decorator(view)
-        assert wrapped.__name__ == 'asdf'
-        wrapped()
-        view.assert_called_once_with('your orientation')
