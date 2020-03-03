@@ -1,9 +1,11 @@
 import click
+from flask.cli import with_appcontext
 
 from app.db.models.internal import HawkUsers
 
 
 @click.command('add_hawk_user')
+@with_appcontext
 @click.option('--client_id', type=str, help="a unique id for the client")
 @click.option(
     '--client_key', type=str, help="secret key only known by the client and server",

@@ -27,7 +27,7 @@ arg_to_pipeline_config_list = {
     DITEUCountryMembershipPipeline.data_source: [
         (DITEUCountryMembershipPipeline, 'dit/eu_country_membership')
     ],
-    WorldBankTariffPipeline.data_source: [(WorldBankTariffPipeline, 'world_bank/bulk')],
+    WorldBankTariffPipeline.data_source: [(WorldBankTariffPipeline, 'world_bank/tariff')],
 }
 
 
