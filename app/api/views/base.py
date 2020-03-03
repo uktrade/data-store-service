@@ -31,7 +31,6 @@ class PaginatedListView(View):
         df = flask_app.dbi.execute_query(sql_query, data=values, df=True)
         if len(df) == pagination_size + 1:
             next_ = '{}{}?'.format(request.host_url[:-1], request.path)
-            next_ += '&' if next_[-1] != '?' else ''
             next_ += 'orientation={}'.format(orientation)
             next_ += '&next-id={}'.format(df['id'].values[-1])
             df = df[:-1]
