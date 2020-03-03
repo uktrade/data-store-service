@@ -41,20 +41,3 @@ class PaginatedListView(View):
         web_dict['next'] = next_
         return flask_app.make_response(web_dict)
 
-
-class SingleResourceView(View):
-    def dispatch_request(self):
-        postcode = request.args.get('postcode')
-        orientation = request.args.get('orientation', 'tabular')
-        postcode = postcode.replace(' ', '').lower()
-        sql_query = f'''
-            select {','.join(
-                [field for field, _ in self.pipeline._l1_data_column_types]
-            )}
-            from {self.model.get_fq_table_name()}
-            where lower(replace(postcode, ' ', '')) = %s
-            limit 1
-        '''
-        df = flask_app.dbi.execute_query(sql_query, data=[postcode], df=True)
-        web_dict = to_web_dict(df, orientation)
-        return flask_app.make_response(web_dict)
