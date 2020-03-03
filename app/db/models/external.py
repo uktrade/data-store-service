@@ -2,7 +2,6 @@ from app.db.models import (
     _col,
     _date,
     _decimal,
-    _float,
     _int,
     _text,
     BaseModel,

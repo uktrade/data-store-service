@@ -26,7 +26,7 @@ _array = _sa.ARRAY
 _date = _sa.Date
 _enum = _sa.Enum
 _float = _sa.Float
-_decimal = _sa.Float(asdecimal=True)
+_decimal = _num
 
 
 class BaseModel(db.Model):
