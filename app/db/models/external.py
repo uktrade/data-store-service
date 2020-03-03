@@ -1,6 +1,7 @@
 from app.db.models import (
     _col,
     _date,
+    _decimal,
     _float,
     _int,
     _text,
@@ -119,13 +120,13 @@ class WorldBankTariffL1(BaseModel):
     reporter = _col(_int)
     partner = _col(_int)
     year = _col(_int)
-    assumed_tariff = _col(_float)
-    app_rate = _col(_float)
-    mfn_rate = _col(_float)
-    prf_rate = _col(_float)
-    bnd_rate = _col(_float)
-    country_average = _col(_float)
-    world_average = _col(_float)
+    assumed_tariff = _col(_decimal)
+    app_rate = _col(_decimal)
+    mfn_rate = _col(_decimal)
+    prf_rate = _col(_decimal)
+    bnd_rate = _col(_decimal)
+    country_average = _col(_decimal)
+    world_average = _col(_decimal)
 
 
 class ComtradeCountryCodeAndISOL1(BaseModel):
