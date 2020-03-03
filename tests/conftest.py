@@ -2,8 +2,10 @@ import datetime
 
 import pytest
 import sqlalchemy_utils
+from flask import make_response
 
 from app import application
+from app.api.views import ac, json_error
 from app.db.models.internal import HawkUsers
 
 pytest_plugins = [
@@ -13,10 +15,18 @@ pytest_plugins = [
 TESTING_DB_NAME_TEMPLATE = 'dss_test_{}'
 
 
+@json_error
+@ac.authentication_required
+@ac.authorization_required
+def mock_endpoint():
+    return make_response('OK')
+
+
 @pytest.fixture(scope='session')
 def app():
     db_name = _create_testing_db_name()
     app = application.make_current_app_test_app(db_name)
+    app.add_url_rule('/test/', 'test', mock_endpoint)
     ctx = app.app_context()
     ctx.push()
     yield app

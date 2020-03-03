@@ -1,10 +1,6 @@
-from flask.blueprints import Blueprint
-
 from app.api.views import ac, base, json_error
 from app.db.models.external import WorldBankTariffL1
 from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
-
-api = Blueprint(name="world_bank_tariffs_api", import_name=__name__)
 
 
 class WorldBankTariffListView(base.PaginatedListView):

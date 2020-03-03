@@ -39,4 +39,3 @@ class PaginatedListView(View):
         web_dict = to_web_dict(df.iloc[:, 1:], orientation)
         web_dict['next'] = next_
         return flask_app.make_response(web_dict)
-

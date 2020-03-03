@@ -3,13 +3,11 @@ from functools import wraps
 import redis
 from flask import current_app as flask_app
 from flask import jsonify, make_response
-from flask.blueprints import Blueprint
 from werkzeug.exceptions import BadRequest, NotFound, Unauthorized
 
 from app.api.access_control import AccessControl
 from app.db.models.internal import HawkUsers
 
-api = Blueprint(name="api", import_name=__name__)
 ac = AccessControl()
 
 
@@ -68,6 +66,5 @@ def json_error(f):
     return error_handler
 
 
-@api.route('/healthcheck/', methods=["GET"])
 def healthcheck():
     return jsonify({"status": "OK"})
