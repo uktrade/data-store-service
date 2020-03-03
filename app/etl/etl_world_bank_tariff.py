@@ -7,52 +7,16 @@ from app.etl.etl_incremental_data import IncrementalDataPipeline
 
 class WorldBankTariffPipeline(IncrementalDataPipeline):
     organisation = 'world_bank'
-    dataset = 'tariff'
+    dataset = 'bulk'
 
     _l0_data_column_types = [
-        ('selected_nomen', 'text'),
-        ('native_nomen', 'text'),
         ('reporter', 'integer'),
-        ('reporter_name', 'text'),
+        ('year', 'integer'),
         ('product', 'integer'),
-        ('product_name', 'text'),
         ('partner', 'integer'),
-        ('partner_name', 'text'),
-        ('tariff_year', 'integer'),
-        ('trade_year', 'integer'),
-        ('trade_source', 'text'),
         ('duty_type', 'text'),
         ('simple_average', 'decimal'),
-        ('weighted_average', 'decimal'),
-        ('standard_deviation', 'decimal'),
-        ('minimum_rate', 'decimal'),
-        ('maximum_rate', 'decimal'),
         ('number_of_total_lines', 'integer'),
-        ('number_of_domestic_peaks', 'integer'),
-        ('number_of_international_peaks', 'integer'),
-        ('imports_value_in_1000_usd', 'decimal'),
-        ('binding_coverage', 'integer'),
-        ('simple_tariff_line_average', 'decimal'),
-        ('variance', 'decimal'),
-        ('sum_of_rates', 'decimal'),
-        ('sum_of_savg_rates', 'decimal'),
-        ('count_of_savg_rates_cases', 'integer'),
-        ('sum_of_squared_rates', 'decimal'),
-        ('number_of_ave_lines', 'integer'),
-        ('number_of_na_lines', 'integer'),
-        ('number_of_free_lines', 'integer'),
-        ('number_of_dutiable_lines', 'integer'),
-        ('number_lines_0_to_5', 'integer'),
-        ('number_lines_5_to_10', 'integer'),
-        ('number_lines_10_to_20', 'integer'),
-        ('number_lines_20_to_50', 'integer'),
-        ('number_lines_50_to_100', 'integer'),
-        ('number_lines_more_than_100', 'integer'),
-        ('sum_rate_by_weight_trade_value', 'decimal'),
-        ('sum_weight_trade_value_not_null', 'decimal'),
-        ('free_imports_in_1000_usd', 'decimal'),
-        ('dutiable_imports_in_1000_usd', 'decimal'),
-        ('specific_duty_imports_in_1000_usd', 'decimal'),
     ]
 
     _l1_data_column_types = [
@@ -101,19 +65,17 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
                 select
                     t1.reporter,
                     t1.partner,
-                    t1.tariff_year as year,
+                    t1.year as year,
                     t1.product,
-                    t1.trade_source as source,
                     t1.duty_type as tariff_type,
                     t1.simple_average,
-                    t1.weighted_average,
                     t2.tariff_code as reporter_eu,
                     t3.tariff_code as partner_eu
                 from {self._l0_temp_table} t1
                 left join eu_countries t2
-                    on t1.reporter = t2.iso_number and t1.tariff_year = t2.year
+                    on t1.reporter = t2.iso_number and t1.year = t2.year
                 left join eu_countries t3
-                    on t1.partner = t3.iso_number and t1.tariff_year = t3.year
+                    on t1.partner = t3.iso_number and t1.year = t3.year
             ), ahs_tariffs as (
                 select * from tariffs_and_countries where tariff_type = 'AHS'
             ), prf_tariffs as (
@@ -139,9 +101,9 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
                     t3.simple_average as mfn_rate,
                     t4.simple_average as bnd_rate
                 from ahs_tariffs t1
-                left join prf_tariffs t2 using (reporter, partner, year, product, source)
-                left join mfn_tariffs t3 using (reporter, partner, year, product, source)
-                left join bnd_tariffs t4 using (reporter, partner, year, product, source)
+                left join prf_tariffs t2 using (reporter, partner, year, product)
+                left join mfn_tariffs t3 using (reporter, partner, year, product)
+                left join bnd_tariffs t4 using (reporter, partner, year, product)
                 where reporter != partner and reporter != 0 and partner != 0
             ), eu_charging_rates as (
                 select reporter, year, 'EUN' as partner_eu, avg(prf_rate) as eu_partner_avg
@@ -234,6 +196,7 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
                 ) sq2
             )
             insert into {self._l1_temp_table} (
+                id,
                 product,
                 reporter,
                 partner,
@@ -247,6 +210,7 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
                 world_average
             )
             select
+                nextval('{self._l1_sequence}') as id,
                 product,
                 reporter,
                 partner,

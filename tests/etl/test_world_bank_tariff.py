@@ -51,53 +51,7 @@ class TestWorldBankTariffPipeline:
         pipeline.process(fi)
 
         # check L0
-        expected_rows = [
-            (
-                'HS',
-                'H0',
-                48,
-                'Bahrain',
-                201,
-                'Meat of bovine animals, fresh or chilled.',
-                0,
-                ' World',
-                1999,
-                1999,
-                'WTO',
-                'AHS',
-                5.0,
-                5.0,
-                0.0,
-                5.0,
-                5.0,
-                20,
-                0,
-                0,
-                1649.213,
-                None,
-                5.0,
-                0.0,
-                100.0,
-                100.0,
-                20,
-                500.0,
-                0,
-                0,
-                0,
-                20,
-                20,
-                0,
-                0,
-                0,
-                0,
-                0,
-                8246.063,
-                1649.213,
-                0.0,
-                1649.213,
-                0.0,
-            )
-        ]
+        expected_rows = [(48, 1999, 201, 0, 'AHS', 5.0, 20,)]
 
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1)
 

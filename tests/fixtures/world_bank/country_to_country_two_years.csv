@@ -1,3 +1,3 @@
-"Selected Nomen","Native Nomen","Reporter","Reporter Name","Product","Product Name","Partner","Partner Name","Tariff Year","Trade Year","Trade Source","DutyType","Simple Average","Weighted Average","Standard Deviation","Minimum Rate","Maximum Rate","Nbr of Total Lines","Nbr of DomesticPeaks","Nbr of InternationalPeaks","Imports Value in 1000 USD","Binding Coverage","Simple Tariff Line Average","Variance","Sum Of Rates","Sum Of SAvgRates","Count_Of_SAvgRates_Cases","Sum_Of_Squared_Rates","Nbr of AVE Lines","Nbr of NA Lines","Nbr of Free Lines","Nbr of Dutiable Lines","Nbr Line 0 to 5","Nbr Line 5 to 10","Nbr Line 10 to 20","Nbr Line 20 to 50","Nbr Line 50 to 100","Nbr Line more than 100","SumRateByWghtTrdValue","SumWghtTrdValue4NotNull","Free Imports in 1000 USD","Dutiable Imports in 1000 USD","Specific Duty Imports in 1000 USD"
-HS,H5,12,Algeria,201,"Meat of bovine animals, fresh or chilled.",76,Brazil,2018,2018,CMT,AHS,21,30,0,30,30,13,0,13,39416.729,,30,0,390,60,2,11700,0,0,0,13,0,0,0,13,0,0,1182501.856,39416.729,0,39416.729,0
-HS,H5,24,Angola,201,"Meat of bovine animals, fresh or chilled.",710,South Africa,2017,2017,INV,AHS,10,10,0,10,10,2,0,0,870.025,,10,0,20,20,2,200,0,0,0,2,0,2,0,0,0,0,8700.253,870.025,0,870.025,0
+Reporter_ISO_N,Year,ProductCode,Partner_ISO_N,DutyType,SimpleAverage,Nbr_Total_Lines
+12,2018,201,76,AHS,21,13
+24,2017,201,710,AHS,10,2

@@ -12,6 +12,10 @@ from app.db.models.internal import DatafileRegistryModel
 PipelineConfig = namedtuple('PipelineConfig', 'pipeline sub_directory force')
 
 
+class DSSDatafileProvider(DatafileProvider):
+    ignore_filename_patterns = ['[Content_Types].xml'] + DatafileProvider.ignore_filename_patterns
+
+
 class Manager:
     """ Manages several clean pipelines and one storage instance
     """
@@ -50,7 +54,7 @@ class Manager:
     def pipeline_process(self, pipeline_id, progress_bar=None):
         pipeline_config = self.pipeline_get(pipeline_id)
         storage = self.storage.get_sub_storage(pipeline_config.sub_directory)
-        dfp = DatafileProvider(storage)
+        dfp = DSSDatafileProvider(storage)
         processed_and_ignored_files = DatafileRegistryModel.get_processed_or_ignored_datafiles(
             pipeline_id
         )
@@ -64,7 +68,7 @@ class Manager:
                 progress_bar.set_postfix(str=file_name)
             pipeline = pipeline_config.pipeline
             try:
-                file_info = next(dfp.read_files(file_name))
+                file_info = next(dfp.read_files(file_name, unpack=True))
                 DatafileRegistryModel.get_update_or_create(
                     source=pipeline.id,
                     file_name=file_info.name,
