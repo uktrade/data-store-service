@@ -209,7 +209,6 @@ class DBI:
 
     def dsv_buffer_to_table(
         self,
-        *,
         csv_buffer,
         fq_table_name,
         columns,

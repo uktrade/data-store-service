@@ -19,7 +19,7 @@ arg_to_pipeline_config_list = {
         (ONSPostcodeDirectoryPipeline, 'ons/postcode_directory/')
     ],
     DITReferencePostcodesPipeline.data_source: [
-        (DITReferencePostcodesPipeline, 'data_workspace/reference_postcodes')
+        (DITReferencePostcodesPipeline, 'dit/reference_postcodes')
     ],
     ComtradeCountryCodeAndISOPipeline.data_source: [
         (ComtradeCountryCodeAndISOPipeline, 'comtrade/country_code_and_iso')
