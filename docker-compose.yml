@@ -1,0 +1,27 @@
+version: '3'
+services:
+  dss_web:
+    build: .
+    environment:
+      - DOCKER=1
+    env_file:
+      - ${ENV_FILE:-.env}
+    ports:
+      - ${PORT:-5050}:5050
+    depends_on:
+      - dss_postgres
+    volumes:
+      - .:/app
+
+  dss_postgres:
+    image: postgres:10
+    env_file:
+      - ${ENV_FILE:-.env}
+    ports:
+      - "5435:5432"
+
+  dss_redis:
+    image: redis:3.2
+    restart: always
+    ports:
+      - "6375:6379"

@@ -1,0 +1,5 @@
+flask:
+  env: test
+app:
+  hawk_enabled: True
+  database_url: $ENV{DSS_DATABASE_URL, postgresql://postgres:postgres@dss_postgres/postgres}

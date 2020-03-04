@@ -1,0 +1,4 @@
+Reporter_ISO_N,Year,ProductCode,Partner_ISO_N,DutyType,SimpleAverage,Nbr_Total_Lines
+"048", 1999, "0201","000","AHS",5,20
+"262", 2005, "0201","380","BND",40,40
+"266", 1998, "0201","000","AHS",20,20
