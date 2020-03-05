@@ -4,7 +4,7 @@ from app.db.models.external import (
     ComtradeCountryCodeAndISOL1,
     DITEUCountryMembershipL1,
     DITReferencePostcodesL1,
-    WorldBankTariffL1,
+    WorldBankTariffTransformL1,
 )
 from app.db.models.external import ONSPostcodeDirectoryL1
 
@@ -97,7 +97,7 @@ def add_world_bank_tariff(app):
                 'country_average': record.get('country_average'),
                 'world_average': record.get('world_average'),
             }
-            WorldBankTariffL1.get_or_create(
+            WorldBankTariffTransformL1.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
 

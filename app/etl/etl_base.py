@@ -101,11 +101,7 @@ class DataPipeline(metaclass=ABCMeta):
 
     @classproperty
     def schema(self):
-        return (
-            f'{self.organisation}.{self.dataset}'
-            f"{('.' + self.subdataset) if self.subdataset else ''}"
-            f'''{('.' + self.format_version) if self.format_version else ''}'''
-        )
+        return f'{self.organisation}.{self.dataset}'
 
     def _create_schema_if_not_exists(self, schema):
         if not self.dbi.schema_exists(schema):

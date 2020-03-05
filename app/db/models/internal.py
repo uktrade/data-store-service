@@ -57,7 +57,7 @@ class DatafileRegistryModel(BaseModel):
 
     id = _col('id', _int, primary_key=True, autoincrement=True)
     source = _col(_text, nullable=False)
-    file_name = _col(_text, nullable=False)
+    file_name = _col(_text)
     state = _col(processing_state, nullable=False, default=False)
     error_message = _col(_text)
     created_timestamp = _col(
@@ -69,6 +69,15 @@ class DatafileRegistryModel(BaseModel):
 
     @classmethod
     def get_update_or_create(cls, source, file_name, state=None, error_message=None):
+        if not file_name:
+            # always create new row if file_name is empty
+            instance = DatafileRegistryModel(
+                source=source, file_name=file_name, state=state, error_message=error_message
+            )
+            instance.save()
+            return instance, True
+
+        # update row if source/file_name already exists otherwise create new row
         defaults = {
             'state': state,
             'error_message': error_message,
