@@ -1,7 +1,7 @@
 import pytest
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
+from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline, WorldBankTariffTransformPipeline
 from tests.utils import rows_equal_table
 
 fixture_path = 'tests/fixtures/world_bank'
@@ -56,6 +56,8 @@ class TestWorldBankTariffPipeline:
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1)
 
         # check L1
+        pipeline = WorldBankTariffTransformPipeline(self.dbi, True)
+        pipeline.process()
         assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline, top_rows=1)
 
     @pytest.mark.parametrize(
@@ -127,4 +129,6 @@ class TestWorldBankTariffPipeline:
         pipeline = WorldBankTariffPipeline(self.dbi, True)
         fi = FileInfo.from_path(file_name)
         pipeline.process(fi)
+        pipeline = WorldBankTariffTransformPipeline(self.dbi, True)
+        pipeline.process()
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)

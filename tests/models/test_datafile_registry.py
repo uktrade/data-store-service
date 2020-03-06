@@ -40,6 +40,18 @@ entry6 = {
     'state': DatafileState.IGNORED.value,
     'error_message': None,
 }
+entry7 = {
+    'source': 'source3',
+    'file_name': None,
+    'state': DatafileState.PROCESSED.value,
+    'error_message': None,
+}
+entry8 = {
+    'source': 'source3',
+    'file_name': None,
+    'state': DatafileState.PROCESSED.value,
+    'error_message': None,
+}
 
 
 def test_get_dataframe(app_with_db):
@@ -61,6 +73,19 @@ def test_get_dataframe(app_with_db):
         df2[['source', 'file_name', 'state', 'error_message']], expected_df
     )
     assert df2.loc[1, 'created_timestamp'] < df2.loc[1, 'updated_timestamp']
+
+
+def test_empty_file_name_creates_additional_record(app_with_db):
+    row1, _ = DatafileRegistryModel.get_update_or_create(**entry7)
+    row2, _ = DatafileRegistryModel.get_update_or_create(**entry8)
+
+    # update data_file entry
+    expected_df = pd.DataFrame([entry7, entry8], index=[row1.id, row2.id])
+    expected_df.index.name = 'id'
+    result_df = DatafileRegistryModel.get_dataframe()
+    assert_dfs_equal_ignore_dtype(
+        result_df[['source', 'file_name', 'state', 'error_message']], expected_df
+    )
 
 
 def test_get_processed_or_ignored_datafile_names(app_with_db):

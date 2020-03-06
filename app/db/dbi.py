@@ -135,6 +135,10 @@ class DBI:
         stmt = 'DROP TABLE IF EXISTS {} CASCADE'.format(fq_name)
         self.execute_statement(stmt)
 
+    def drop_sequence(self, fq_name):
+        stmt = 'DROP SEQUENCE IF EXISTS {} CASCADE'.format(fq_name)
+        self.execute_statement(stmt)
+
     def table_exists(self, schema, table_name):
         query = f"""
          SELECT EXISTS (
@@ -250,3 +254,34 @@ class DBI:
         if encoding:
             sql += f" ENCODING '{encoding}'"
         return sql
+
+    def rename_table(self, schema, table_name, new_table_name):
+        stmt = f"""
+            select indexname
+            from pg_indexes
+            where tablename = '{table_name}' and schemaname = '{schema}';
+        """
+        indices = self.execute_query(stmt, df=False)
+        for index in indices:
+            stmt = f"""
+                alter index "{schema}"."{index[0]}"
+                rename to "{index[0].replace(table_name, new_table_name)}";
+            """
+            self.execute_statement(stmt)
+        stmt = f"""
+            SELECT relname FROM pg_class c
+            join pg_namespace nsp on nsp.oid = c.relnamespace
+            WHERE c.relkind = 'S'
+            and relname = '{table_name}_id_seq' and nspname = '{schema}';
+        """
+        sequences = self.execute_query(stmt, df=False)
+        if sequences:
+            stmt = f"""
+                alter sequence "{schema}"."{sequences[0][0]}"
+                rename to "{sequences[0][0].replace(table_name, new_table_name)}";
+            """
+            self.execute_statement(stmt)
+        stmt = f"""
+            alter table "{schema}"."{table_name}" rename to "{new_table_name}";
+        """
+        self.execute_statement(stmt)
