@@ -6,9 +6,10 @@ from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOP
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline, WorldBankTariffTransformPipeline
+from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline, WorldBankTariffTransformPipeline, \
+    WorldBankTariffBulkPipeline, WorldBankTariffTestPipeline, WorldBankTariffTransformTestPipeline, \
+    WorldBankTariffTransformBulkPipeline
 from app.etl.manager import Manager as PipelineManager
-
 
 arg_to_pipeline_config_list = {
     # format:  {'command option': [(pipeline, dataset subdir)]}
@@ -30,6 +31,14 @@ arg_to_pipeline_config_list = {
     WorldBankTariffPipeline.data_source: [
         (WorldBankTariffPipeline, 'world_bank/tariff'),
         (WorldBankTariffTransformPipeline, None),
+    ],
+    WorldBankTariffTestPipeline.data_source: [
+        (WorldBankTariffTestPipeline, 'world_bank/test'),
+        (WorldBankTariffTransformTestPipeline, None),
+    ],
+    WorldBankTariffBulkPipeline.data_source: [
+        (WorldBankTariffBulkPipeline, 'world_bank/bulk'),
+        (WorldBankTariffTransformBulkPipeline, None),
     ],
 }
 

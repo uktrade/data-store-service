@@ -48,7 +48,6 @@ def app_with_db(app):
     yield app
     app.db.session.close()
     app.db.session.remove()
-    app.db.drop_all()
     sqlalchemy_utils.drop_database(app.config['SQLALCHEMY_DATABASE_URI'])
 
 
@@ -61,7 +60,6 @@ def app_with_db_module(app):
     yield app
     app.db.session.close()
     app.db.session.remove()
-    app.db.drop_all()
     sqlalchemy_utils.drop_database(app.config['SQLALCHEMY_DATABASE_URI'])
 
 

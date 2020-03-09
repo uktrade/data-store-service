@@ -8,6 +8,7 @@ from io import StringIO
 import pandas as pd
 import sqlalchemy
 from flask import current_app as flask_app
+from sqlalchemy import DDL
 from sqlalchemy_utils import functions as sa_functions
 
 TableID = namedtuple('TableID', 'schema table')
@@ -133,6 +134,10 @@ class DBI:
 
     def drop_table(self, fq_name):
         stmt = 'DROP TABLE IF EXISTS {} CASCADE'.format(fq_name)
+        self.execute_statement(stmt)
+
+    def drop_view(self, fq_name):
+        stmt = 'DROP VIEW IF EXISTS {} CASCADE'.format(fq_name)
         self.execute_statement(stmt)
 
     def drop_sequence(self, fq_name):
@@ -285,3 +290,19 @@ class DBI:
             alter table "{schema}"."{table_name}" rename to "{new_table_name}";
         """
         self.execute_statement(stmt)
+
+    def table_exists(self, schema, table_name, materialized_view=False):
+        query = f"""
+         SELECT EXISTS (
+            SELECT 1
+               FROM   {'information_schema.tables' if not materialized_view else 'pg_matviews'} 
+               WHERE  {'table_schema' if not materialized_view else 'schemaname'} = '{schema}'
+               AND    {'table_name' if not materialized_view else 'matviewname'} = '{table_name}'
+         );
+        """
+        return list(self.execute_query(query))[0][0]
+
+    def refresh_materialised_view(self, fq_view_name):
+        self.execute_statement(DDL(f"""
+            REFRESH MATERIALIZED VIEW {fq_view_name};
+        """))
