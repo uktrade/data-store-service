@@ -120,7 +120,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
         for view_name, create_view in views:
             fq_view_name = self._fq(view_name)
             if self.force:
-                self.dbi.drop_view(fq_view_name)
+                self.dbi.drop_materialized_view(fq_view_name)
             if not self.dbi.table_exists(self.schema, view_name, materialized_view=True):
                 create_view()
             else:
