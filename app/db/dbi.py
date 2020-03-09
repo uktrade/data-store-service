@@ -136,8 +136,8 @@ class DBI:
         stmt = 'DROP TABLE IF EXISTS {} CASCADE'.format(fq_name)
         self.execute_statement(stmt)
 
-    def drop_view(self, fq_name):
-        stmt = 'DROP VIEW IF EXISTS {} CASCADE'.format(fq_name)
+    def drop_materialized_view(self, fq_name):
+        stmt = 'DROP MATERIALIZED VIEW IF EXISTS {} CASCADE'.format(fq_name)
         self.execute_statement(stmt)
 
     def drop_sequence(self, fq_name):
