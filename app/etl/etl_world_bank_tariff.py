@@ -12,9 +12,9 @@ def timeit(method):
         ts = time.time()
         result = method(*args, **kw)
         te = time.time()
-        print('%r  %2.2f min' %
-              (method.__name__, (te - ts)/60))
+        print('%r  %2.2f min' % (method.__name__, (te - ts) / 60))
         return result
+
     return timed
 
 
@@ -34,7 +34,7 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
 
     _l1_data_column_types = None
 
-    def process(self, file_info=None, drop_source=True):
+    def process(self, file_info=None, drop_source=True, **kwargs):
         self._create_sequence(self._l0_sequence, drop_existing=self.force)
         self._create_table(self._l0_table, self._l0_column_types, drop_existing=self.force)
         self._create_table(self._l0_temp_table, self._l0_column_types, drop_existing=True)
@@ -90,10 +90,13 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
 
     _l0_l1_data_transformations = {}
 
-    def process(self, file_info=None, drop_source=True):
-        self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=True)
+    def process(self, file_info=None, drop_source=True, **kwargs):
+        drop_existing = not self.continue_transform
+        self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=drop_existing)
         self._l0_to_l1()
+        self.finish_processing()
 
+    def finish_processing(self):
         # swap tables to minimize api downtime
         self.dbi.drop_table(self._l1_table)
         self.dbi.rename_table(
@@ -135,11 +138,15 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
         return self.dbi.to_fully_qualified(table_name, self.schema)
 
     def _get_products(self):
+        where = ""
+        if self.continue_transform:
+            where = f"where product not in (select distinct product from {self._l1_temp_table})"
+
         stmt = f"""
         select distinct 
             product 
         from {self._l0_table}
-        --where substr(product::text, 0,5)::int = 8442 
+        {where}
         order by product
         """
         return self.dbi.execute_query(stmt, raise_if_fail=True)

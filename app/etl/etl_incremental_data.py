@@ -75,7 +75,7 @@ class IncrementalDataPipeline(DataPipeline):
         self._create_table(self._l0_temp_table, self._l0_column_types, drop_existing=True)
         self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=True)
 
-    def process(self, file_info=None, drop_source=True):
+    def process(self, file_info, drop_source=True, **kwargs):
         self.create_tables()
         self._datafile_to_l0_temp(file_info)
         self._l0_to_l1()
