@@ -1,8 +1,9 @@
 import time
 from io import BytesIO
 from multiprocessing.pool import ThreadPool as Pool
-from flask import current_app as flask_app
+
 import psycopg2
+from flask import current_app as flask_app
 
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
@@ -151,8 +152,8 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             where = f"where product not in (select distinct product from {self._l1_temp_table})"
 
         stmt = f"""
-        select distinct 
-            product 
+        select distinct
+            product
         from {self._l0_table}
         {where}
         order by product
@@ -166,7 +167,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             stmt = f"""
             with all_product_tariffs as (
                 select
-                    * 
+                    *
                 from {self._fq(self.all_tariffs_vn)}
                 where product = '{product}'
             ), cleaned_tariffs as (
@@ -196,8 +197,10 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                     ) as final_tariff
                 from {self._fq(self.tariff_spine_vn)} t1
                 left join all_product_tariffs t2 using (reporter, partner, year)
-                left join {self._fq(self.eu_countries_vn)} t3 on t1.reporter = t3.iso_number and t1.year = t3.year
-                left join {self._fq(self.eu_countries_vn)} t4 on t1.partner = t4.iso_number and t1.year = t4.year
+                left join {self._fq(self.eu_countries_vn)} t3
+                    on t1.reporter = t3.iso_number and t1.year = t3.year
+                left join {self._fq(self.eu_countries_vn)} t4
+                    on t1.partner = t4.iso_number and t1.year = t4.year
                 left join {self._fq(self.eu_charging_rates_vn)} t5
                     on t1.reporter = t5.reporter and t1.year = t5.year
                         and t5.partner_eu = t4.tariff_code
@@ -237,7 +240,8 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                     from (
                         select
                             *,
-                            count(filled_tariff_tmp) over (partition by reporter, partner ORDER BY year)
+                            count(filled_tariff_tmp)
+                                over (partition by reporter, partner ORDER BY year)
                             as filled_tariff_partition
                         from filled_tariffs
                     ) sq1
@@ -326,7 +330,8 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             ), mfn_tariffs as (
                 select * from tariffs_and_countries where tariff_type = 'MFN'
             ), bnd_tariffs as (
-                select distinct reporter, product, bound_rate from {world_bank_bound_rates._l1_table}
+                select distinct reporter, product, bound_rate
+                    from {world_bank_bound_rates._l1_table}
             )
             select
                 product,
@@ -350,12 +355,12 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
     def _create_eu_charging_rates_view(self):
         stmt = f"""
         create materialized view if not exists {self._fq(self.eu_charging_rates_vn)} as (
-            select 
-                reporter, 
-                year, 
-                'EUN' as partner_eu, 
+            select
+                reporter,
+                year,
+                'EUN' as partner_eu,
                 avg(app_rate) as eu_partner_avg
-            from {self._fq(self.all_tariffs_vn)} 
+            from {self._fq(self.all_tariffs_vn)}
             where partner_eu = 'EUN'
             group by reporter, year, partner_eu
         )
@@ -366,10 +371,10 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
     def _create_eu_member_rates_view(self):
         stmt = f"""
         create materialized view if not exists {self._fq(self.eu_member_rates_vn)} as (
-            select 
-                partner, 
-                year, 
-                'EUN' as reporter_eu, 
+            select
+                partner,
+                year,
+                'EUN' as reporter_eu,
                 app_rate as eu_reporter_avg
             from {self._fq(self.all_tariffs_vn)} where reporter = '918'
         )

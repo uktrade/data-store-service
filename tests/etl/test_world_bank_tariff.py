@@ -174,7 +174,7 @@ class TestWorldBankTariffPipeline:
         (
             (True, PRODUCT_201_ROWS + PRODUCT_301_ROWS + PRODUCT_401_ROWS),
             (False, PRODUCT_301_ROWS + PRODUCT_401_ROWS),
-            ),
+        ),
     )
     def test_transform_of_datafile_continue(self, continue_transform, expected_rows):
         self.partial_transform_data()

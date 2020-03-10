@@ -7,9 +7,14 @@ from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 from app.etl.etl_world_bank_bound_rates import WorldBankBoundRatesPipeline
-from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline, WorldBankTariffTransformPipeline, \
-    WorldBankTariffBulkPipeline, WorldBankTariffTestPipeline, WorldBankTariffTransformTestPipeline, \
-    WorldBankTariffTransformBulkPipeline
+from app.etl.etl_world_bank_tariff import (
+    WorldBankTariffBulkPipeline,
+    WorldBankTariffPipeline,
+    WorldBankTariffTestPipeline,
+    WorldBankTariffTransformBulkPipeline,
+    WorldBankTariffTransformPipeline,
+    WorldBankTariffTransformTestPipeline,
+)
 from app.etl.manager import Manager as PipelineManager
 
 arg_to_pipeline_config_list = {

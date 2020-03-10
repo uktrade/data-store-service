@@ -144,17 +144,6 @@ class DBI:
         stmt = 'DROP SEQUENCE IF EXISTS {} CASCADE'.format(fq_name)
         self.execute_statement(stmt)
 
-    def table_exists(self, schema, table_name):
-        query = f"""
-         SELECT EXISTS (
-            SELECT 1
-               FROM   information_schema.tables
-               WHERE  table_schema = '{schema}'
-               AND    table_name = '{table_name}'
-         );
-        """
-        return list(self.execute_statement(query))[0][0]
-
     def append_table(self, source_table, target_table, drop_source=True):
         stmt = f"""
                INSERT INTO {target_table} (
@@ -295,7 +284,7 @@ class DBI:
         query = f"""
          SELECT EXISTS (
             SELECT 1
-               FROM   {'information_schema.tables' if not materialized_view else 'pg_matviews'} 
+               FROM   {'information_schema.tables' if not materialized_view else 'pg_matviews'}
                WHERE  {'table_schema' if not materialized_view else 'schemaname'} = '{schema}'
                AND    {'table_name' if not materialized_view else 'matviewname'} = '{table_name}'
          );
