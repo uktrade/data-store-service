@@ -7,6 +7,7 @@ import psycopg2
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_incremental_data import IncrementalDataPipeline
+from app.etl.etl_world_bank_bound_rates import WorldBankBoundRatesPipeline
 
 
 def timeit(method):
@@ -294,6 +295,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
 
     @timeit
     def _create_all_tariffs_view(self):
+        world_bank_bound_rates = WorldBankBoundRatesPipeline(self.dbi)
         stmt = f"""
         create materialized view if not exists {self._fq(self.all_tariffs_vn)} as (
             with tariffs_and_countries as (
@@ -316,7 +318,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             ), mfn_tariffs as (
                 select * from tariffs_and_countries where tariff_type = 'MFN'
             ), bnd_tariffs as (
-                select * from tariffs_and_countries where tariff_type = 'BND'
+                select distinct reporter, product, bound_rate from {world_bank_bound_rates._l1_table}
             )
             select
                 product,
@@ -327,10 +329,10 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                 t1.partner_eu,
                 t1.simple_average as app_rate,
                 t3.simple_average as mfn_rate,
-                t4.simple_average as bnd_rate
+                t4.bound_rate as bnd_rate
             from ahs_tariffs t1
             left join mfn_tariffs t3 using (product, reporter, partner, year)
-            left join bnd_tariffs t4 using (product, reporter, partner, year)
+            left join bnd_tariffs t4 using (product, reporter)
             where reporter != partner and reporter != 0 and partner != 0
         )
         """
