@@ -303,6 +303,10 @@ class DBI:
         return list(self.execute_query(query))[0][0]
 
     def refresh_materialised_view(self, fq_view_name):
-        self.execute_statement(DDL(f"""
+        self.execute_statement(
+            DDL(
+                f"""
             REFRESH MATERIALIZED VIEW {fq_view_name};
-        """))
+        """
+            )
+        )
