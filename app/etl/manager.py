@@ -105,7 +105,7 @@ class Manager:
             self.pipeline_process(pipeline_id, progress_bar=progress)
 
     def pipeline_register(
-        self, pipeline, sub_directory=None, pipeline_id=None, force=False, continue_transfom=False
+        self, pipeline, sub_directory=None, pipeline_id=None, force=False, continue_transform=False
     ):
         """ Register a clean pipeline for the manager to use
 
@@ -125,7 +125,7 @@ class Manager:
             None
         """
         po = (
-            pipeline(dbi=self.dbi, force=force, continue_transfom=continue_transfom)
+            pipeline(dbi=self.dbi, force=force, continue_transform=continue_transform)
             if inspect.isclass(pipeline)
             else pipeline
         )

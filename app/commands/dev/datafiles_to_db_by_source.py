@@ -50,7 +50,7 @@ def datafiles_to_db_by_source(**kwargs):
                     pipeline=pipeline,
                     sub_directory=sub_dir,
                     force=kwargs['force'],
-                    continue_transfom=kwargs['continue'],
+                    continue_transform=kwargs['continue'],
                 )
     manager.pipeline_process_all()
 
