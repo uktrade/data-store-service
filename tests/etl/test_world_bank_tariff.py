@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from datatools.io.fileinfo import FileInfo
 
@@ -12,6 +14,35 @@ eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
 country_to_world_file = f'{fixture_path}/country_to_world.csv'
 countries_expanding_file = f'{fixture_path}/countries_expanding.csv'
 country_to_country_two_years = f'{fixture_path}/country_to_country_two_years.csv'
+country_to_country_three_products = f'{fixture_path}/country_to_country_three_products.csv'
+
+
+PRODUCT_201_ROWS = [
+    (201, 12, 76, 2018, 21.0, 21.0, None, None, None, 21.0, 21.0),
+    (201, 12, 710, 2018, 21.0, None, None, None, None, 21.0, 21.0),
+    (201, 24, 76, 2018, 21.0, None, None, None, None, None, 21.0),
+    (201, 24, 710, 2018, 21.0, None, None, None, None, None, 21.0),
+    (201, 26, 76, 2018, 21.0, None, None, None, None, None, 21.0),
+    (201, 26, 710, 2018, 21.0, None, None, None, None, None, 21.0),
+]
+
+PRODUCT_301_ROWS = [
+    (301, 12, 76, 2018, 10.0, None, None, None, None, None, 10.0),
+    (301, 12, 710, 2018, 10.0, None, None, None, None, None, 10.0),
+    (301, 24, 76, 2018, 10.0, None, None, None, None, 10.0, 10.0),
+    (301, 24, 710, 2018, 10.0, 10.0, None, None, None, 10.0, 10.0),
+    (301, 26, 76, 2018, 10.0, None, None, None, None, None, 10.0),
+    (301, 26, 710, 2018, 10.0, None, None, None, None, None, 10.0),
+]
+
+PRODUCT_401_ROWS = [
+    (401, 12, 76, 2018, 10.0, None, None, None, None, None, 10.0),
+    (401, 12, 710, 2018, 10.0, None, None, None, None, None, 10.0),
+    (401, 24, 76, 2018, 10.0, None, None, None, None, None, 10.0),
+    (401, 24, 710, 2018, 10.0, None, None, None, None, None, 10.0),
+    (401, 26, 76, 2018, 10.0, None, None, None, None, 10.0, 10.0),
+    (401, 26, 710, 2018, 10.0, 10.0, None, None, None, 10.0, 10.0),
+]
 
 comtrade_countries = [
     {'id': 1, 'cty_code': 0, 'cty_name_english': 'World', 'iso3_digit_alp': 'WLD'},
@@ -123,6 +154,11 @@ class TestWorldBankTariffPipeline:
                 # tariff between Vietnam (704) to Ireland (372) and a PRF rate
                 # added, different world average
             ),
+            (
+                country_to_country_three_products,
+                [2018],
+                PRODUCT_201_ROWS + PRODUCT_301_ROWS + PRODUCT_401_ROWS,
+            ),
         ),
     )
     def test_transform_of_datafile(self, file_name, years, expected_rows):
@@ -132,3 +168,42 @@ class TestWorldBankTariffPipeline:
         pipeline = WorldBankTariffTransformPipeline(self.dbi, True)
         pipeline.process()
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
+
+    @pytest.mark.parametrize(
+        'continue_transform,expected_rows',
+        (
+            (True, PRODUCT_201_ROWS + PRODUCT_301_ROWS + PRODUCT_401_ROWS),
+            (False, PRODUCT_301_ROWS + PRODUCT_401_ROWS),
+            ),
+    )
+    def test_transform_of_datafile_continue(self, continue_transform, expected_rows):
+        self.partial_transform_data()
+        with mock.patch(
+            'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline._get_products'
+        ) as mock_get_products:
+            mock_get_products.return_value = [['301'], ['401']]
+
+            pipeline = WorldBankTariffTransformPipeline(self.dbi, False, continue_transform)
+            pipeline.process()
+            assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline,)
+
+    def partial_transform_data(self):
+        pipeline = WorldBankTariffPipeline(self.dbi, True)
+        fi = FileInfo.from_path(country_to_country_three_products)
+        pipeline.process(fi)
+
+        with mock.patch(
+            'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline._get_products'
+        ) as mock_get_products:
+            mock_get_products.return_value = [['201']]
+            with mock.patch(
+                'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline.finish_processing'
+            ) as mock_finish_processing:
+                mock_finish_processing.return_value = None
+
+                pipeline = WorldBankTariffTransformPipeline(self.dbi, False, True)
+                pipeline.process()
+                assert rows_equal_table(
+                    self.dbi, PRODUCT_201_ROWS, pipeline._l1_temp_table, pipeline
+                )
+                assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline)

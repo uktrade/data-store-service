@@ -45,9 +45,10 @@ class DataPipeline(metaclass=ABCMeta):
             ('data_source_row_id', 'int'),  # reference to L0 id column
         ]
 
-    def __init__(self, dbi, force=False):
+    def __init__(self, dbi, force=False, continue_transform=False):
         self.dbi = dbi
         self.force = force
+        self.continue_transform = continue_transform
         if not dbi:
             flask_app.logger.error(
                 f'warning: dbi ({dbi}) is not valid; '
@@ -95,7 +96,7 @@ class DataPipeline(metaclass=ABCMeta):
     subdataset, format_version = None, None
 
     @abstractmethod
-    def process(self, fileinfo=None):
+    def process(self, fileinfo, **kwargs):
         """ Takes a datatools.io.fileinfo.FileInfo object """
         ...
 

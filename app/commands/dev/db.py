@@ -42,7 +42,9 @@ def db(create, drop, drop_tables, create_tables, recreate_tables):
             click.echo('Drop DB tables')
             engine = app.db.engine
             all_schemas = inspect(engine).get_schema_names()
-            schemas_to_delete = [x for x in all_schemas if x not in ['admin', 'information_schema', 'public']]
+            schemas_to_delete = [
+                x for x in all_schemas if x not in ['admin', 'information_schema', 'public']
+            ]
             for schema in schemas_to_delete:
                 click.echo(f'Dropping {schema} schema')
                 engine.execute(f'DROP SCHEMA "{schema}" CASCADE')
