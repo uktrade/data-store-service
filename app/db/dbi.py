@@ -8,6 +8,7 @@ from io import StringIO
 import pandas as pd
 import sqlalchemy
 from flask import current_app as flask_app
+from sqlalchemy import DDL
 from sqlalchemy_utils import functions as sa_functions
 
 TableID = namedtuple('TableID', 'schema table')
@@ -135,20 +136,13 @@ class DBI:
         stmt = 'DROP TABLE IF EXISTS {} CASCADE'.format(fq_name)
         self.execute_statement(stmt)
 
+    def drop_materialized_view(self, fq_name):
+        stmt = 'DROP MATERIALIZED VIEW IF EXISTS {} CASCADE'.format(fq_name)
+        self.execute_statement(stmt)
+
     def drop_sequence(self, fq_name):
         stmt = 'DROP SEQUENCE IF EXISTS {} CASCADE'.format(fq_name)
         self.execute_statement(stmt)
-
-    def table_exists(self, schema, table_name):
-        query = f"""
-         SELECT EXISTS (
-            SELECT 1
-               FROM   information_schema.tables
-               WHERE  table_schema = '{schema}'
-               AND    table_name = '{table_name}'
-         );
-        """
-        return list(self.execute_statement(query))[0][0]
 
     def append_table(self, source_table, target_table, drop_source=True):
         stmt = f"""
@@ -285,3 +279,23 @@ class DBI:
             alter table "{schema}"."{table_name}" rename to "{new_table_name}";
         """
         self.execute_statement(stmt)
+
+    def table_exists(self, schema, table_name, materialized_view=False):
+        query = f"""
+         SELECT EXISTS (
+            SELECT 1
+               FROM   {'information_schema.tables' if not materialized_view else 'pg_matviews'}
+               WHERE  {'table_schema' if not materialized_view else 'schemaname'} = '{schema}'
+               AND    {'table_name' if not materialized_view else 'matviewname'} = '{table_name}'
+         );
+        """
+        return list(self.execute_query(query))[0][0]
+
+    def refresh_materialised_view(self, fq_view_name):
+        self.execute_statement(
+            DDL(
+                f"""
+            REFRESH MATERIALIZED VIEW {fq_view_name};
+        """
+            )
+        )

@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from datatools.io.fileinfo import FileInfo
 
@@ -12,6 +14,35 @@ eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
 country_to_world_file = f'{fixture_path}/country_to_world.csv'
 countries_expanding_file = f'{fixture_path}/countries_expanding.csv'
 country_to_country_two_years = f'{fixture_path}/country_to_country_two_years.csv'
+country_to_country_three_products = f'{fixture_path}/country_to_country_three_products.csv'
+
+
+PRODUCT_201_ROWS = [
+    (201, 12, 76, 2018, 21.0, 21.0, None, None, 21.0, 21.0),
+    (201, 12, 710, 2018, 21.0, None, None, None, 21.0, 21.0),
+    (201, 24, 76, 2018, 21.0, None, None, None, None, 21.0),
+    (201, 24, 710, 2018, 21.0, None, None, None, None, 21.0),
+    (201, 26, 76, 2018, 21.0, None, None, None, None, 21.0),
+    (201, 26, 710, 2018, 21.0, None, None, None, None, 21.0),
+]
+
+PRODUCT_301_ROWS = [
+    (301, 12, 76, 2018, 10.0, None, None, None, None, 10.0),
+    (301, 12, 710, 2018, 10.0, None, None, None, None, 10.0),
+    (301, 24, 76, 2018, 10.0, None, None, None, 10.0, 10.0),
+    (301, 24, 710, 2018, 10.0, 10.0, None, None, 10.0, 10.0),
+    (301, 26, 76, 2018, 10.0, None, None, None, None, 10.0),
+    (301, 26, 710, 2018, 10.0, None, None, None, None, 10.0),
+]
+
+PRODUCT_401_ROWS = [
+    (401, 12, 76, 2018, 10.0, None, None, None, None, 10.0),
+    (401, 12, 710, 2018, 10.0, None, None, None, None, 10.0),
+    (401, 24, 76, 2018, 10.0, None, None, None, None, 10.0),
+    (401, 24, 710, 2018, 10.0, None, None, None, None, 10.0),
+    (401, 26, 76, 2018, 10.0, None, None, None, 10.0, 10.0),
+    (401, 26, 710, 2018, 10.0, 10.0, None, None, 10.0, 10.0),
+]
 
 comtrade_countries = [
     {'id': 1, 'cty_code': 0, 'cty_name_english': 'World', 'iso3_digit_alp': 'WLD'},
@@ -37,13 +68,22 @@ eu_country_memberships = [
     for i, year in enumerate(range(1958, 2018), 61)
 ]
 
+bound_rates = [{'reporter': 918, 'product': 201, 'bound_rate': 83.03}]
+
 
 class TestWorldBankTariffPipeline:
     @pytest.fixture(autouse=True, scope='function')
-    def setup(self, app_with_db, add_comtrade_country_code_and_iso, add_dit_eu_country_membership):
+    def setup(
+        self,
+        app_with_db,
+        add_comtrade_country_code_and_iso,
+        add_dit_eu_country_membership,
+        add_world_bank_bound_rates,
+    ):
         self.dbi = app_with_db.dbi
         add_comtrade_country_code_and_iso(comtrade_countries)
         add_dit_eu_country_membership(eu_country_memberships)
+        add_world_bank_bound_rates(bound_rates)
 
     def test_pipeline(self):
         pipeline = WorldBankTariffPipeline(self.dbi, True)
@@ -66,24 +106,24 @@ class TestWorldBankTariffPipeline:
             (
                 eu_country_to_eu_country_file,
                 [2014],
-                [(201, 705, 381, 2014, 76.51, 76.51, 76.53, 76.54, None, 76.51, 76.51)],
+                [(201, 705, 381, 2014, 76.51, 76.51, 76.53, None, 76.51, 76.51)],
                 # Italy has incorrect id 380 in product file and has to be fixed by the
                 # cleaning process and updated to 381
             ),
             (
                 eu_to_country_file,
                 [2014],
-                [(201, 918, 36, 2014, 81.96, 81.96, 81.96, 81.96, 83.03, 81.96, 81.96)],
+                [(201, 918, 36, 2014, 81.96, 81.96, 81.96, 83.03, 81.96, 81.96)],
                 # When the reporter is EU it remains EU
             ),
             (
                 country_to_world_file,
                 [2018],
                 [
-                    (201, 12, 76, 2018, 21, 21, None, None, None, 21, 15.5),
-                    (201, 12, 710, 2018, 21, None, None, None, None, 21, 15.5),
-                    (201, 24, 76, 2018, 10, None, None, None, None, 10, 15.5),
-                    (201, 24, 710, 2018, 10, 10, None, None, None, 10, 15.5),
+                    (201, 12, 76, 2018, 21, 21, None, None, 21, 15.5),
+                    (201, 12, 710, 2018, 21, None, None, None, 21, 15.5),
+                    (201, 24, 76, 2018, 10, None, None, None, 10, 15.5),
+                    (201, 24, 710, 2018, 10, 10, None, None, 10, 15.5),
                 ]
                 # Algeria (12) has a tariff specified with World & Brazil (76)
                 # Angola (24) has a tariff specified with World & South Africa (710)
@@ -95,33 +135,38 @@ class TestWorldBankTariffPipeline:
                 country_to_country_two_years,
                 [2017, 2018],
                 [
-                    (201, 12, 76, 2017, 21, None, None, None, None, 21, 15.5),
-                    (201, 12, 76, 2018, 21, 21, None, None, None, 21, 15.5),
-                    (201, 12, 710, 2017, 21, None, None, None, None, 21, 15.5),
-                    (201, 12, 710, 2018, 21, None, None, None, None, 21, 15.5),
-                    (201, 24, 76, 2017, 10, None, None, None, None, 10, 15.5),
-                    (201, 24, 76, 2018, 10, None, None, None, None, 10, 15.5),
-                    (201, 24, 710, 2017, 10, 10, None, None, None, 10, 15.5),
-                    (201, 24, 710, 2018, 10, None, None, None, None, 10, 15.5),
+                    (201, 12, 76, 2017, 21, None, None, None, 21, 15.5),
+                    (201, 12, 76, 2018, 21, 21, None, None, 21, 15.5),
+                    (201, 12, 710, 2017, 21, None, None, None, 21, 15.5),
+                    (201, 12, 710, 2018, 21, None, None, None, 21, 15.5),
+                    (201, 24, 76, 2017, 10, None, None, None, 10, 15.5),
+                    (201, 24, 76, 2018, 10, None, None, None, 10, 15.5),
+                    (201, 24, 710, 2017, 10, 10, None, None, 10, 15.5),
+                    (201, 24, 710, 2018, 10, None, None, None, 10, 15.5),
                 ],
             ),
             (
                 countries_expanding_file,
                 [2018],
                 [
-                    (201, 12, 76, 2018, 21, 21, None, None, None, 21, 16.333333333333332),
-                    (201, 12, 372, 2018, 21, None, None, None, None, 21, 16.333333333333332),
-                    (201, 12, 710, 2018, 21, None, None, None, None, 21, 16.333333333333332),
-                    (201, 24, 76, 2018, 10, None, None, None, None, 10, 16.333333333333332),
-                    (201, 24, 372, 2018, 10, None, None, None, None, 10, 16.333333333333332),
-                    (201, 24, 710, 2018, 10, 10, None, None, None, 10, 16.333333333333332),
-                    (201, 704, 76, 2018, 18, None, None, None, None, 18, 16.333333333333332),
-                    (201, 704, 372, 2018, 18, 18, None, 9, None, 18, 16.333333333333332),
-                    (201, 704, 710, 2018, 18, None, None, None, None, 18, 16.333333333333332),
+                    (201, 12, 76, 2018, 21, 21, None, None, 21, 16.333333333333332),
+                    (201, 12, 372, 2018, 21, None, None, None, 21, 16.333333333333332),
+                    (201, 12, 710, 2018, 21, None, None, None, 21, 16.333333333333332),
+                    (201, 24, 76, 2018, 10, None, None, None, 10, 16.333333333333332),
+                    (201, 24, 372, 2018, 10, None, None, None, 10, 16.333333333333332),
+                    (201, 24, 710, 2018, 10, 10, None, None, 10, 16.333333333333332),
+                    (201, 704, 76, 2018, 18, None, None, None, 18, 16.333333333333332),
+                    (201, 704, 372, 2018, 18, 18, None, None, 18, 16.333333333333332),
+                    (201, 704, 710, 2018, 18, None, None, None, 18, 16.333333333333332),
                 ]
                 # Same as country_to_world file with World entries removed and a
                 # tariff between Vietnam (704) to Ireland (372) and a PRF rate
                 # added, different world average
+            ),
+            (
+                country_to_country_three_products,
+                [2018],
+                PRODUCT_201_ROWS + PRODUCT_301_ROWS + PRODUCT_401_ROWS,
             ),
         ),
     )
@@ -132,3 +177,42 @@ class TestWorldBankTariffPipeline:
         pipeline = WorldBankTariffTransformPipeline(self.dbi, True)
         pipeline.process()
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
+
+    @pytest.mark.parametrize(
+        'continue_transform,expected_rows',
+        (
+            (True, PRODUCT_201_ROWS + PRODUCT_301_ROWS + PRODUCT_401_ROWS),
+            (False, PRODUCT_301_ROWS + PRODUCT_401_ROWS),
+        ),
+    )
+    def test_transform_of_datafile_continue(self, continue_transform, expected_rows):
+        self.partial_transform_data()
+        with mock.patch(
+            'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline._get_products'
+        ) as mock_get_products:
+            mock_get_products.return_value = [['301'], ['401']]
+
+            pipeline = WorldBankTariffTransformPipeline(self.dbi, False, continue_transform)
+            pipeline.process()
+            assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline,)
+
+    def partial_transform_data(self):
+        pipeline = WorldBankTariffPipeline(self.dbi, True)
+        fi = FileInfo.from_path(country_to_country_three_products)
+        pipeline.process(fi)
+
+        with mock.patch(
+            'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline._get_products'
+        ) as mock_get_products:
+            mock_get_products.return_value = [['201']]
+            with mock.patch(
+                'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline.finish_processing'
+            ) as mock_finish_processing:
+                mock_finish_processing.return_value = None
+
+                pipeline = WorldBankTariffTransformPipeline(self.dbi, False, True)
+                pipeline.process()
+                assert rows_equal_table(
+                    self.dbi, PRODUCT_201_ROWS, pipeline._l1_temp_table, pipeline
+                )
+                assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline)

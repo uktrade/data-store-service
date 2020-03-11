@@ -63,7 +63,7 @@ class SnapshotDataPipeline(DataPipeline):
     def _l1_column_types(self):
         return self.l1_helper_columns + self._l1_data_column_types
 
-    def process(self, file_info, delete_previous=False):
+    def process(self, file_info, delete_previous=False, **kwargs):
         datafile_name = file_info.name.split('/')[-1]
 
         self._create_table(self._l0_temp_table, self._l0_data_column_types, drop_existing=True)

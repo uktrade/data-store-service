@@ -14,7 +14,7 @@ class TestDbCommand:
         assert result.exception is None
 
     @pytest.mark.parametrize(
-        'drop_database,create_tables,drop_tables,' 'create_database,recreate_tables,expected_msg',
+        'drop_database,create_tables,drop_tables,create_database,recreate_tables,expected_msg',
         (
             (False, False, False, False, False, True),
             (True, False, False, False, False, False),
@@ -25,7 +25,7 @@ class TestDbCommand:
         ),
     )
     @mock.patch('flask_sqlalchemy.SQLAlchemy.create_all')
-    @mock.patch('flask_sqlalchemy.SQLAlchemy.drop_all')
+    @mock.patch('app.db.dbi.DBI.drop_schema')
     @mock.patch('sqlalchemy_utils.create_database')
     @mock.patch('sqlalchemy_utils.drop_database')
     def test_run_db(
@@ -60,7 +60,6 @@ class TestDbCommand:
         if recreate_tables:
             args.append('--recreate_tables')
 
-        result = runner.invoke(db)
         result = runner.invoke(db, args)
         assert mock_drop_database.called is drop_database
         assert mock_create_database.called is create_database

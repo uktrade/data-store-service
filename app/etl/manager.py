@@ -104,7 +104,9 @@ class Manager:
             progress.set_description(pipeline_id)
             self.pipeline_process(pipeline_id, progress_bar=progress)
 
-    def pipeline_register(self, pipeline, sub_directory=None, pipeline_id=None, force=False):
+    def pipeline_register(
+        self, pipeline, sub_directory=None, pipeline_id=None, force=False, continue_transform=False
+    ):
         """ Register a clean pipeline for the manager to use
 
         Args:
@@ -122,7 +124,11 @@ class Manager:
         Returns:
             None
         """
-        po = pipeline(dbi=self.dbi, force=force) if inspect.isclass(pipeline) else pipeline
+        po = (
+            pipeline(dbi=self.dbi, force=force, continue_transform=continue_transform)
+            if inspect.isclass(pipeline)
+            else pipeline
+        )
 
         pipeline_id = pipeline_id or po.id
         if pipeline_id in self._pipelines:
