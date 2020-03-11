@@ -23,6 +23,10 @@ class WorldBankBoundRatesPipeline(SnapshotDataPipeline):
             quote='"',
         )
 
-    _l1_data_column_types = _l0_data_column_types
+    _l1_data_column_types = [
+        ('reporter', 'integer'),
+        ('product', 'integer'),
+        ('bound_rate', 'decimal'),
+    ]
 
     _l0_l1_data_transformations = {}
