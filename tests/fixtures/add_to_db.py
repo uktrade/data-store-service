@@ -4,10 +4,10 @@ from app.db.models.external import (
     ComtradeCountryCodeAndISOL1,
     DITEUCountryMembershipL1,
     DITReferencePostcodesL1,
+    ONSPostcodeDirectoryL1,
+    WorldBankBoundRateL1,
     WorldBankTariffTransformL1,
 )
-from app.db.models.external import ONSPostcodeDirectoryL1
-
 
 @pytest.fixture(scope='module')
 def add_ons_postcode(app):
@@ -77,6 +77,23 @@ def add_dit_eu_country_membership(app):
             )
 
     return _method
+
+
+@pytest.fixture(scope='module')
+def add_world_bank_bound_rates(app):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'reporter': record.get('reporter'),
+                'product': record.get('product'),
+                'bound_rate': record.get('bound_rate'),
+            }
+            WorldBankBoundRateL1.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
 
 
 @pytest.fixture(scope='module')

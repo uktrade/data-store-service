@@ -68,13 +68,18 @@ eu_country_memberships = [
     for i, year in enumerate(range(1958, 2018), 61)
 ]
 
+bound_rates = [
+    {'reporter': 918, 'product' : 201, 'bound_rate': 83.03}
+]
+
 
 class TestWorldBankTariffPipeline:
     @pytest.fixture(autouse=True, scope='function')
-    def setup(self, app_with_db, add_comtrade_country_code_and_iso, add_dit_eu_country_membership):
+    def setup(self, app_with_db, add_comtrade_country_code_and_iso, add_dit_eu_country_membership, add_world_bank_bound_rates):
         self.dbi = app_with_db.dbi
         add_comtrade_country_code_and_iso(comtrade_countries)
         add_dit_eu_country_membership(eu_country_memberships)
+        add_world_bank_bound_rates(bound_rates)
 
     def test_pipeline(self):
         pipeline = WorldBankTariffPipeline(self.dbi, True)
