@@ -92,7 +92,6 @@ def add_world_bank_tariff(app):
                 'assumed_tariff': record.get('assumed_tariff'),
                 'app_rate': record.get('app_rate'),
                 'mfn_rate': record.get('mfn_rate'),
-                'prf_rate': record.get('prf_rate'),
                 'bnd_rate': record.get('bnd_rate'),
                 'country_average': record.get('country_average'),
                 'world_average': record.get('world_average'),

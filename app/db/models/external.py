@@ -122,7 +122,6 @@ class WorldBankTariffTransformL1(BaseModel):
     assumed_tariff = _col(_decimal)
     app_rate = _col(_decimal)
     mfn_rate = _col(_decimal)
-    prf_rate = _col(_decimal)
     bnd_rate = _col(_decimal)
     country_average = _col(_decimal)
     world_average = _col(_decimal)

@@ -18,30 +18,30 @@ country_to_country_three_products = f'{fixture_path}/country_to_country_three_pr
 
 
 PRODUCT_201_ROWS = [
-    (201, 12, 76, 2018, 21.0, 21.0, None, None, None, 21.0, 21.0),
-    (201, 12, 710, 2018, 21.0, None, None, None, None, 21.0, 21.0),
-    (201, 24, 76, 2018, 21.0, None, None, None, None, None, 21.0),
-    (201, 24, 710, 2018, 21.0, None, None, None, None, None, 21.0),
-    (201, 26, 76, 2018, 21.0, None, None, None, None, None, 21.0),
-    (201, 26, 710, 2018, 21.0, None, None, None, None, None, 21.0),
+    (201, 12, 76, 2018, 21.0, 21.0, None, None, 21.0, 21.0),
+    (201, 12, 710, 2018, 21.0, None, None, None, 21.0, 21.0),
+    (201, 24, 76, 2018, 21.0, None, None, None, None, 21.0),
+    (201, 24, 710, 2018, 21.0, None, None, None, None, 21.0),
+    (201, 26, 76, 2018, 21.0, None, None, None, None, 21.0),
+    (201, 26, 710, 2018, 21.0, None, None, None, None, 21.0),
 ]
 
 PRODUCT_301_ROWS = [
-    (301, 12, 76, 2018, 10.0, None, None, None, None, None, 10.0),
-    (301, 12, 710, 2018, 10.0, None, None, None, None, None, 10.0),
-    (301, 24, 76, 2018, 10.0, None, None, None, None, 10.0, 10.0),
-    (301, 24, 710, 2018, 10.0, 10.0, None, None, None, 10.0, 10.0),
-    (301, 26, 76, 2018, 10.0, None, None, None, None, None, 10.0),
-    (301, 26, 710, 2018, 10.0, None, None, None, None, None, 10.0),
+    (301, 12, 76, 2018, 10.0, None, None, None, None, 10.0),
+    (301, 12, 710, 2018, 10.0, None, None, None, None, 10.0),
+    (301, 24, 76, 2018, 10.0, None, None, None, 10.0, 10.0),
+    (301, 24, 710, 2018, 10.0, 10.0, None, None, 10.0, 10.0),
+    (301, 26, 76, 2018, 10.0, None, None, None, None, 10.0),
+    (301, 26, 710, 2018, 10.0, None, None, None, None, 10.0),
 ]
 
 PRODUCT_401_ROWS = [
-    (401, 12, 76, 2018, 10.0, None, None, None, None, None, 10.0),
-    (401, 12, 710, 2018, 10.0, None, None, None, None, None, 10.0),
-    (401, 24, 76, 2018, 10.0, None, None, None, None, None, 10.0),
-    (401, 24, 710, 2018, 10.0, None, None, None, None, None, 10.0),
-    (401, 26, 76, 2018, 10.0, None, None, None, None, 10.0, 10.0),
-    (401, 26, 710, 2018, 10.0, 10.0, None, None, None, 10.0, 10.0),
+    (401, 12, 76, 2018, 10.0, None, None, None, None, 10.0),
+    (401, 12, 710, 2018, 10.0, None, None, None, None, 10.0),
+    (401, 24, 76, 2018, 10.0, None, None, None, None, 10.0),
+    (401, 24, 710, 2018, 10.0, None, None, None, None, 10.0),
+    (401, 26, 76, 2018, 10.0, None, None, None, 10.0, 10.0),
+    (401, 26, 710, 2018, 10.0, 10.0, None, None, 10.0, 10.0),
 ]
 
 comtrade_countries = [
