@@ -8,7 +8,7 @@ from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOP
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
+from app.etl.etl_world_bank_tariff import WorldBankBoundRatesPipeline, WorldBankTariffPipeline
 
 db = SQLAlchemy()
 sql_alchemy = db
@@ -92,19 +92,24 @@ class BaseModel(db.Model):
 
 
 def create_schemas(*args, **kwargs):
-    schemas = [
-        'operations',
-        'admin',
-        ONSPostcodeDirectoryPipeline.schema,
-        DITReferencePostcodesPipeline.schema,
-        WorldBankTariffPipeline.schema,
-        ComtradeCountryCodeAndISOPipeline.schema,
-        DITEUCountryMembershipPipeline.schema,
-    ]
+    schemas = get_schemas()
     for schema in schemas:
         _sa.engine.execute(DDL(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
 
     _sa.session.commit()
+
+
+def get_schemas():
+    return [
+        'operations',
+        'admin',
+        ONSPostcodeDirectoryPipeline.schema,
+        DITReferencePostcodesPipeline.schema,
+        WorldBankBoundRatesPipeline.schema,
+        WorldBankTariffPipeline.schema,
+        ComtradeCountryCodeAndISOPipeline.schema,
+        DITEUCountryMembershipPipeline.schema,
+    ]
 
 
 event.listen(BaseModel.metadata, 'before_create', create_schemas)

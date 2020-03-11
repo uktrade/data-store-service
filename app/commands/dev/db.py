@@ -2,7 +2,8 @@ import click
 import sqlalchemy_utils
 from flask import current_app as app
 from flask.cli import with_appcontext
-from sqlalchemy import inspect
+
+from app.db.models import get_schemas
 
 
 @click.command('db')
@@ -40,15 +41,13 @@ def db(create, drop, drop_tables, create_tables, recreate_tables):
             sqlalchemy_utils.create_database(db_url, encoding='utf8')
         if drop_tables or recreate_tables:
             click.echo('Drop DB tables')
-            engine = app.db.engine
-            all_schemas = inspect(engine).get_schema_names()
-            schemas_to_delete = [
-                x for x in all_schemas if x not in ['admin', 'information_schema', 'public']
-            ]
-            for schema in schemas_to_delete:
-                click.echo(f'Dropping {schema} schema')
-                engine.execute(f'DROP SCHEMA "{schema}" CASCADE')
-
+            drop_schemas()
         if create or create_tables or recreate_tables:
             click.echo('Creating DB tables')
             app.db.create_all()
+
+
+def drop_schemas():
+    schemas = get_schemas()
+    for schema in schemas:
+        app.dbi.drop_schema(schema)
