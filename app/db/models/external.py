@@ -10,7 +10,10 @@ from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOP
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_world_bank_tariff import WorldBankTariffTransformPipeline, WorldBankBoundRatesPipeline
+from app.etl.etl_world_bank_tariff import (
+    WorldBankBoundRatesPipeline,
+    WorldBankTariffTransformPipeline,
+)
 
 
 class ONSPostcodeDirectoryL1(BaseModel):
@@ -109,6 +112,7 @@ class WorldBankBoundRateL1(BaseModel):
     """
     World bank bound rates
     """
+
     __tablename__ = 'L1'
     __table_args__ = {'schema': WorldBankBoundRatesPipeline.schema}
 

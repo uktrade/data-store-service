@@ -9,6 +9,7 @@ from app.db.models.external import (
     WorldBankTariffTransformL1,
 )
 
+
 @pytest.fixture(scope='module')
 def add_ons_postcode(app):
     def _method(records):
@@ -93,7 +94,6 @@ def add_world_bank_bound_rates(app):
             )
 
     return _method
-
 
 
 @pytest.fixture(scope='module')
