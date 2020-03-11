@@ -45,6 +45,11 @@ arg_to_pipeline_config_list = {
     ],
 }
 
+exclude_pipelines = [
+    WorldBankTariffTestPipeline.data_source,
+    WorldBankTariffBulkPipeline.data_source,
+]
+
 
 @click.command('datafiles_to_db_by_source')
 @with_appcontext
@@ -55,18 +60,22 @@ def datafiles_to_db_by_source(**kwargs):
     """
     Populate tables with source files
     """
-    manager = PipelineManager(storage=app.config['inputs']['source-folder'], dbi=app.dbi)
-    for arg, pipeline_info_list in arg_to_pipeline_config_list.items():
-        arg = arg.replace(".", "__")
-        if kwargs['all'] or kwargs[arg]:
-            for pipeline, sub_dir in pipeline_info_list:
-                manager.pipeline_register(
-                    pipeline=pipeline,
-                    sub_directory=sub_dir,
-                    force=kwargs['force'],
-                    continue_transform=kwargs['continue'],
-                )
-    manager.pipeline_process_all()
+    if not any(kwargs.values()):
+        ctx = click.get_current_context()
+        click.echo(ctx.get_help())
+    else:
+        manager = PipelineManager(storage=app.config['inputs']['source-folder'], dbi=app.dbi)
+        for _arg, pipeline_info_list in arg_to_pipeline_config_list.items():
+            arg = _arg.replace(".", "__")
+            if (kwargs['all'] and _arg not in exclude_pipelines) or kwargs[arg]:
+                for pipeline, sub_dir in pipeline_info_list:
+                    manager.pipeline_register(
+                        pipeline=pipeline,
+                        sub_directory=sub_dir,
+                        force=kwargs['force'],
+                        continue_transform=kwargs['continue'],
+                    )
+        manager.pipeline_process_all()
 
 
 def _pipeline_option(option_name):
