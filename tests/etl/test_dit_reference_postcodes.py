@@ -8,7 +8,7 @@ snapshot1 = 'tests/fixtures/dit/reference_postcodes/snapshot1.csv'
 
 class TestDITReferencePostcodesPipeline:
     def test_one_datafile(self, app_with_db):
-        pipeline = DITReferencePostcodesPipeline(app_with_db.dbi, False)
+        pipeline = DITReferencePostcodesPipeline(app_with_db.dbi, force=False)
         fi = FileInfo.from_path(snapshot1)
         pipeline.process(fi)
         expected_rows = [

@@ -1,5 +1,6 @@
 import re
 from abc import ABCMeta, abstractmethod
+from collections import namedtuple
 
 from flask import current_app as flask_app
 
@@ -38,6 +39,14 @@ class DataPipeline(metaclass=ABCMeta):
     L1_TABLE = 'L1'
     L2_TABLE = 'L2'
 
+    def set_option_defaults(self, options):
+        options.setdefault('force', False)
+        return options
+
+    def get_options(self, options):
+        options = self.set_option_defaults(options)
+        return namedtuple('Options', options.keys())(*options.values())
+
     @property
     def l1_helper_columns(self):
         return [
@@ -45,10 +54,9 @@ class DataPipeline(metaclass=ABCMeta):
             ('data_source_row_id', 'int'),  # reference to L0 id column
         ]
 
-    def __init__(self, dbi, force=False, continue_transform=False):
+    def __init__(self, dbi, **kwargs):
         self.dbi = dbi
-        self.force = force
-        self.continue_transform = continue_transform
+        self.options = self.get_options(kwargs)
         if not dbi:
             flask_app.logger.error(
                 f'warning: dbi ({dbi}) is not valid; '

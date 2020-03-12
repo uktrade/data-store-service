@@ -86,7 +86,7 @@ class TestWorldBankTariffPipeline:
         add_world_bank_bound_rates(bound_rates)
 
     def test_pipeline(self):
-        pipeline = WorldBankTariffPipeline(self.dbi, True)
+        pipeline = WorldBankTariffPipeline(self.dbi, force=True)
         fi = FileInfo.from_path(file_1)
         pipeline.process(fi)
 
@@ -96,7 +96,7 @@ class TestWorldBankTariffPipeline:
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1)
 
         # check L1
-        pipeline = WorldBankTariffTransformPipeline(self.dbi, True)
+        pipeline = WorldBankTariffTransformPipeline(self.dbi, force=True)
         pipeline.process()
         assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline, top_rows=1)
 
@@ -171,10 +171,10 @@ class TestWorldBankTariffPipeline:
         ),
     )
     def test_transform_of_datafile(self, file_name, years, expected_rows):
-        pipeline = WorldBankTariffPipeline(self.dbi, True)
+        pipeline = WorldBankTariffPipeline(self.dbi, force=True)
         fi = FileInfo.from_path(file_name)
         pipeline.process(fi)
-        pipeline = WorldBankTariffTransformPipeline(self.dbi, True)
+        pipeline = WorldBankTariffTransformPipeline(self.dbi, force=True)
         pipeline.process()
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
 
@@ -192,12 +192,14 @@ class TestWorldBankTariffPipeline:
         ) as mock_get_products:
             mock_get_products.return_value = [['301'], ['401']]
 
-            pipeline = WorldBankTariffTransformPipeline(self.dbi, False, continue_transform)
+            pipeline = WorldBankTariffTransformPipeline(
+                self.dbi, force=False, continue_transform=continue_transform
+            )
             pipeline.process()
             assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline,)
 
     def partial_transform_data(self):
-        pipeline = WorldBankTariffPipeline(self.dbi, True)
+        pipeline = WorldBankTariffPipeline(self.dbi, force=True)
         fi = FileInfo.from_path(country_to_country_three_products)
         pipeline.process(fi)
 
@@ -210,7 +212,9 @@ class TestWorldBankTariffPipeline:
             ) as mock_finish_processing:
                 mock_finish_processing.return_value = None
 
-                pipeline = WorldBankTariffTransformPipeline(self.dbi, False, True)
+                pipeline = WorldBankTariffTransformPipeline(
+                    self.dbi, force=False, continue_transform=True
+                )
                 pipeline.process()
                 assert rows_equal_table(
                     self.dbi, PRODUCT_201_ROWS, pipeline._l1_temp_table, pipeline
