@@ -56,6 +56,7 @@ exclude_pipelines = [
 @click.option('--all', is_flag=True, help='ingest datafile into the DB')
 @click.option('--force', is_flag=True, help='Force pipeline')
 @click.option('--continue', is_flag=True, help='Continue transform')
+@click.option('--products', type=str, help='Only process selected products', default=None)
 def datafiles_to_db_by_source(**kwargs):
     """
     Populate tables with source files
@@ -74,6 +75,7 @@ def datafiles_to_db_by_source(**kwargs):
                         sub_directory=sub_dir,
                         force=kwargs['force'],
                         continue_transform=kwargs['continue'],
+                        products=kwargs['products'],
                     )
         manager.pipeline_process_all()
 

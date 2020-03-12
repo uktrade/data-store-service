@@ -151,11 +151,38 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
     def _fq(self, table_name):
         return self.dbi.to_fully_qualified(table_name, self.schema)
 
-    def _get_products(self):
-        where = ""
-        if self.continue_transform:
-            where = f"where product not in (select distinct product from {self._l1_temp_table})"
+    def format_product_option(self, product_string):
+        products = product_string.split(',')
+        try:
+            list(map(int, products))
+        except ValueError or SyntaxError:
+            print(f'Product string invalid - {product_string}')
+            return []
+        return products
 
+    def get_where_products_clause(self):
+        where = ""
+        where_clauses = []
+        if self.options.continue_transform or self.options.products:
+
+            if self.options.continue_transform:
+                where_clauses.append(
+                    f"product not in (select distinct product from {self._l1_temp_table})"
+                )
+            if self.options.products:
+                products = self.format_product_option(self.options.products)
+                if len(products) == 1:
+                    where_clauses.append(f"product = {products[0]}")
+                elif len(products) > 1:
+                    where_clauses.append(f"product in {tuple(products)}")
+            if where_clauses:
+                where = 'where ' + ' and '.join(where_clauses)
+
+        print(where)
+        return where
+
+    def _get_products(self):
+        where = self.get_where_products_clause()
         stmt = f"""
         select distinct
             product
