@@ -55,8 +55,15 @@ exclude_pipelines = [
 @with_appcontext
 @click.option('--all', is_flag=True, help='ingest datafile into the DB')
 @click.option('--force', is_flag=True, help='Force pipeline')
-@click.option('--continue', is_flag=True, help='Continue transform')
-@click.option('--products', type=str, help='Only process selected products', default=None)
+@click.option(
+    '--continue', is_flag=True, help='Continue transform [World bank tariff pipelines ' 'only]'
+)
+@click.option(
+    '--products',
+    type=str,
+    help='Only process selected products [World bank tariff ' 'pipelines only]',
+    default=None,
+)
 def datafiles_to_db_by_source(**kwargs):
     """
     Populate tables with source files

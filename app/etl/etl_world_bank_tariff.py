@@ -177,8 +177,6 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                     where_clauses.append(f"product in {tuple(products)}")
             if where_clauses:
                 where = 'where ' + ' and '.join(where_clauses)
-
-        print(where)
         return where
 
     def _get_products(self):
