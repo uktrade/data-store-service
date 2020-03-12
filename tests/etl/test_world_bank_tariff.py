@@ -232,3 +232,46 @@ class TestWorldBankTariffPipeline:
                     self.dbi, PRODUCT_201_ROWS, pipeline._l1_temp_table, pipeline
                 )
                 assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline)
+
+    @pytest.mark.parametrize(
+        'continue_transform,products,expected_where_clause',
+        (
+            (False, None, ''),
+            (
+                True,
+                None,
+                'where product not in (select distinct product from "world_bank.tariff"."L1.temp")',
+            ),
+            (
+                True,
+                'hello,1234',
+                'where product not in (select distinct product from "world_bank.tariff"."L1.temp")',
+            ),
+            (False, '1234', 'where product = 1234'),
+            (False, '1234,5678,90', "where product in ('1234', '5678', '90')"),
+            (False, 'Hello', ''),
+            (
+                True,
+                '1234',
+                (
+                    'where product not in (select distinct product from '
+                    '"world_bank.tariff"."L1.temp") and product = 1234'
+                ),
+            ),
+            (
+                True,
+                '1234,5678,90',
+                (
+                    'where product not in '
+                    '(select distinct product from "world_bank.tariff"."L1.temp") '
+                    "and product in ('1234', '5678', '90')"
+                ),
+            ),
+        ),
+    )
+    def test_product_where_clause(self, continue_transform, products, expected_where_clause):
+        pipeline = WorldBankTariffTransformPipeline(
+            self.dbi, force=False, continue_transform=continue_transform, products=products
+        )
+        result = pipeline.get_where_products_clause()
+        assert result == expected_where_clause
