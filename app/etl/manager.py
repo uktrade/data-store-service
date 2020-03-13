@@ -104,9 +104,7 @@ class Manager:
             progress.set_description(pipeline_id)
             self.pipeline_process(pipeline_id, progress_bar=progress)
 
-    def pipeline_register(
-        self, pipeline, sub_directory=None, pipeline_id=None, force=False, continue_transform=False
-    ):
+    def pipeline_register(self, pipeline, sub_directory=None, pipeline_id=None, **kwargs):
         """ Register a clean pipeline for the manager to use
 
         Args:
@@ -124,15 +122,12 @@ class Manager:
         Returns:
             None
         """
-        po = (
-            pipeline(dbi=self.dbi, force=force, continue_transform=continue_transform)
-            if inspect.isclass(pipeline)
-            else pipeline
-        )
+        po = pipeline(dbi=self.dbi, **kwargs) if inspect.isclass(pipeline) else pipeline
 
         pipeline_id = pipeline_id or po.id
         if pipeline_id in self._pipelines:
             raise ValueError(f'{po.id} pipeline is already registered')
+        force = kwargs.get('force', False)
         self._pipelines[pipeline_id] = PipelineConfig(po, sub_directory, force)
 
     def pipeline_remove(self, pipeline):

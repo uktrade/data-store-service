@@ -39,8 +39,8 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
     _l1_data_column_types = None
 
     def process(self, file_info=None, drop_source=True, **kwargs):
-        self._create_sequence(self._l0_sequence, drop_existing=self.force)
-        self._create_table(self._l0_table, self._l0_column_types, drop_existing=self.force)
+        self._create_sequence(self._l0_sequence, drop_existing=self.options.force)
+        self._create_table(self._l0_table, self._l0_column_types, drop_existing=self.options.force)
         self._create_table(self._l0_temp_table, self._l0_column_types, drop_existing=True)
         self._datafile_to_l0_temp(file_info)
         datafile_name = file_info.name.split('/')[-1] if file_info else None
@@ -88,13 +88,18 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
         ('world_average', 'decimal'),
     ]
 
+    def set_option_defaults(self, options):
+        options.setdefault('continue_transform', False)
+        options.setdefault('products', None)
+        return super().set_option_defaults(options)
+
     def _datafile_to_l0_temp(self, file_info):
         pass
 
     _l0_l1_data_transformations = {}
 
     def process(self, file_info=None, drop_source=True, **kwargs):
-        drop_existing = not self.continue_transform
+        drop_existing = not self.options.continue_transform
         self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=drop_existing)
         self._l0_to_l1()
         self.finish_processing()
@@ -126,7 +131,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
         ]
         for view_name, create_view in views:
             fq_view_name = self._fq(view_name)
-            if self.force:
+            if self.options.force:
                 self.dbi.drop_materialized_view(fq_view_name)
             if not self.dbi.table_exists(self.schema, view_name, materialized_view=True):
                 create_view()
@@ -146,11 +151,36 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
     def _fq(self, table_name):
         return self.dbi.to_fully_qualified(table_name, self.schema)
 
-    def _get_products(self):
-        where = ""
-        if self.continue_transform:
-            where = f"where product not in (select distinct product from {self._l1_temp_table})"
+    def format_product_option(self, product_string):
+        products = product_string.split(',')
+        try:
+            list(map(int, products))
+        except ValueError or SyntaxError:
+            print(f'Product string invalid - {product_string}')
+            return []
+        return products
 
+    def get_where_products_clause(self):
+        where = ""
+        where_clauses = []
+        if self.options.continue_transform or self.options.products:
+
+            if self.options.continue_transform:
+                where_clauses.append(
+                    f"product not in (select distinct product from {self._l1_temp_table})"
+                )
+            if self.options.products:
+                products = self.format_product_option(self.options.products)
+                if len(products) == 1:
+                    where_clauses.append(f"product = {products[0]}")
+                elif len(products) > 1:
+                    where_clauses.append(f"product in {tuple(products)}")
+            if where_clauses:
+                where = 'where ' + ' and '.join(where_clauses)
+        return where
+
+    def _get_products(self):
+        where = self.get_where_products_clause()
         stmt = f"""
         select distinct
             product

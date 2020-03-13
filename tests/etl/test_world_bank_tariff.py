@@ -86,7 +86,7 @@ class TestWorldBankTariffPipeline:
         add_world_bank_bound_rates(bound_rates)
 
     def test_pipeline(self):
-        pipeline = WorldBankTariffPipeline(self.dbi, True)
+        pipeline = WorldBankTariffPipeline(self.dbi, force=True)
         fi = FileInfo.from_path(file_1)
         pipeline.process(fi)
 
@@ -96,16 +96,17 @@ class TestWorldBankTariffPipeline:
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1)
 
         # check L1
-        pipeline = WorldBankTariffTransformPipeline(self.dbi, True)
+        pipeline = WorldBankTariffTransformPipeline(self.dbi, force=True)
         pipeline.process()
         assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline, top_rows=1)
 
     @pytest.mark.parametrize(
-        'file_name,years,expected_rows',
+        'file_name,years,only_products,expected_rows',
         (
             (
                 eu_country_to_eu_country_file,
                 [2014],
+                None,
                 [(201, 705, 381, 2014, 76.51, 76.51, 76.53, None, 76.51, 76.51)],
                 # Italy has incorrect id 380 in product file and has to be fixed by the
                 # cleaning process and updated to 381
@@ -113,12 +114,14 @@ class TestWorldBankTariffPipeline:
             (
                 eu_to_country_file,
                 [2014],
+                None,
                 [(201, 918, 36, 2014, 81.96, 81.96, 81.96, 83.03, 81.96, 81.96)],
                 # When the reporter is EU it remains EU
             ),
             (
                 country_to_world_file,
                 [2018],
+                None,
                 [
                     (201, 12, 76, 2018, 21, 21, None, None, 21, 15.5),
                     (201, 12, 710, 2018, 21, None, None, None, 21, 15.5),
@@ -134,6 +137,7 @@ class TestWorldBankTariffPipeline:
             (
                 country_to_country_two_years,
                 [2017, 2018],
+                None,
                 [
                     (201, 12, 76, 2017, 21, None, None, None, 21, 15.5),
                     (201, 12, 76, 2018, 21, 21, None, None, 21, 15.5),
@@ -148,6 +152,7 @@ class TestWorldBankTariffPipeline:
             (
                 countries_expanding_file,
                 [2018],
+                None,
                 [
                     (201, 12, 76, 2018, 21, 21, None, None, 21, 16.333333333333332),
                     (201, 12, 372, 2018, 21, None, None, None, 21, 16.333333333333332),
@@ -166,15 +171,22 @@ class TestWorldBankTariffPipeline:
             (
                 country_to_country_three_products,
                 [2018],
+                None,
                 PRODUCT_201_ROWS + PRODUCT_301_ROWS + PRODUCT_401_ROWS,
+            ),
+            (
+                country_to_country_three_products,
+                [2018],
+                '201,401',
+                PRODUCT_201_ROWS + PRODUCT_401_ROWS,
             ),
         ),
     )
-    def test_transform_of_datafile(self, file_name, years, expected_rows):
-        pipeline = WorldBankTariffPipeline(self.dbi, True)
+    def test_transform_of_datafile(self, file_name, years, only_products, expected_rows):
+        pipeline = WorldBankTariffPipeline(self.dbi, force=True)
         fi = FileInfo.from_path(file_name)
         pipeline.process(fi)
-        pipeline = WorldBankTariffTransformPipeline(self.dbi, True)
+        pipeline = WorldBankTariffTransformPipeline(self.dbi, force=True, products=only_products)
         pipeline.process()
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
 
@@ -192,12 +204,14 @@ class TestWorldBankTariffPipeline:
         ) as mock_get_products:
             mock_get_products.return_value = [['301'], ['401']]
 
-            pipeline = WorldBankTariffTransformPipeline(self.dbi, False, continue_transform)
+            pipeline = WorldBankTariffTransformPipeline(
+                self.dbi, force=False, continue_transform=continue_transform
+            )
             pipeline.process()
             assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline,)
 
     def partial_transform_data(self):
-        pipeline = WorldBankTariffPipeline(self.dbi, True)
+        pipeline = WorldBankTariffPipeline(self.dbi, force=True)
         fi = FileInfo.from_path(country_to_country_three_products)
         pipeline.process(fi)
 
@@ -210,9 +224,54 @@ class TestWorldBankTariffPipeline:
             ) as mock_finish_processing:
                 mock_finish_processing.return_value = None
 
-                pipeline = WorldBankTariffTransformPipeline(self.dbi, False, True)
+                pipeline = WorldBankTariffTransformPipeline(
+                    self.dbi, force=False, continue_transform=True
+                )
                 pipeline.process()
                 assert rows_equal_table(
                     self.dbi, PRODUCT_201_ROWS, pipeline._l1_temp_table, pipeline
                 )
                 assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline)
+
+    @pytest.mark.parametrize(
+        'continue_transform,products,expected_where_clause',
+        (
+            (False, None, ''),
+            (
+                True,
+                None,
+                'where product not in (select distinct product from "world_bank.tariff"."L1.temp")',
+            ),
+            (
+                True,
+                'hello,1234',
+                'where product not in (select distinct product from "world_bank.tariff"."L1.temp")',
+            ),
+            (False, '1234', 'where product = 1234'),
+            (False, '1234,5678,90', "where product in ('1234', '5678', '90')"),
+            (False, 'Hello', ''),
+            (
+                True,
+                '1234',
+                (
+                    'where product not in (select distinct product from '
+                    '"world_bank.tariff"."L1.temp") and product = 1234'
+                ),
+            ),
+            (
+                True,
+                '1234,5678,90',
+                (
+                    'where product not in '
+                    '(select distinct product from "world_bank.tariff"."L1.temp") '
+                    "and product in ('1234', '5678', '90')"
+                ),
+            ),
+        ),
+    )
+    def test_product_where_clause(self, continue_transform, products, expected_where_clause):
+        pipeline = WorldBankTariffTransformPipeline(
+            self.dbi, force=False, continue_transform=continue_transform, products=products
+        )
+        result = pipeline.get_where_products_clause()
+        assert result == expected_where_clause
