@@ -93,9 +93,10 @@ class Manager:
             entry.state = DatafileState.PROCESSED.value
             entry.save()
         except Exception as e:
-            entry.state = DatafileState.FAILED.value
-            entry.error_message = str(e)
-            entry.save()
+            if entry:
+                entry.state = DatafileState.FAILED.value
+                entry.error_message = str(e)
+                entry.save()
             flask_app.logger.error(f'pipeline processing failed: {e}')
 
     def pipeline_process_all(self):
@@ -126,7 +127,7 @@ class Manager:
 
         pipeline_id = pipeline_id or po.id
         if pipeline_id in self._pipelines:
-            raise ValueError(f'{po.id} pipeline is already registered')
+            raise ValueError(f'{pipeline_id} pipeline is already registered')
         force = kwargs.get('force', False)
         self._pipelines[pipeline_id] = PipelineConfig(po, sub_directory, force)
 

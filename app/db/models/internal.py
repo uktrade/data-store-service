@@ -61,9 +61,9 @@ class DatafileRegistryModel(BaseModel):
     state = _col(processing_state, nullable=False, default=False)
     error_message = _col(_text)
     created_timestamp = _col(
-        'created_timestamp', _dt, nullable=False, default=datetime.datetime.utcnow
+        'created_timestamp', _dt, nullable=False, default=lambda: datetime.datetime.utcnow()
     )
-    updated_timestamp = _col('updated_timestamp', _dt, onupdate=datetime.datetime.utcnow)
+    updated_timestamp = _col('updated_timestamp', _dt, onupdate=lambda: datetime.datetime.utcnow())
 
     __mapper_args__ = {'order_by': 'created_timestamp'}
 
