@@ -6,9 +6,11 @@ import redis
 from flask import Flask, json
 from sqlalchemy.engine.url import make_url
 
-from app import config
+from common import config
 from app.commands.dev import cmd_group as dev_cmd
 from app.db.dbi import DBI
+
+config_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__), 'config'))
 
 logging_config = {
     'version': 1,
@@ -36,32 +38,24 @@ def get_or_create():
 
 def make_current_app_test_app(test_db_name):
     flask_app = get_or_create()
-    postgres_db_config = (
-        os.environ.get('DATABASE_URL')
-        if 'DATABASE_URL' in os.environ
-        else config.get_config()['app']['database_url']
-    )
     flask_app.config.update(
         {
             'TESTING': True,
             'SQLALCHEMY_DATABASE_URI': _create_sql_alchemy_connection_str(
-                postgres_db_config, test_db_name
+                config.Config(config_location)['app']['database_url']
             ),
         }
     )
+    import ipdb; ipdb.set_trace()
     return flask_app
 
 
 def _create_base_app():
     flask_app = Flask(__name__)
-    flask_app.config.update(config.get_config())
+    flask_app.config.update(config.Config(config_location).all())
     flask_app.cli.add_command(dev_cmd)
+    postgres_db_config = config.Config(config_location)['app']['database_url']
 
-    postgres_db_config = (
-        os.environ.get('DATABASE_URL')
-        if 'DATABASE_URL' in os.environ
-        else config.get_config()['app']['database_url']
-    )
     flask_app.config.update(
         {
             'TESTING': False,

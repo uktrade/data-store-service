@@ -80,10 +80,9 @@ pytest-cov==2.8.1         # via -r requirements.in
 pytest-mock==2.0.0        # via -r requirements.in
 pytest==5.4.1             # via -r requirements.in, pytest-cov, pytest-mock
 python-dateutil==2.8.1    # via botocore, freezegun, pandas
-python-dotenv==0.12.0     # via -r requirements.in
-pytz==2019.3              # via apscheduler, babel, pandas, tzlocal
-pyyaml==5.3               # via -r requirements.in
-redis==3.4.1              # via -r requirements.in
+pytz==2019.3              # via apscheduler, babel, celery, pandas, tzlocal
+pyyaml==5.3               # via -r requirements.in (line 27)
+redis==3.4.1              # via -r requirements.in (line 28)
 regex==2020.1.8           # via black
 requests-oauthlib==1.1.0  # via -r requirements.in, flask-oauthlib
 requests==2.22.0          # via codecov, requests-oauthlib, spacy
