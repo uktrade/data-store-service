@@ -10,14 +10,14 @@ apscheduler==3.6.3        # via -r requirements.in
 attrs==19.3.0             # via black, pytest
 babel==2.8.0              # via flask-babelex
 backcall==0.1.0           # via ipython
-billiard==3.6.1.0         # via celery
+billiard==3.6.3.0         # via celery
 black==19.10b0            # via -r requirements.in
 blinker==1.4              # via flask-mail, flask-principal
 blis==0.4.1               # via spacy, thinc
 boto3==1.11.10            # via uktrade-data-tools
 botocore==1.14.10         # via boto3, s3transfer
 catalogue==1.0.0          # via spacy, thinc
-celery==4.4.0             # via -r requirements.in
+celery==4.4.1             # via -r requirements.in
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 click==7.0                # via black, flask, flask-shell-ipython, pip-tools
@@ -51,7 +51,7 @@ jedi==0.16.0              # via ipython
 jinja2==2.11.0            # via flask, flask-babelex
 jmespath==0.9.4           # via boto3, botocore
 json-log-formatter==0.3.0  # via -r requirements.in
-kombu==4.6.7              # via celery
+kombu==4.6.8              # via celery
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
 mohawk==1.1.0             # via -r requirements.in
