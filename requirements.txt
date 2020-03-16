@@ -4,20 +4,17 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
-amqp==2.5.2               # via kombu
 appdirs==1.4.3            # via black
 apscheduler==3.6.3        # via -r requirements.in
 attrs==19.3.0             # via black, pytest
 babel==2.8.0              # via flask-babelex
 backcall==0.1.0           # via ipython
-billiard==3.6.1.0         # via celery
 black==19.10b0            # via -r requirements.in
 blinker==1.4              # via flask-mail, flask-principal
 blis==0.4.1               # via spacy, thinc
 boto3==1.11.10            # via uktrade-data-tools
 botocore==1.14.10         # via boto3, s3transfer
 catalogue==1.0.0          # via spacy, thinc
-celery==4.4.0             # via -r requirements.in
 certifi==2019.11.28       # via requests
 chardet==3.0.4            # via requests
 click==7.0                # via black, flask, flask-shell-ipython, pip-tools
@@ -43,7 +40,7 @@ freezegun==0.3.15         # via -r requirements.in
 fuzzywuzzy==0.18.0        # via -r requirements.in
 gunicorn==20.0.4          # via -r requirements.in
 idna==2.8                 # via requests
-importlib-metadata==1.5.0  # via catalogue, kombu, pluggy, pytest
+importlib-metadata==1.5.0  # via catalogue, pluggy, pytest
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.11.1           # via flask-shell-ipython
 itsdangerous==1.1.0       # via flask, flask-security
@@ -51,7 +48,6 @@ jedi==0.16.0              # via ipython
 jinja2==2.11.0            # via flask, flask-babelex
 jmespath==0.9.4           # via boto3, botocore
 json-log-formatter==0.3.0  # via -r requirements.in
-kombu==4.6.7              # via celery
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8
 mohawk==1.1.0             # via -r requirements.in
@@ -85,7 +81,7 @@ pytest-mock==2.0.0        # via -r requirements.in
 pytest==5.4.1             # via -r requirements.in, pytest-cov, pytest-mock
 python-dateutil==2.8.1    # via botocore, freezegun, pandas
 python-dotenv==0.12.0     # via -r requirements.in
-pytz==2019.3              # via apscheduler, babel, celery, pandas, tzlocal
+pytz==2019.3              # via apscheduler, babel, pandas, tzlocal
 pyyaml==5.3               # via -r requirements.in
 redis==3.4.1              # via -r requirements.in
 regex==2020.1.8           # via black
@@ -107,7 +103,6 @@ typed-ast==1.4.1          # via black
 tzlocal==2.0.0            # via apscheduler
 git+https://github.com/uktrade/dt08-data-tools.git  # via -r requirements.in
 urllib3==1.25.8           # via botocore, requests
-vine==1.3.0               # via amqp, celery
 wasabi==0.6.0             # via spacy, thinc
 watchdog==0.10.2          # via -r requirements.in
 wcwidth==0.1.8            # via prompt-toolkit, pytest
