@@ -2,9 +2,9 @@ import datetime
 
 import pytest
 import sqlalchemy_utils
+from common import application
 from flask import make_response
 
-from app import application
 from app.api.views import ac, json_error
 from app.db.models.internal import HawkUsers
 
