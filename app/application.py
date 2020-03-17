@@ -3,14 +3,14 @@ from logging.config import dictConfig
 
 import certifi
 import redis
+from common import config
 from flask import Flask, json
 from sqlalchemy.engine.url import make_url
 
-from common import config
+from app.api.settings import CustomJSONEncoder
 from app.commands.dev import cmd_group as dev_cmd
 from app.db.dbi import DBI
 
-config_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__), 'config'))
 
 logging_config = {
     'version': 1,
@@ -27,13 +27,37 @@ logging_config = {
 
 dictConfig(logging_config)
 
+config_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__), 'config'))
+
 
 def get_or_create():
     from flask import current_app as flask_app
 
-    if not flask_app:
-        flask_app = _create_base_app()
-    return flask_app
+    if flask_app:
+        return flask_app
+    return _create_base_app()
+
+
+def _create_base_app():
+    flask_app = Flask(__name__)
+    flask_app.config.update(config.Config(config_location).all())
+    flask_app.cli.add_command(dev_cmd)
+
+    flask_app.config.update(
+        {
+            'TESTING': False,
+            'SQLALCHEMY_DATABASE_URI': _create_sql_alchemy_connection_str(
+                flask_app.config['app']['database_url']
+            ),
+            # set SQLALCHEMY_TRACK_MODIFICATIONS to False because
+            # default of None produces warnings, and track modifications
+            # are not required
+            'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+        }
+    )
+    flask_app.json_encoder = CustomJSONEncoder
+    flask_app.secret_key = flask_app.config['app']['secret_key']
+    return _register_components(flask_app)
 
 
 def make_current_app_test_app(test_db_name):
@@ -42,36 +66,10 @@ def make_current_app_test_app(test_db_name):
         {
             'TESTING': True,
             'SQLALCHEMY_DATABASE_URI': _create_sql_alchemy_connection_str(
-                config.Config(config_location)['app']['database_url']
+                flask_app.config['app']['database_url'], test_db_name
             ),
         }
     )
-    import ipdb; ipdb.set_trace()
-    return flask_app
-
-
-def _create_base_app():
-    flask_app = Flask(__name__)
-    flask_app.config.update(config.Config(config_location).all())
-    flask_app.cli.add_command(dev_cmd)
-    postgres_db_config = config.Config(config_location)['app']['database_url']
-
-    flask_app.config.update(
-        {
-            'TESTING': False,
-            'SQLALCHEMY_DATABASE_URI': _create_sql_alchemy_connection_str(postgres_db_config),
-            # set SQLALCHEMY_TRACK_MODIFICATIONS to False because
-            # default of None produces warnings, and track modifications
-            # are not required
-            'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-        }
-    )
-
-    flask_app.secret_key = flask_app.config['app']['secret_key']
-    from app.api.settings import CustomJSONEncoder
-
-    flask_app.json_encoder = CustomJSONEncoder
-    flask_app = _register_components(flask_app)
     return flask_app
 
 
