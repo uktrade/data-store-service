@@ -360,7 +360,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             ), mfn_tariffs as (
                 select * from tariffs_and_countries where tariff_type = 'MFN'
             ), bnd_tariffs as (
-                select distinct reporter, product, bound_rate
+                select reporter, product, bound_rate
                     from {world_bank_bound_rates._l1_table}
             )
             select
