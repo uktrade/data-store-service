@@ -16,7 +16,6 @@ from app import constants
 from app.constants import DatafileState
 
 
-
 class DatafileRegistryModel(BaseModel):
     __tablename__ = 'datafile_registry'
     __table_args__ = {'schema': 'operations'}
