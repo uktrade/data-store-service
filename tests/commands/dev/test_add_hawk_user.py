@@ -16,7 +16,7 @@ class TestAddHawkUserCommand:
     @pytest.mark.parametrize(
         'client_id,expected_add_user_called', (('client_id', True), (None, False),),
     )
-    @mock.patch('app.db.models.internal.HawkUsers.add_user')
+    @mock.patch('common.db.models.HawkUsers.add_user')
     def test_run_hawk_user(self, mock_add_user, client_id, expected_add_user_called, app_with_db):
         mock_add_user.return_value = None
         runner = app_with_db.test_cli_runner()

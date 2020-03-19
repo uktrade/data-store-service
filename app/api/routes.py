@@ -1,7 +1,6 @@
-from app.api.views import dit_reference_postcodes, healthcheck, ons_postcodes, world_bank_tariffs
+from app.api.views import dit_reference_postcodes, ons_postcodes, world_bank_tariffs
 
 RULES = [
-    ('/healthcheck/', healthcheck),
     (
         '/api/v1/get-dit-reference-postcodes/',
         dit_reference_postcodes.DitReferencePostcodeListView.as_view(

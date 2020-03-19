@@ -1,4 +1,5 @@
-from app.api.views import ac, base, json_error
+from common.views import ac, base, json_error
+
 from app.db.models.external import ONSPostcodeDirectoryL1
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 

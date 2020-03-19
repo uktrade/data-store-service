@@ -1,9 +1,9 @@
+from common.api.utils import to_web_dict
+from common.views import ac, base, json_error
 from flask import current_app as flask_app
 from flask import request
 from flask.views import View
 
-from app.api.utils import to_web_dict
-from app.api.views import ac, base, json_error
 from app.db.models.external import DITReferencePostcodesL1
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 

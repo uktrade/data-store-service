@@ -1,7 +1,6 @@
 import click
+from common.db.models import HawkUsers
 from flask.cli import with_appcontext
-
-from app.db.models.internal import HawkUsers
 
 
 @click.command('add_hawk_user')
