@@ -10,6 +10,7 @@ flask-sqlalchemy==2.4.1
 flask==1.1.1
 freezegun==0.3.15
 fuzzywuzzy==0.18.0
+git+https://github.com/uktrade/data-engineering-common.git
 git+https://github.com/uktrade/dt08-data-tools.git
 gunicorn==20.*
 json-log-formatter==0.3.0
