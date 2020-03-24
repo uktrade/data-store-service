@@ -23,7 +23,11 @@ RULES = [
     ('/api/v1/get-ons-postcodes/', ons_postcodes.OnsPostcodeListView.as_view('list_ons_postcodes')),
     (
         '/api/v1/get-world-bank-tariffs/',
-        world_bank_tariffs.WorldBankTariffTransformListView.as_view('list_world_data_tariffs'),
+        world_bank_tariffs.WorldBankTariffTransformListView.as_view('list_world_bank_tariff'),
+    ),
+    (
+        '/api/v1/get-world-bank-tariffs/raw/',
+        world_bank_tariffs.WorldBankTariffListView.as_view('list_world_bank_tariff_raw'),
     ),
     (
         '/api/v1/get-world-bank-bound-rates/',

@@ -146,6 +146,25 @@ class WorldBankTariffTransformL1(BaseModel):
     world_average = _col(_decimal)
 
 
+class WorldBankTariffL0(BaseModel):
+    """
+    World bank tariff data
+    """
+
+    __tablename__ = 'L0'
+    __table_args__ = {'schema': WorldBankTariffTransformPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    data_file_created = _col(_text)
+    reporter = _col(_int)
+    year = _col(_int)
+    product = _col(_int)
+    partner = _col(_int)
+    duty_type = _col(_text)
+    simple_average = _col(_decimal)
+    number_of_total_lines = _col(_int)
+
+
 class ComtradeCountryCodeAndISOL1(BaseModel):
 
     __tablename__ = 'L1'
