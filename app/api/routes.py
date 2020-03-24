@@ -1,4 +1,10 @@
-from app.api.views import dit_reference_postcodes, healthcheck, ons_postcodes, world_bank_tariffs
+from app.api.views import (
+    dit_reference_postcodes,
+    healthcheck,
+    ons_postcodes,
+    world_bank_bound_rates,
+    world_bank_tariffs,
+)
 
 RULES = [
     ('/healthcheck/', healthcheck),
@@ -20,5 +26,9 @@ RULES = [
     (
         '/api/v1/get-world-bank-tariffs/',
         world_bank_tariffs.WorldBankTariffTransformListView.as_view('list_world_data_tariffs'),
+    ),
+    (
+        '/api/v1/get-world-bank-bound-rates/',
+        world_bank_bound_rates.WorldBankBoundRatesListView.as_view('list_world_bank_bound_rates'),
     ),
 ]
