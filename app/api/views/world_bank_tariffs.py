@@ -1,4 +1,4 @@
-from common.views import ac, base, json_error
+from data_engineering.common.views import ac, base, json_error
 
 from app.db.models.external import WorldBankTariffTransformL1
 from app.etl.etl_world_bank_tariff import WorldBankTariffTransformPipeline

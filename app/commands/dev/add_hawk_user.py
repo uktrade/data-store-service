@@ -1,5 +1,5 @@
 import click
-from common.db.models import HawkUsers
+from data_engineering.common.db.models import HawkUsers
 from flask.cli import with_appcontext
 
 
