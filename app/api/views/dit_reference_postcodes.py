@@ -1,18 +1,16 @@
 from data_engineering.common.api.utils import to_web_dict
-from data_engineering.common.views import ac, base, json_error
+from data_engineering.common.views import ac, json_error
 from flask import current_app as flask_app
 from flask import request
 from flask.views import View
 
+from app.api.views.base import PipelinePaginatedListView
 from app.db.models.external import DITReferencePostcodesL1
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 
 
-class DitReferencePostcodeListView(base.PaginatedListView):
-
-    decorators = [json_error, ac.authentication_required, ac.authorization_required]
-
-    pipeline = DITReferencePostcodesPipeline
+class DitReferencePostcodeListView(PipelinePaginatedListView):
+    pipeline_column_types = DITReferencePostcodesPipeline._l1_data_column_types
     model = DITReferencePostcodesL1
 
 
