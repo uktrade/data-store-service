@@ -1,4 +1,4 @@
-from app.db.models import (
+from data_engineering.common.db.models import (
     _col,
     _date,
     _decimal,
@@ -6,6 +6,7 @@ from app.db.models import (
     _text,
     BaseModel,
 )
+
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline

@@ -25,7 +25,7 @@ class TestDbCommand:
         ),
     )
     @mock.patch('flask_sqlalchemy.SQLAlchemy.create_all')
-    @mock.patch('app.db.dbi.DBI.drop_schema')
+    @mock.patch('data_engineering.common.db.dbi.DBI.drop_schema')
     @mock.patch('sqlalchemy_utils.create_database')
     @mock.patch('sqlalchemy_utils.drop_database')
     def test_run_db(
