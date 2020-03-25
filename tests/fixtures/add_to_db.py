@@ -6,6 +6,7 @@ from app.db.models.external import (
     DITReferencePostcodesL1,
     ONSPostcodeDirectoryL1,
     WorldBankBoundRateL1,
+    WorldBankTariffL0,
     WorldBankTariffTransformL1,
 )
 
@@ -114,6 +115,26 @@ def add_world_bank_tariff(app):
                 'world_average': record.get('world_average'),
             }
             WorldBankTariffTransformL1.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_world_bank_raw_tariff(app):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'product': record.get('product'),
+                'reporter': record.get('reporter'),
+                'partner': record.get('partner'),
+                'year': record.get('year'),
+                'simple_average': record.get('simple_average'),
+                'duty_type': record.get('duty_type'),
+                'number_of_total_lines': record.get('number_of_total_lines'),
+            }
+            WorldBankTariffL0.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
 
