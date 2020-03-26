@@ -30,7 +30,9 @@ RULES = [
         world_bank_tariffs.WorldBankTariffListView.as_view('list_world_bank_tariff_raw'),
     ),
     (
-        '/api/v1/get-world-bank-bound-rates/',
-        world_bank_bound_rates.WorldBankBoundRatesListView.as_view('list_world_bank_bound_rates'),
+        '/api/v1/get-world-bank-bound-rates/raw/',
+        world_bank_bound_rates.WorldBankBoundRatesListView.as_view(
+            'list_world_bank_bound_rates_raw'
+        ),
     ),
 ]
