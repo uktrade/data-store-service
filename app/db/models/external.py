@@ -155,7 +155,7 @@ class WorldBankTariffL0(BaseModel):
     __table_args__ = {'schema': WorldBankTariffTransformPipeline.schema}
 
     id = _col(_int, primary_key=True, autoincrement=True)
-    data_file_created = _col(_text)
+    datafile_created = _col(_text)
     reporter = _col(_int)
     year = _col(_int)
     product = _col(_int)
