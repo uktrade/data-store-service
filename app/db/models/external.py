@@ -109,6 +109,25 @@ class DITReferencePostcodesL1(BaseModel):
     date_of_termination = _col(_date)
 
 
+class WorldBankBoundRateL0(BaseModel):
+    """
+    Raw world bank bound rates
+    """
+
+    __tablename__ = 'L0'
+    __table_args__ = {'schema': WorldBankBoundRatesPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datafile_created = _col(_text)
+    datafile_updated = _col(_text)
+    data_hash = _col(_text, unique=True)
+    nomen_code = _col(_text)
+    reporter = _col(_int)
+    product = _col(_int)
+    bound_rate = _col(_decimal)
+    total_number_of_lines = _col(_int)
+
+
 class WorldBankBoundRateL1(BaseModel):
     """
     World bank bound rates
@@ -122,6 +141,25 @@ class WorldBankBoundRateL1(BaseModel):
     reporter = _col(_int)
     product = _col(_int)
     bound_rate = _col(_decimal)
+
+
+class WorldBankTariffL0(BaseModel):
+    """
+    Raw world bank tariff data
+    """
+
+    __tablename__ = 'L0'
+    __table_args__ = {'schema': WorldBankTariffTransformPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datafile_created = _col(_text)
+    reporter = _col(_int)
+    year = _col(_int)
+    product = _col(_int)
+    partner = _col(_int)
+    duty_type = _col(_text)
+    simple_average = _col(_decimal)
+    number_of_total_lines = _col(_int)
 
 
 class WorldBankTariffTransformL1(BaseModel):
@@ -144,25 +182,6 @@ class WorldBankTariffTransformL1(BaseModel):
     bnd_rate = _col(_decimal)
     country_average = _col(_decimal)
     world_average = _col(_decimal)
-
-
-class WorldBankTariffL0(BaseModel):
-    """
-    World bank tariff data
-    """
-
-    __tablename__ = 'L0'
-    __table_args__ = {'schema': WorldBankTariffTransformPipeline.schema}
-
-    id = _col(_int, primary_key=True, autoincrement=True)
-    datafile_created = _col(_text)
-    reporter = _col(_int)
-    year = _col(_int)
-    product = _col(_int)
-    partner = _col(_int)
-    duty_type = _col(_text)
-    simple_average = _col(_decimal)
-    number_of_total_lines = _col(_int)
 
 
 class ComtradeCountryCodeAndISOL1(BaseModel):

@@ -5,6 +5,7 @@ from app.db.models.external import (
     DITEUCountryMembershipL1,
     DITReferencePostcodesL1,
     ONSPostcodeDirectoryL1,
+    WorldBankBoundRateL0,
     WorldBankBoundRateL1,
     WorldBankTariffL0,
     WorldBankTariffTransformL1,
@@ -75,6 +76,24 @@ def add_dit_eu_country_membership(app):
                 'tariff_code': record.get('tariff_code'),
             }
             DITEUCountryMembershipL1.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_world_bank_raw_bound_rates(app):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'nomen_code': record.get('nomen_code'),
+                'reporter': record.get('reporter'),
+                'product': record.get('product'),
+                'bound_rate': record.get('bound_rate'),
+                'total_number_of_lines': record.get('total_number_of_lines'),
+            }
+            WorldBankBoundRateL0.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
 
