@@ -4,9 +4,12 @@ from app.db.models.external import (
     ComtradeCountryCodeAndISOL1,
     DITEUCountryMembershipL1,
     DITReferencePostcodesL1,
-    WorldBankTariffL1,
+    ONSPostcodeDirectoryL1,
+    WorldBankBoundRateL0,
+    WorldBankBoundRateL1,
+    WorldBankTariffL0,
+    WorldBankTariffTransformL1,
 )
-from app.db.models.external import ONSPostcodeDirectoryL1
 
 
 @pytest.fixture(scope='module')
@@ -80,6 +83,40 @@ def add_dit_eu_country_membership(app):
 
 
 @pytest.fixture(scope='module')
+def add_world_bank_raw_bound_rates(app):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'nomen_code': record.get('nomen_code'),
+                'reporter': record.get('reporter'),
+                'product': record.get('product'),
+                'bound_rate': record.get('bound_rate'),
+                'total_number_of_lines': record.get('total_number_of_lines'),
+            }
+            WorldBankBoundRateL0.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_world_bank_bound_rates(app):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'reporter': record.get('reporter'),
+                'product': record.get('product'),
+                'bound_rate': record.get('bound_rate'),
+            }
+            WorldBankBoundRateL1.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
 def add_world_bank_tariff(app):
     def _method(records):
         for record in records:
@@ -92,12 +129,31 @@ def add_world_bank_tariff(app):
                 'assumed_tariff': record.get('assumed_tariff'),
                 'app_rate': record.get('app_rate'),
                 'mfn_rate': record.get('mfn_rate'),
-                'prf_rate': record.get('prf_rate'),
                 'bnd_rate': record.get('bnd_rate'),
                 'country_average': record.get('country_average'),
                 'world_average': record.get('world_average'),
             }
-            WorldBankTariffL1.get_or_create(
+            WorldBankTariffTransformL1.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_world_bank_raw_tariff(app):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'product': record.get('product'),
+                'reporter': record.get('reporter'),
+                'partner': record.get('partner'),
+                'year': record.get('year'),
+                'simple_average': record.get('simple_average'),
+                'duty_type': record.get('duty_type'),
+                'number_of_total_lines': record.get('number_of_total_lines'),
+            }
+            WorldBankTariffL0.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
 

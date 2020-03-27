@@ -14,7 +14,7 @@ job_defaults: &job_defaults
 
   environment:
     FLASK_ENV: test
-    DATABASE_URL: postgresql://postgres@localhost/
+    DSS_DATABASE_URL: postgresql://postgres@localhost/
     ABC_CLIENT_ID: dss_client_id
     ABC_CLIENT_SECRET: dss_client_secret
     APP_SECRET_KEY: dss_app_secret

@@ -53,41 +53,51 @@ class Manager:
 
     def pipeline_process(self, pipeline_id, progress_bar=None):
         pipeline_config = self.pipeline_get(pipeline_id)
-        storage = self.storage.get_sub_storage(pipeline_config.sub_directory)
-        dfp = DSSDatafileProvider(storage)
-        processed_and_ignored_files = DatafileRegistryModel.get_processed_or_ignored_datafiles(
-            pipeline_id
-        )
-        for file_name in dfp.get_file_names():
-            if (
-                file_name in processed_and_ignored_files[pipeline_id]
-                and pipeline_config.force is False
-            ):
-                continue
-            if progress_bar:
-                progress_bar.set_postfix(str=file_name)
-            pipeline = pipeline_config.pipeline
-            try:
+        pipeline = pipeline_config.pipeline
+        if pipeline_config.sub_directory:
+            storage = self.storage.get_sub_storage(pipeline_config.sub_directory)
+            dfp = DSSDatafileProvider(storage)
+            processed_and_ignored_files = DatafileRegistryModel.get_processed_or_ignored_datafiles(
+                pipeline_id
+            )
+            for file_name in dfp.get_file_names():
+                if (
+                    file_name in processed_and_ignored_files[pipeline_id]
+                    and pipeline_config.force is False
+                ):
+                    continue
                 file_info = next(dfp.read_files(file_name, unpack=True))
-                DatafileRegistryModel.get_update_or_create(
-                    source=pipeline.id,
-                    file_name=file_info.name,
-                    state=DatafileState.PROCESSING.value,
+                self._update_registry_and_process(
+                    pipeline=pipeline,
+                    orig_file_name=file_name,
+                    file_info=file_info,
+                    progress_bar=progress_bar,
                 )
-                pipeline.process(file_info)
-                DatafileRegistryModel.get_update_or_create(
-                    source=pipeline.id,
-                    file_name=file_info.name,
-                    state=DatafileState.PROCESSED.value,
-                )
-            except Exception as e:
-                DatafileRegistryModel.get_update_or_create(
-                    source=pipeline.id,
-                    file_name=file_info.name,
-                    state=DatafileState.FAILED.value,
-                    error_message=str(e),
-                )
-                flask_app.logger.error(f'pipeline processing failed: {e}')
+        else:
+            self._update_registry_and_process(
+                pipeline=pipeline, progress_bar=progress_bar,
+            )
+
+    @staticmethod
+    def _update_registry_and_process(
+        pipeline, orig_file_name=None, file_info=None, progress_bar=None
+    ):
+        if progress_bar:
+            progress_bar.set_postfix(str=orig_file_name or pipeline.id)
+        entry = None
+        try:
+            entry, _ = DatafileRegistryModel.get_update_or_create(
+                source=pipeline.id, file_name=orig_file_name, state=DatafileState.PROCESSING.value,
+            )
+            pipeline.process(file_info)
+            entry.state = DatafileState.PROCESSED.value
+            entry.save()
+        except Exception as e:
+            if entry:
+                entry.state = DatafileState.FAILED.value
+                entry.error_message = str(e)
+                entry.save()
+            flask_app.logger.error(f'pipeline processing failed: {e}')
 
     def pipeline_process_all(self):
         progress = tqdm(self._pipelines.keys())
@@ -95,7 +105,7 @@ class Manager:
             progress.set_description(pipeline_id)
             self.pipeline_process(pipeline_id, progress_bar=progress)
 
-    def pipeline_register(self, pipeline, sub_directory=None, pipeline_id=None, force=False):
+    def pipeline_register(self, pipeline, sub_directory=None, pipeline_id=None, **kwargs):
         """ Register a clean pipeline for the manager to use
 
         Args:
@@ -113,13 +123,12 @@ class Manager:
         Returns:
             None
         """
-        po = pipeline(dbi=self.dbi, force=force) if inspect.isclass(pipeline) else pipeline
+        po = pipeline(dbi=self.dbi, **kwargs) if inspect.isclass(pipeline) else pipeline
 
         pipeline_id = pipeline_id or po.id
         if pipeline_id in self._pipelines:
-            raise ValueError(f'{po.id} pipeline is already registered')
-        if sub_directory is None:
-            sub_directory = f'{po.organisation}/{po.dataset}'
+            raise ValueError(f'{pipeline_id} pipeline is already registered')
+        force = kwargs.get('force', False)
         self._pipelines[pipeline_id] = PipelineConfig(po, sub_directory, force)
 
     def pipeline_remove(self, pipeline):

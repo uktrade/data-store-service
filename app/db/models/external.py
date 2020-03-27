@@ -1,4 +1,4 @@
-from app.db.models import (
+from data_engineering.common.db.models import (
     _col,
     _date,
     _decimal,
@@ -6,11 +6,15 @@ from app.db.models import (
     _text,
     BaseModel,
 )
+
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline
+from app.etl.etl_world_bank_tariff import (
+    WorldBankBoundRatesPipeline,
+    WorldBankTariffTransformPipeline,
+)
 
 
 class ONSPostcodeDirectoryL1(BaseModel):
@@ -105,13 +109,66 @@ class DITReferencePostcodesL1(BaseModel):
     date_of_termination = _col(_date)
 
 
-class WorldBankTariffL1(BaseModel):
+class WorldBankBoundRateL0(BaseModel):
+    """
+    Raw world bank bound rates
+    """
+
+    __tablename__ = 'L0'
+    __table_args__ = {'schema': WorldBankBoundRatesPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datafile_created = _col(_text)
+    datafile_updated = _col(_text)
+    data_hash = _col(_text, unique=True)
+    nomen_code = _col(_text)
+    reporter = _col(_int)
+    product = _col(_int)
+    bound_rate = _col(_decimal)
+    total_number_of_lines = _col(_int)
+
+
+class WorldBankBoundRateL1(BaseModel):
+    """
+    World bank bound rates
+    """
+
+    __tablename__ = 'L1'
+    __table_args__ = {'schema': WorldBankBoundRatesPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    data_source_row_id = _col(_int, unique=True)
+    reporter = _col(_int)
+    product = _col(_int)
+    bound_rate = _col(_decimal)
+
+
+class WorldBankTariffL0(BaseModel):
+    """
+    Raw world bank tariff data
+    """
+
+    __tablename__ = 'L0'
+    __table_args__ = {'schema': WorldBankTariffTransformPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    datafile_created = _col(_text)
+    reporter = _col(_int)
+    year = _col(_int)
+    product = _col(_int)
+    partner = _col(_int)
+    duty_type = _col(_text)
+    simple_average = _col(_decimal)
+    number_of_total_lines = _col(_int)
+
+
+class WorldBankTariffTransformL1(BaseModel):
     """
     World bank tariff data
     """
 
     __tablename__ = 'L1'
-    __table_args__ = {'schema': WorldBankTariffPipeline.schema}
+    __table_args__ = {'schema': WorldBankTariffTransformPipeline.schema}
 
     id = _col(_int, primary_key=True, autoincrement=True)
     data_source_row_id = _col(_int, unique=True)
@@ -122,7 +179,6 @@ class WorldBankTariffL1(BaseModel):
     assumed_tariff = _col(_decimal)
     app_rate = _col(_decimal)
     mfn_rate = _col(_decimal)
-    prf_rate = _col(_decimal)
     bnd_rate = _col(_decimal)
     country_average = _col(_decimal)
     world_average = _col(_decimal)

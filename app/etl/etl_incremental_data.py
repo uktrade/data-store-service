@@ -67,15 +67,14 @@ class IncrementalDataPipeline(DataPipeline):
         return self.l1_helper_columns + self._l1_data_column_types
 
     def create_tables(self):
-        self._create_sequence(self._l0_sequence)
-        self._create_sequence(self._l1_sequence)
-
-        self._create_table(self._l0_table, self._l0_column_types, drop_existing=self.force)
-        self._create_table(self._l1_table, self._l1_column_types, drop_existing=self.force)
+        self._create_sequence(self._l0_sequence, drop_existing=self.options.force)
+        self._create_sequence(self._l1_sequence, drop_existing=self.options.force)
+        self._create_table(self._l0_table, self._l0_column_types, drop_existing=self.options.force)
+        self._create_table(self._l1_table, self._l1_column_types, drop_existing=self.options.force)
         self._create_table(self._l0_temp_table, self._l0_column_types, drop_existing=True)
         self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=True)
 
-    def process(self, file_info=None, drop_source=True):
+    def process(self, file_info, drop_source=True, **kwargs):
         self.create_tables()
         self._datafile_to_l0_temp(file_info)
         self._l0_to_l1()
@@ -95,7 +94,9 @@ class IncrementalDataPipeline(DataPipeline):
         stmt = f'CREATE TABLE IF NOT EXISTS {table_name} ({columns})'
         self.dbi.execute_statement(stmt)
 
-    def _create_sequence(self, sequence_name):
+    def _create_sequence(self, sequence_name, drop_existing=False):
+        if drop_existing:
+            self.dbi.drop_sequence(sequence_name)
         stmt = f'CREATE SEQUENCE IF NOT EXISTS {sequence_name}'
         self.dbi.execute_statement(stmt)
 
