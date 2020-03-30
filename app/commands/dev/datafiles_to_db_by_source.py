@@ -3,6 +3,7 @@ from flask import current_app as app
 from flask.cli import with_appcontext
 
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
+from app.etl.etl_dit_baci import DITBACIPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
@@ -29,6 +30,7 @@ arg_to_pipeline_config_list = {
         (DITReferencePostcodesPipeline, 'dit/reference_postcodes')
     ],
     WorldBankTariffPipeline.data_source: [
+        (DITBACIPipeline, 'dit/baci'),
         (DITEUCountryMembershipPipeline, 'dit/eu_country_membership'),
         (ComtradeCountryCodeAndISOPipeline, 'comtrade/country_code_and_iso'),
         (WorldBankBoundRatesPipeline, 'world_bank/bound_rates'),
