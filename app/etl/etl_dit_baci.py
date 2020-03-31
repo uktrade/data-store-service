@@ -34,10 +34,10 @@ class DITBACIPipeline(SnapshotDataPipeline):
     ]
 
     _l0_l1_data_transformations = {
-        'year' : 't',
-        'product_category' : 'hs6',
-        'exporter' : 'i',
-        'importer' : 'j',
-        'trade_flow_value' : 'v',
-        'quantity': 'q'
+        'year': 't',
+        'product_category': 'hs6',
+        'exporter': 'i',
+        'importer': 'j',
+        'trade_flow_value': 'v',
+        'quantity': 'q',
     }

@@ -12,9 +12,7 @@ def test_get_dit_baci_data_empty_dataset(app_with_hawk_user, app_with_mock_cache
     assert response.json == {'next': None, 'results': []}
 
 
-def test_get_dit_baci_data_single_row(
-    app_with_hawk_user, app_with_mock_cache, add_dit_baci
-):
+def test_get_dit_baci_data_single_row(app_with_hawk_user, app_with_mock_cache, add_dit_baci):
     add_dit_baci(
         [
             {
