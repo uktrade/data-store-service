@@ -5,6 +5,7 @@ import pytest
 from app.commands.dev.datafiles_to_db_by_source import (
     ComtradeCountryCodeAndISOPipeline,
     datafiles_to_db_by_source,
+    DITBACIPipeline,
     DITEUCountryMembershipPipeline,
     DITReferencePostcodesPipeline,
     ONSPostcodeDirectoryPipeline,
@@ -41,6 +42,20 @@ class TestDataFileToDBBySource:
                         'continue_transform': False,
                         'force': False,
                         'products': None,
+                        'sub_directory': 'dit/baci',
+                        'pipeline': DITBACIPipeline,
+                    },
+                    {
+                        'continue_transform': False,
+                        'force': False,
+                        'products': None,
+                        'sub_directory': 'dit/eu_country_membership',
+                        'pipeline': DITEUCountryMembershipPipeline,
+                    },
+                    {
+                        'continue_transform': False,
+                        'force': False,
+                        'products': None,
                         'sub_directory': 'dit/reference_postcodes',
                         'pipeline': DITReferencePostcodesPipeline,
                     },
@@ -50,13 +65,6 @@ class TestDataFileToDBBySource:
                         'products': None,
                         'sub_directory': 'world_bank/tariff',
                         'pipeline': WorldBankTariffPipeline,
-                    },
-                    {
-                        'continue_transform': False,
-                        'force': False,
-                        'products': None,
-                        'sub_directory': 'dit/eu_country_membership',
-                        'pipeline': DITEUCountryMembershipPipeline,
                     },
                     {
                         'continue_transform': False,
