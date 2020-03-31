@@ -1,4 +1,5 @@
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
+from app.etl.etl_dit_baci import DITBACIPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
@@ -15,4 +16,5 @@ def get_schemas():
         WorldBankTariffPipeline.schema,
         ComtradeCountryCodeAndISOPipeline.schema,
         DITEUCountryMembershipPipeline.schema,
+        DITBACIPipeline.schema,
     ]
