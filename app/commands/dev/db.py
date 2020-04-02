@@ -3,6 +3,7 @@ import sqlalchemy_utils
 from flask import current_app as app
 from flask.cli import with_appcontext
 
+from data_engineering.common.db.models import Base
 from app.db.models import get_schemas
 
 
@@ -44,7 +45,7 @@ def db(create, drop, drop_tables, create_tables, recreate_tables):
             drop_schemas()
         if create or create_tables or recreate_tables:
             click.echo('Creating DB tables')
-            app.db.create_all()
+            Base.metadata.create_all(app.db.engine)
 
 
 def drop_schemas():
