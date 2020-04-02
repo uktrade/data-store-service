@@ -1,9 +1,9 @@
 import click
 import sqlalchemy_utils
+from data_engineering.common.db.models import Base
 from flask import current_app as app
 from flask.cli import with_appcontext
 
-from data_engineering.common.db.models import Base
 from app.db.models import get_schemas
 
 

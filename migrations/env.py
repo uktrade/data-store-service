@@ -35,9 +35,7 @@ def update_schema(filename, options):
         for line in file_:
             lines.append(
                 re.sub(
-                    r'schema=\'([A-Za-z._]*)\'',
-                    'schema=quoted_name(\'\\g<1>\', quote=True)',
-                    line
+                    r'schema=\'([A-Za-z._]*)\'', 'schema=quoted_name(\'\\g<1>\', quote=True)', line
                 )
             )
     with open(filename, "w") as to_write:
