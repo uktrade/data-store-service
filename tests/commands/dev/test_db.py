@@ -24,7 +24,7 @@ class TestDbCommand:
             (False, False, False, False, True, False),
         ),
     )
-    @mock.patch('flask_sqlalchemy.SQLAlchemy.create_all')
+    @mock.patch('data_engineering.common.db.models.Base.metadata.create_all')
     @mock.patch('data_engineering.common.db.dbi.DBI.drop_schema')
     @mock.patch('sqlalchemy_utils.create_database')
     @mock.patch('sqlalchemy_utils.drop_database')
