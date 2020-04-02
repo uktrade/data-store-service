@@ -24,6 +24,20 @@ class DITBACIPipeline(SnapshotDataPipeline):
             quote='"',
         )
 
-    _l1_data_column_types = _l0_data_column_types
+    _l1_data_column_types = [
+        ('year', 'integer'),
+        ('product_category', 'integer'),
+        ('exporter', 'integer'),
+        ('importer', 'integer'),
+        ('trade_flow_value', 'decimal'),
+        ('quantity', 'decimal'),
+    ]
 
-    _l0_l1_data_transformations = {}
+    _l0_l1_data_transformations = {
+        'year': 't',
+        'product_category': 'hs6',
+        'exporter': 'i',
+        'importer': 'j',
+        'trade_flow_value': 'v',
+        'quantity': 'q',
+    }

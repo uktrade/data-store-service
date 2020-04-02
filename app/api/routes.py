@@ -1,4 +1,5 @@
 from app.api.views import (
+    dit_baci,
     dit_reference_postcodes,
     ons_postcodes,
     world_bank_bound_rates,
@@ -35,4 +36,5 @@ RULES = [
             'list_world_bank_bound_rates_raw'
         ),
     ),
+    ('/api/v1/get-dit-baci-data/', dit_baci.BACIListView.as_view('list_dit_baci'),),
 ]

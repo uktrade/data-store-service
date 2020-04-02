@@ -8,6 +8,7 @@ from data_engineering.common.db.models import (
 )
 
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
+from app.etl.etl_dit_baci import DITBACIPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
@@ -213,3 +214,18 @@ class DITEUCountryMembershipL1(BaseModel):
     iso3 = _col(_text)
     year = _col(_int)
     tariff_code = _col(_text)
+
+
+class DITBACIL1(BaseModel):
+
+    __tablename__ = 'L1'
+    __table_args__ = {'schema': DITBACIPipeline.schema}
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+    data_source_row_id = _col(_int, unique=True)
+    year = _col(_int)
+    product_category = _col(_int)
+    exporter = _col(_int)
+    importer = _col(_int)
+    trade_flow_value = _col(_decimal)
+    quantity = _col(_decimal)
