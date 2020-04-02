@@ -53,7 +53,7 @@ class TestETLManager:
             pipeline=FakePipeline(1234), sub_directory=None, force=False
         )
         manager.pipeline_process('fake_pipeline')
-        actual_data_file_registry_list = DatafileRegistryModel.query.all()
+        actual_data_file_registry_list = app_with_db.db.session.query(DatafileRegistryModel).all()
         assert len(actual_data_file_registry_list) == 1
         actual_data_file_registry = actual_data_file_registry_list[0]
         assert actual_data_file_registry.state == DatafileState.PROCESSED.value
@@ -96,7 +96,7 @@ class TestETLManager:
             force=False,
         )
         manager.pipeline_process('fake_pipeline')
-        actual_data_file_registry_list = DatafileRegistryModel.query.all()
+        actual_data_file_registry_list = app_with_db.db.session.query(DatafileRegistryModel).all()
         assert len(actual_data_file_registry_list) == 1
         actual_data_file_registry = actual_data_file_registry_list[0]
         assert actual_data_file_registry.state == expected_state
