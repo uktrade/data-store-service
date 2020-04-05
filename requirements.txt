@@ -107,7 +107,7 @@ urllib3==1.25.8           # via botocore, requests
 wasabi==0.6.0             # via spacy, thinc
 watchdog==0.10.2          # via -r requirements.in
 wcwidth==0.1.8            # via prompt-toolkit, pytest
-werkzeug==1.0.0           # via -r requirements.in, flask
+werkzeug==1.0.1           # via -r requirements.in, flask
 wtforms==2.2.1            # via flask-wtf
 zipp==2.1.0               # via importlib-metadata
 
