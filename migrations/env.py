@@ -100,7 +100,6 @@ def run_migrations_online():
             process_revision_directives=process_revision_directives,
             include_schemas=True,
             include_object=include_object,
-            version_table_schema='public',
             **current_app.extensions['migrate'].configure_args
         )
 
