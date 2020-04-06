@@ -8,6 +8,7 @@ from app.etl.etl_world_bank_tariff import WorldBankBoundRatesPipeline, WorldBank
 
 def get_schemas():
     return [
+        'public',
         'operations',
         'admin',
         ONSPostcodeDirectoryPipeline.schema,
