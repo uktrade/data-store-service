@@ -131,6 +131,8 @@ def add_world_bank_tariff(app):
                 'app_rate': record.get('app_rate'),
                 'mfn_rate': record.get('mfn_rate'),
                 'bnd_rate': record.get('bnd_rate'),
+                'eu_rep_rate': record.get('eu_rep_rate'),
+                'eu_part_rate': record.get('eu_part_rate'),
                 'country_average': record.get('country_average'),
                 'world_average': record.get('world_average'),
             }

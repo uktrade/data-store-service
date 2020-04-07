@@ -1,7 +1,7 @@
-from app.etl.etl_snapshot_data import SnapshotDataPipeline
+from app.etl.etl_incremental_data import IncrementalDataPipeline
 
 
-class DITBACIPipeline(SnapshotDataPipeline):
+class DITBACIPipeline(IncrementalDataPipeline):
     organisation = 'dit'
     dataset = 'baci'
 
@@ -18,7 +18,7 @@ class DITBACIPipeline(SnapshotDataPipeline):
         self.dbi.dsv_buffer_to_table(
             csv_buffer=file_info.data,
             fq_table_name=self._l0_temp_table,
-            columns=None,
+            columns=[c for c, _ in self._l0_data_column_types],
             has_header=True,
             sep=',',
             quote='"',
