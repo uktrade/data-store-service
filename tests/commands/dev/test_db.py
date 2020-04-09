@@ -24,7 +24,8 @@ class TestDbCommand:
             (False, False, False, False, True, False),
         ),
     )
-    @mock.patch('flask_sqlalchemy.SQLAlchemy.create_all')
+    @mock.patch('flask_migrate.upgrade')
+    @mock.patch('data_engineering.common.db.dbi.DBI.create_schema')
     @mock.patch('data_engineering.common.db.dbi.DBI.drop_schema')
     @mock.patch('sqlalchemy_utils.create_database')
     @mock.patch('sqlalchemy_utils.drop_database')
@@ -33,7 +34,8 @@ class TestDbCommand:
         mock_drop_database,
         mock_create_database,
         mock_drop_tables,
-        mock_create,
+        mock_create_schemas,
+        mock_run_migrations,
         drop_database,
         create_tables,
         drop_tables,
@@ -45,7 +47,8 @@ class TestDbCommand:
         mock_drop_database.return_value = None
         mock_create_database.return_value = None
         mock_drop_tables.return_value = None
-        mock_create_database.return_value = None
+        mock_create_schemas.return_value = None
+        mock_run_migrations.return_value = None
         runner = app_with_db.test_cli_runner()
 
         args = []
@@ -64,7 +67,8 @@ class TestDbCommand:
         assert mock_drop_database.called is drop_database
         assert mock_create_database.called is create_database
         assert mock_drop_tables.called is any([drop_tables, recreate_tables])
-        assert mock_create.called is any([create_tables, create_database, recreate_tables])
+        assert mock_create_schemas.called is any([create_tables, create_database, recreate_tables])
+        assert mock_run_migrations.called is any([create_tables, create_database, recreate_tables])
 
         if expected_msg:
             assert result.output.startswith('Usage: db [OPTIONS]')

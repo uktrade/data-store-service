@@ -1,4 +1,5 @@
 import click
+import flask_migrate
 import sqlalchemy_utils
 from flask import current_app as app
 from flask.cli import with_appcontext
@@ -16,7 +17,9 @@ from app.db.models import get_schemas
 @click.option(
     '--drop', is_flag=True, help='Drop database using database name specified in (local) config',
 )
-@click.option('--create_tables', is_flag=True, help='Create database tables')
+@click.option(
+    '--create_tables', '--upgrade', '--run_migrations', is_flag=True, help='Create database tables'
+)
 @click.option(
     '--drop_tables', is_flag=True, help='Drop database tables',
 )
@@ -44,10 +47,17 @@ def db(create, drop, drop_tables, create_tables, recreate_tables):
             drop_schemas()
         if create or create_tables or recreate_tables:
             click.echo('Creating DB tables')
-            app.db.create_all()
+            create_schemas()
+            flask_migrate.upgrade()
 
 
 def drop_schemas():
     schemas = get_schemas()
     for schema in schemas:
         app.dbi.drop_schema(schema)
+
+
+def create_schemas():
+    schemas = get_schemas()
+    for schema in schemas:
+        app.dbi.create_schema(schema)
