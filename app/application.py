@@ -7,5 +7,5 @@ config_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__f
 
 
 def register_app_components(flask_app):
-    Migrate(flask_app, flask_app.db)
+    Migrate(app=flask_app, db=flask_app.db, compare_type=True)
     return flask_app
