@@ -6,6 +6,7 @@ import psycopg2
 from flask import current_app as flask_app
 
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
+from app.etl.etl_dit_baci import DITBACIPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_incremental_data import IncrementalDataPipeline
 from app.etl.etl_world_bank_bound_rates import WorldBankBoundRatesPipeline
@@ -77,13 +78,15 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
 
     _l1_data_column_types = [
         ('product', 'integer'),
-        ('reporter', 'integer'),
-        ('partner', 'integer'),
+        ('reporter', 'text'),
+        ('partner', 'text'),
         ('year', 'integer'),
         ('assumed_tariff', 'decimal'),
         ('app_rate', 'decimal'),
         ('mfn_rate', 'decimal'),
         ('bnd_rate', 'decimal'),
+        ('eu_rep_rate', 'decimal'),
+        ('eu_part_rate', 'decimal'),
         ('country_average', 'decimal'),
         ('world_average', 'decimal'),
     ]
@@ -113,21 +116,33 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             self.dbi.parse_fully_qualified(self._l1_table).table,
         )
 
-    eu_countries_vn = 'eu_countries'
+    required_countries_vn = 'required_countries'
     all_tariffs_vn = 'all_tariffs'
-    eu_charging_rates_vn = 'eu_charging_rates'
-    eu_member_rates_vn = 'eu_member_rates'
-    tariff_spine_vn = 'tariff_spine'
-    cutoff_year = 2012
+    baci_spine_vn = 'baci_spine'
+    eu_countries_vn = 'eu_countries'
+    eu_reporter_rates_vn = 'eu_reporter_rates'
+    tariffs_with_eu_reporter_rates_vn = 'tariffs_with_eu_reporter_rates'
+    eu_partner_rates_vn = 'eu_partner_rates'
+    tariffs_with_world_partner_rates_vn = 'tariffs_with_world_partner_rates'
+    cutoff_year = 2000
 
     @timeit
     def _l0_to_l1(self):
         views = [
-            (self.eu_countries_vn, self._create_eu_countries_view),
+            (self.required_countries_vn, self._create_required_countries_view),
+            (self.baci_spine_vn, self._create_baci_spine_view),
             (self.all_tariffs_vn, self._create_all_tariffs_view),
-            (self.eu_charging_rates_vn, self._create_eu_charging_rates_view),
-            (self.eu_member_rates_vn, self._create_eu_member_rates_view),
-            (self.tariff_spine_vn, self._create_tariff_spine_view),
+            (self.eu_countries_vn, self._create_eu_countries_view),
+            (self.eu_reporter_rates_vn, self._create_eu_reporter_rates_view),
+            (
+                self.tariffs_with_eu_reporter_rates_vn,
+                self._create_tariffs_with_eu_reporter_rates_view,
+            ),
+            (self.eu_partner_rates_vn, self._create_eu_partner_rates_view),
+            (
+                self.tariffs_with_world_partner_rates_vn,
+                self._create_tariffs_with_world_partner_rates_view,
+            ),
         ]
         for view_name, create_view in views:
             fq_view_name = self._fq(view_name)
@@ -138,12 +153,15 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             else:
                 self.dbi.refresh_materialised_view(fq_view_name)
         products = self._get_products()
-        p = Pool(processes=5)
+        p = Pool(processes=10)
         connection_str = str(flask_app.db.engine.url)
         for i, product in enumerate(products):
-            print(f'Processing product: {i+1}/{len(products)}', end='\t')
+            print(f'Processing product: {i + 1}/{len(products)}', end='\t')
             code = str(product[0])
-            p.apply_async(self._clean_and_transform_tariffs, (code, connection_str))
+            p.apply_async(
+                self._clean_and_transform_tariffs,
+                (code, connection_str, WorldBankBoundRatesPipeline(self.dbi)._l1_table,),
+            )
         p.close()
         p.join()
         print('Done!')
@@ -184,70 +202,87 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
         stmt = f"""
         select distinct
             product
-        from {self._l0_table}
+        from {self._fq(self.baci_spine_vn)}
         {where}
         order by product
         """
         return self.dbi.execute_query(stmt, raise_if_fail=True)
 
     @timeit
-    def _clean_and_transform_tariffs(self, product, connection_str):
+    def _clean_and_transform_tariffs(
+        self, product, connection_str, world_bank_bound_rates_l1_table
+    ):
         conn, curs = None, None
         try:
             stmt = f"""
-            with all_product_tariffs as (
+            with bnd_tariffs as (
                 select
-                    *
-                from {self._fq(self.all_tariffs_vn)}
-                where product = '{product}'
+                    t1.product,
+                    t2.iso3 as reporter,
+                    bound_rate as bnd_rate
+                from {world_bank_bound_rates_l1_table} t1
+                left join {self._fq(self.required_countries_vn)} t2
+                    on t1.reporter = t2.iso_num
+                where t2.requirement is not null
+            ), product_tariffs as (
+                select distinct
+                    product,
+                    year,
+                    reporter,
+                    partner,
+                    app_rate,
+                    t3.mfn_rate,
+                    t4.bnd_rate,
+                    eu_rep,
+                    eu_rep_rate,
+                    eu_part,
+                    eu_part_rate
+                from (
+                    select * from {self._fq(self.tariffs_with_eu_reporter_rates_vn)}
+                    where product = '{product}'
+                ) t1
+                full join (
+                    select * from {self._fq(self.eu_partner_rates_vn)}
+                    where product = '{product}'
+                ) t2 using (product, year, reporter, eu_part)
+                full join (
+                    select * from {self._fq(self.tariffs_with_world_partner_rates_vn)}
+                    where product = '{product}'
+                ) t3 using (product, year, partner, reporter)
+                left join (
+                    select * from bnd_tariffs
+                    where product = '{product}'
+                ) t4 using (product, reporter)
+                where partner is not null
             ), cleaned_tariffs as (
                 select
-                    t1.reporter,
-                    case
-                        when t1.partner = 250 then 251
-                        when t1.partner = 380 then 381
-                        else t1.partner
-                    end as partner,
-                    t1.year,
-                    case when t1.partner = '918' then 'EUN' else t3.tariff_code end as reporter_eu,
-                    t4.tariff_code as partner_eu,
+                    product,
+                    year,
+                    reporter,
+                    partner,
                     app_rate,
                     mfn_rate,
                     bnd_rate,
+                    eu_rep_rate,
+                    eu_part_rate,
                     avg(app_rate) OVER () as world_average,
-                    avg(app_rate) OVER (PARTITION BY t1.reporter) as country_average,
+                    avg(app_rate) OVER (PARTITION BY reporter) as country_average,
                     coalesce(
                         app_rate,
-                        t6.eu_reporter_avg,
-                        t5.eu_partner_avg,
-                        case
-                            when t2.partner_eu = 'EUN' and t2.reporter_eu = 'EUN' then 0
-                            else null
-                        end
+                        eu_rep_rate,
+                        eu_part_rate,
+                        mfn_rate
                     ) as final_tariff
-                from {self._fq(self.tariff_spine_vn)} t1
-                left join all_product_tariffs t2 using (reporter, partner, year)
-                left join {self._fq(self.eu_countries_vn)} t3
-                    on t1.reporter = t3.iso_number and t1.year = t3.year
-                left join {self._fq(self.eu_countries_vn)} t4
-                    on t1.partner = t4.iso_number and t1.year = t4.year
-                left join {self._fq(self.eu_charging_rates_vn)} t5
-                    on t1.reporter = t5.reporter and t1.year = t5.year
-                        and t5.partner_eu = t4.tariff_code
-                left join {self._fq(self.eu_member_rates_vn)} t6
-                    on t1.partner = t6.partner and t1.year = t6.year
-                        and t6.reporter_eu = t3.tariff_code
-                where t1.partner != t1.reporter
+                from product_tariffs
             ), filled_tariffs as (
                 select
-                    *, (app_rate is null and final_tariff is not null) as eu_derived,
-                    coalesce(first_value(final_tariff)
+                    *,
+                    first_value(final_tariff)
                         OVER (
                             PARTITION BY reporter, partner,
                             final_tariff_partition ORDER BY year
                         )
-                    , mfn_rate)
-                    as filled_tariff_tmp
+                    as filled_tariff
                 from (
                     select
                         *,
@@ -258,24 +293,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                 ) sq
             ), assumed_tariffs as (
                 select *, coalesce(filled_tariff, country_average, world_average) as assumed_tariff
-                from (
-                    select
-                        *,
-                        first_value(filled_tariff_tmp)
-                            OVER (
-                                PARTITION BY reporter, partner, filled_tariff_partition
-                                ORDER BY year
-                            )
-                        as filled_tariff
-                    from (
-                        select
-                            *,
-                            count(filled_tariff_tmp)
-                                over (partition by reporter, partner ORDER BY year)
-                            as filled_tariff_partition
-                        from filled_tariffs
-                    ) sq1
-                ) sq2
+                from filled_tariffs
             )
             insert into {self._l1_temp_table} (
                 product,
@@ -286,6 +304,8 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                 app_rate,
                 mfn_rate,
                 bnd_rate,
+                eu_rep_rate,
+                eu_part_rate,
                 country_average,
                 world_average
             )
@@ -294,14 +314,15 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                 reporter,
                 partner,
                 year,
-                avg(assumed_tariff) as assumed_tariff,
-                avg(app_rate) as app_rate,
-                avg(mfn_rate) as mfn_rate,
-                avg(bnd_rate) as bnd_rate,
-                avg(country_average) as country_average,
-                avg(world_average) as world_average
+                round(avg(assumed_tariff), 3) as assumed_tariff,
+                round(avg(app_rate), 3) as app_rate,
+                round(avg(mfn_rate), 3) as mfn_rate,
+                round(avg(bnd_rate), 3) as bnd_rate,
+                round(avg(eu_rep_rate), 3) as eu_rep_rate,
+                round(avg(eu_part_rate), 3) as eu_part_rate,
+                round(avg(country_average), 3) as country_average,
+                round(avg(world_average), 3) as world_average
             from assumed_tariffs t1
-            where year > {self.cutoff_year}
             group by reporter, partner, year
             order by reporter, partner, year;
             """
@@ -316,132 +337,512 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                 conn.close()
 
     @timeit
-    def _create_eu_countries_view(self):
-        dit_eu_country_membership = DITEUCountryMembershipPipeline(self.dbi)
-        comtrade_country_code_and_iso = ComtradeCountryCodeAndISOPipeline(self.dbi)
+    def _create_required_countries_view(self):
         stmt = f"""
-        create materialized view if not exists {self._fq(self.eu_countries_vn)} as (
-            select
-                t1.year,
-                t1.iso3,
-                t1.tariff_code,
-                t2.cty_name_english as country,
-                t2.cty_code as iso_number
-            from {dit_eu_country_membership._l1_table} t1
-            left join {comtrade_country_code_and_iso._l1_table} t2
-                on t1.iso3 = t2.iso3_digit_alpha
-            where tariff_code = 'EUN'
+        create materialized view if not exists {self._fq(self.required_countries_vn)} as (
+            with required_countries (iso3, iso_num,	requirement) as (values
+                ('ABW',	533, True),
+                ('AFG',	4, True),
+                ('AGO',	24, True),
+                ('ALB',	8, True),
+                ('ARE',	784, True),
+                ('ARG',	32, True),
+                ('ARM',	51, True),
+                ('ATG',	28, True),
+                ('AUS',	36, True),
+                ('AUT',	40, True),
+                ('AZE',	31, True),
+                ('BDI',	108, True),
+                ('BEL',	56, True),
+                ('BEN',	204, True),
+                ('BFA',	854, True),
+                ('BGD',	50, True),
+                ('BGR',	100, True),
+                ('BHR',	48, True),
+                ('BHS',	44, True),
+                ('BIH',	70, True),
+                ('BLR',	112, True),
+                ('BLZ',	84, True),
+                ('BOL',	68, True),
+                ('BRA',	76, True),
+                ('BRB',	52, True),
+                ('BRN',	96, True),
+                ('BTN',	64, True),
+                ('CAF',	140, True),
+                ('CAN',	124, True),
+                ('CHE',	756, True),
+                ('CHL',	152, True),
+                ('CHN',	156, True),
+                ('CIV',	384, True),
+                ('CMR',	120, True),
+                ('COD',	180, True),
+                ('COG',	178, True),
+                ('COL',	170, True),
+                ('COM',	174, True),
+                ('CPV',	132, True),
+                ('CRI',	188, True),
+                ('CYP',	196, True),
+                ('CZE',	203, True),
+                ('DEU',	276, True),
+                ('DJI',	262, True),
+                ('DMA',	212, True),
+                ('DNK',	208, True),
+                ('DOM',	214, True),
+                ('DZA',	12, True),
+                ('ECU',	218, True),
+                ('EGY',	818, True),
+                ('ERI',	232, True),
+                ('ESP',	724, True),
+                ('EST',	233, True),
+                ('ETH',	231, True),
+                ('FIN',	246, True),
+                ('FJI',	242, True),
+                ('FRA',	250, True),
+                ('FRA',	251, True),
+                ('FSM',	583, True),
+                ('GAB',	266, True),
+                ('GBR',	826, True),
+                ('GEO',	268, True),
+                ('GHA',	288, True),
+                ('GIN',	324, True),
+                ('GMB',	270, True),
+                ('GNB',	624, True),
+                ('GNQ',	226, True),
+                ('GRC',	300, True),
+                ('GRD',	308, True),
+                ('GTM',	320, True),
+                ('GUY',	328, True),
+                ('HKG',	344, True),
+                ('HND',	340, True),
+                ('HRV',	191, True),
+                ('HTI',	332, True),
+                ('HUN',	348, True),
+                ('IDN',	360, True),
+                ('IND',	699, True),
+                ('IRL',	372, True),
+                ('IRN',	364, True),
+                ('IRQ',	368, True),
+                ('ISL',	352, True),
+                ('ISR',	376, True),
+                ('ITA',	381, True),
+                ('ITA',	380, True),
+                ('JAM',	388, True),
+                ('JOR',	400, True),
+                ('JPN',	392, True),
+                ('KAZ',	398, True),
+                ('KEN',	404, True),
+                ('KGZ',	417, True),
+                ('KHM',	116, True),
+                ('KIR',	296, True),
+                ('KNA',	659, True),
+                ('KOR',	410, True),
+                ('KWT',	414, True),
+                ('LAO',	418, True),
+                ('LBN',	422, True),
+                ('LBR',	430, True),
+                ('LBY',	434, True),
+                ('LCA',	662, True),
+                ('LKA',	144, True),
+                ('LTU',	440, True),
+                ('LVA',	428, True),
+                ('MAC',	446, True),
+                ('MAR',	504, True),
+                ('MDA',	498, True),
+                ('MDG',	450, True),
+                ('MDV',	462, True),
+                ('MEX',	484, True),
+                ('MHL',	584, True),
+                ('MKD',	807, True),
+                ('MLI',	466, True),
+                ('MLT',	470, True),
+                ('MMR',	104, True),
+                ('MNG',	496, True),
+                ('MOZ',	508, True),
+                ('MRT',	478, True),
+                ('MUS',	480, True),
+                ('MWI',	454, True),
+                ('MYS',	458, True),
+                ('NER',	562, True),
+                ('NGA',	566, True),
+                ('NIC',	558, True),
+                ('NLD',	528, True),
+                ('NOR',	579, True),
+                ('NPL',	524, True),
+                ('NRU',	520, True),
+                ('NZL',	554, True),
+                ('OMN',	512, True),
+                ('PAK',	586, True),
+                ('PAN',	591, True),
+                ('PER',	604, True),
+                ('PHL',	608, True),
+                ('PLW',	585, True),
+                ('PNG',	598, True),
+                ('POL',	616, True),
+                ('PRT',	620, True),
+                ('PRY',	600, True),
+                ('QAT',	634, True),
+                ('ROU',	642, True),
+                ('RUS',	643, True),
+                ('RWA',	646, True),
+                ('SAU',	682, True),
+                ('SDN',	729, True),
+                ('SEN',	686, True),
+                ('SGP',	702, True),
+                ('SLB',	90, True),
+                ('SLE',	694, True),
+                ('SLV',	222, True),
+                ('SMR',	674, True),
+                ('SOM',	706, True),
+                ('STP',	678, True),
+                ('SUR',	740, True),
+                ('SVK',	703, True),
+                ('SVN',	705, True),
+                ('SWE',	752, True),
+                ('SYC',	690, True),
+                ('TCD',	148, True),
+                ('TGO',	768, True),
+                ('THA',	764, True),
+                ('TJK',	762, True),
+                ('TKM',	795, True),
+                ('TON',	776, True),
+                ('TTO',	780, True),
+                ('TUN',	788, True),
+                ('TUR',	792, True),
+                ('TUV',	798, True),
+                ('TWN',	490, True),
+                ('TZA',	834, True),
+                ('UGA',	800, True),
+                ('UKR',	804, True),
+                ('URY',	858, True),
+                ('USA',	842, True),
+                ('UZB',	860, True),
+                ('VCT',	670, True),
+                ('VEN',	862, True),
+                ('VNM',	704, True),
+                ('VUT',	548, True),
+                ('WSM',	882, True),
+                ('YEM',	887, True),
+                ('ZAF',	710, True),
+                ('ZMB',	894, True),
+                ('ZWE',	716, True)
+            ) select
+                iso3,
+                iso_num,
+                requirement
+            from required_countries
+        )
+        """
+        self.dbi.execute_statement(stmt, raise_if_fail=True)
+
+    @timeit
+    def _create_baci_spine_view(self):
+        """
+            Create spine as cross product of product, year, reporter and partner
+            combinations from BACI data joined on required country and filtered on
+                - only containing required country pairs
+                - reporter must be different from partner
+            Switch to use iso3 instead of iso_number for partner/reporter
+
+            Used by (eu_reporter_rates_view, tariffs_with_eu_reporter_rates)
+        """
+        dit_baci = DITBACIPipeline(self.dbi)
+        stmt = f"""
+        create materialized view if not exists {self._fq(self.baci_spine_vn)} as (
+            with baci_master as (
+                select distinct
+                    product_category as product,
+                    importer as reporter,
+                    exporter as partner,
+                    year
+                from {dit_baci._l1_table}
+                where year >= {self.cutoff_year}
+            ), baci_master_required_countries as (
+                select
+                    product,
+                    year,
+                    t2.iso3 as reporter,
+                    t3.iso3 as partner
+                from  baci_master t1
+                left join {self._fq(self.required_countries_vn)} t2
+                    on t1.reporter = t2.iso_num
+                left join {self._fq(self.required_countries_vn)} t3
+                    on t1.partner = t3.iso_num
+                where t2.requirement is True and t3.requirement is True
+            )
+            select distinct
+                product,
+                year,
+                reporter,
+                partner
+            from (select distinct reporter from baci_master_required_countries
+                where reporter is not null) t1
+            cross join (select distinct partner from baci_master_required_countries
+                where partner is not null) cj1
+            cross join (select distinct year from baci_master_required_countries
+                where year is not null) cj2
+            cross join (select distinct product from baci_master_required_countries
+                where product is not null) cj3
+            where reporter != partner
         )
         """
         self.dbi.execute_statement(stmt, raise_if_fail=True)
 
     @timeit
     def _create_all_tariffs_view(self):
-        world_bank_bound_rates = WorldBankBoundRatesPipeline(self.dbi)
+        """
+            Create tariff view with different types as columns. Switch to use
+            iso3 instead of iso_number for partner/reporter
+
+            Used by (eu_reporter_rates_view, tariffs_with_eu_reporter_rates)
+
+        """
         stmt = f"""
         create materialized view if not exists {self._fq(self.all_tariffs_vn)} as (
             with tariffs_and_countries as (
                 select
                     t1.product,
-                    t1.reporter,
-                    t1.partner,
                     t1.year as year,
+                    t1.reporter as rep_iso_num,
+                    t2.iso3 as rep_iso3,
+                    t2.requirement as rep_req,
+                    t1.partner as part_iso_num,
+                    t3.iso3 as part_iso3,
+                    t3.requirement as part_req,
                     t1.duty_type as tariff_type,
-                    t1.simple_average,
-                    t2.tariff_code as reporter_eu,
-                    t3.tariff_code as partner_eu
+                    t1.simple_average
                 from {self._l0_table} t1
-                left join {self._fq(self.eu_countries_vn)} t2
-                    on t1.reporter = t2.iso_number and t1.year = t2.year
-                left join {self._fq(self.eu_countries_vn)} t3
-                    on t1.partner = t3.iso_number and t1.year = t3.year
+                left join {self._fq(self.required_countries_vn)} t2
+                    on t1.reporter = t2.iso_num
+                left join {self._fq(self.required_countries_vn)} t3
+                    on t1.partner = t3.iso_num
             ), ahs_tariffs as (
                 select * from tariffs_and_countries where tariff_type = 'AHS'
             ), mfn_tariffs as (
                 select * from tariffs_and_countries where tariff_type = 'MFN'
-            ), bnd_tariffs as (
-                select reporter, product, bound_rate
-                    from {world_bank_bound_rates._l1_table}
+            )
+            select distinct
+                product,
+                year,
+                coalesce(t1.rep_iso_num, t2.rep_iso_num) as rep_iso_num,
+                coalesce(t1.rep_iso3, t2.rep_iso3) as reporter,
+                coalesce(t1.rep_req, t2.rep_req) as rep_req,
+                coalesce(t1.part_iso_num, t2.part_iso_num) as part_iso_num,
+                t1.part_iso3 as partner,
+                    -- always null for t2
+                t1.part_req as part_req,
+                    -- always null for t2
+                t1.simple_average as app_rate,
+                t2.simple_average as mfn_rate
+            from ahs_tariffs t1
+            full join mfn_tariffs t2 using (product, year, rep_iso3, part_iso3) -- only 0 partner
+        )
+        """
+        self.dbi.execute_statement(stmt, raise_if_fail=True)
+
+    @timeit
+    def _create_eu_countries_view(self):
+        """
+            Eu country list filtered on
+                - only containing required country pairs
+                - tariff_code is EUN
+
+            Used by (eu_reporter_rates)
+        """
+        dit_eu_country_membership = DITEUCountryMembershipPipeline(self.dbi)
+        comtrade_country_code_and_iso = ComtradeCountryCodeAndISOPipeline(self.dbi)
+        stmt = f"""
+        create materialized view if not exists {self._fq(self.eu_countries_vn)} as (
+
+            select distinct
+                t1.year,
+                t1.iso3,
+                t1.tariff_code
+            from {dit_eu_country_membership._l1_table} t1
+            left join {self._fq(self.required_countries_vn)} t2
+                using (iso3)
+            where requirement is True and tariff_code = 'EUN'
+            order by t1.iso3, t1.year
+
+            -- select distinct
+            --    year,
+            --    t1.iso3,
+            --    tariff_code
+            -- from {dit_eu_country_membership._l1_table} t1
+            -- left join {comtrade_country_code_and_iso._l1_table} t2
+            --        on t1.iso3 = t2.iso3_digit_alpha
+            -- left join {self._fq(self.required_countries_vn)} t3
+            --        on t1.iso3 = t3.iso3 and t2.cty_code = t3.iso_num
+            -- where tariff_code = 'EUN' and requirement is True
+        )
+        """
+        self.dbi.execute_statement(stmt, raise_if_fail=True)
+
+    @timeit
+    def _create_eu_reporter_rates_view(self):
+        """
+            All tariffs where
+                - reporter is EU (918)
+                - partner is part of spine
+            expanded to include all eu countries
+                - EU-EU rates set to 0 if no app rate present
+
+            Only a reporter can be 918 and a corresponding partner can only be non-eu
+
+            Used by (tariffs_with_eu_reporter_rates)
+        """
+        stmt = f"""
+        create materialized view if not exists {self._fq(self.eu_reporter_rates_vn)} as (
+            with eu_reported_tariffs as (
+                select distinct
+                    product,
+                    year,
+                    partner,
+                    app_rate
+                from {self._fq(self.baci_spine_vn)}
+                left join {self._fq(self.all_tariffs_vn)}
+                    using (product, year, partner)
+                where part_req = True and rep_iso_num = 918
+            ), eu_product_spine as (
+                select distinct
+                    product,
+                    t1.year,
+                    t2.iso3,
+                    t2.tariff_code
+                from eu_reported_tariffs t1
+                cross join {self._fq(self.eu_countries_vn)} t2
+            ), expanded_with_eu_partners as (
+                select product, t1.year, partner, t2.tariff_code from eu_reported_tariffs t1
+                left join {self._fq(self.eu_countries_vn)} t2
+                    on t1.partner = t2.iso3 and t1.year = t2.year
+                union
+                select product, year, iso3 as partner, tariff_code from eu_product_spine
+            ), expanded_with_eu_partners_and_reporters as (
+                select
+                    product,
+                    year,
+                    partner,
+                    t2.iso3 as reporter,
+                    t1.tariff_code as eu_part,
+                    t2.tariff_code as eu_rep
+                from expanded_with_eu_partners t1
+                left join {self._fq(self.eu_countries_vn)} t2 using (year)
+                where partner != t2.iso3
+            )
+            select distinct
+                product,
+                year,
+                reporter,
+                partner,
+                eu_rep,
+                eu_part,
+                case
+                    when
+                        app_rate is null
+                        and eu_rep = 'EUN'
+                        and eu_part = 'EUN'
+                    then 0
+                    -- set all EU - EU rates to 0
+                    else app_rate
+                end as eu_rep_rate
+            from eu_reported_tariffs
+            full join expanded_with_eu_partners_and_reporters
+            using (product, year, partner)
+        )
+        """
+        self.dbi.execute_statement(stmt, raise_if_fail=True)
+
+    @timeit
+    def _create_tariffs_with_eu_reporter_rates_view(self):
+        """
+            All required tariffs including the eu reported rates
+            and if partner/reporter is EUN
+
+            Used by (eu_partner_rates, product_tariffs)
+        """
+        stmt = f"""
+        create materialized view if not exists
+            {self._fq(self.tariffs_with_eu_reporter_rates_vn)} as (
+            with all_tariffs as (
+                select distinct
+                    product,
+                    year,
+                    reporter,
+                    partner,
+                    app_rate
+                from {self._fq(self.baci_spine_vn)} t1
+                left join {self._fq(self.all_tariffs_vn)} t2
+                    using (product, year, reporter, partner)
             )
             select
                 product,
+                year,
                 reporter,
                 partner,
-                year,
-                t1.reporter_eu,
-                t1.partner_eu,
-                t1.simple_average as app_rate,
-                t3.simple_average as mfn_rate,
-                t4.bound_rate as bnd_rate
-            from ahs_tariffs t1
-            left join mfn_tariffs t3 using (product, reporter, partner, year)
-            left join bnd_tariffs t4 using (product, reporter)
-            where reporter != partner and reporter != 0 and partner != 0
+                app_rate,
+                eu_rep,
+                t2.eu_part,
+                eu_rep_rate
+            from all_tariffs t1
+            full join {self._fq(self.eu_reporter_rates_vn)} t2
+                using (product, year, reporter, partner)
         )
         """
         self.dbi.execute_statement(stmt, raise_if_fail=True)
 
     @timeit
-    def _create_eu_charging_rates_view(self):
+    def _create_eu_partner_rates_view(self):
+        """
+            Calculates the average EU partner rate
+
+            Used by (product_tariffs)
+        """
         stmt = f"""
-        create materialized view if not exists {self._fq(self.eu_charging_rates_vn)} as (
-            select
-                reporter,
-                year,
-                'EUN' as partner_eu,
-                avg(app_rate) as eu_partner_avg
-            from {self._fq(self.all_tariffs_vn)}
-            where partner_eu = 'EUN'
-            group by reporter, year, partner_eu
+        create materialized view if not exists {self._fq(self.eu_partner_rates_vn)} as (
+            select * from (
+                select
+                    product,
+                    year,
+                    reporter,
+                    eu_part,
+                    avg(app_rate) as eu_part_rate
+                from {self._fq(self.tariffs_with_eu_reporter_rates_vn)}
+                where eu_part = 'EUN'
+                group by product, year, reporter, eu_part
+            ) sq1 where eu_part_rate is not null
         )
         """
         self.dbi.execute_statement(stmt, raise_if_fail=True)
 
     @timeit
-    def _create_eu_member_rates_view(self):
+    def _create_tariffs_with_world_partner_rates_view(self):
+        """
+            Required tariffs with expanded world partner rates
+
+            Used by (product_tariffs)
+        """
         stmt = f"""
-        create materialized view if not exists {self._fq(self.eu_member_rates_vn)} as (
-            select
-                partner,
+        create materialized view if not exists
+            {self._fq(self.tariffs_with_world_partner_rates_vn)} as (
+            with world_reported_tariffs as (
+                select distinct
+                    product,
+                    year,
+                    reporter as iso3,
+                    mfn_rate
+                from {self._fq(self.baci_spine_vn)} t1
+                left join {self._fq(self.all_tariffs_vn)} t2
+                    using (product, year, reporter)
+                where rep_req = True and part_iso_num = 0
+            )
+            select distinct
+                product,
                 year,
-                'EUN' as reporter_eu,
-                app_rate as eu_reporter_avg
-            from {self._fq(self.all_tariffs_vn)} where reporter = '918'
+                t1.iso3 as reporter,
+                t2.iso3 as partner,
+                mfn_rate
+            from world_reported_tariffs t1
+            cross join {self._fq(self.required_countries_vn)} t2
+            where t1.iso3 != t2.iso3
         )
         """
         self.dbi.execute_statement(stmt, raise_if_fail=True)
-
-    @timeit
-    def _create_tariff_spine_view(self):
-        stmt = f"""
-        create materialized view if not exists {self._fq(self.tariff_spine_vn)} as (
-            select
-                reporter,
-                partner,
-                year
-            from (select distinct reporter from {self._fq(self.all_tariffs_vn)}) t1
-            cross join (select distinct partner from {self._fq(self.all_tariffs_vn)}) cj1
-            cross join (select distinct year from {self._fq(self.all_tariffs_vn)}) cj2
-        )
-        """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
-
-
-class WorldBankTariffTestPipeline(WorldBankTariffPipeline):
-    organisation = 'world_bank'
-    dataset = 'test'
-
-
-class WorldBankTariffTransformTestPipeline(WorldBankTariffTransformPipeline):
-    organisation = WorldBankTariffTestPipeline.organisation
-    dataset = WorldBankTariffTestPipeline.dataset
-
-
-class WorldBankTariffBulkPipeline(WorldBankTariffPipeline):
-    organisation = 'world_bank'
-    dataset = 'bulk'
-
-
-class WorldBankTariffTransformBulkPipeline(WorldBankTariffTransformPipeline):
-    organisation = WorldBankTariffBulkPipeline.organisation
-    dataset = WorldBankTariffBulkPipeline.dataset

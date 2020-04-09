@@ -9,12 +9,8 @@ from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 from app.etl.etl_world_bank_bound_rates import WorldBankBoundRatesPipeline
 from app.etl.etl_world_bank_tariff import (
-    WorldBankTariffBulkPipeline,
     WorldBankTariffPipeline,
-    WorldBankTariffTestPipeline,
-    WorldBankTariffTransformBulkPipeline,
     WorldBankTariffTransformPipeline,
-    WorldBankTariffTransformTestPipeline,
 )
 from app.etl.manager import Manager as PipelineManager
 
@@ -37,20 +33,7 @@ arg_to_pipeline_config_list = {
         (WorldBankTariffPipeline, 'world_bank/tariff'),
         (WorldBankTariffTransformPipeline, None),
     ],
-    WorldBankTariffTestPipeline.data_source: [
-        (WorldBankTariffTestPipeline, 'world_bank/test'),
-        (WorldBankTariffTransformTestPipeline, None),
-    ],
-    WorldBankTariffBulkPipeline.data_source: [
-        (WorldBankTariffBulkPipeline, 'world_bank/bulk'),
-        (WorldBankTariffTransformBulkPipeline, None),
-    ],
 }
-
-exclude_pipelines = [
-    WorldBankTariffTestPipeline.data_source,
-    WorldBankTariffBulkPipeline.data_source,
-]
 
 
 @click.command('datafiles_to_db_by_source')
@@ -77,7 +60,7 @@ def datafiles_to_db_by_source(**kwargs):
         manager = PipelineManager(storage=app.config['inputs']['source-folder'], dbi=app.dbi)
         for _arg, pipeline_info_list in arg_to_pipeline_config_list.items():
             arg = _arg.replace(".", "__")
-            if (kwargs['all'] and _arg not in exclude_pipelines) or kwargs[arg]:
+            if (kwargs['all'] and _arg) or kwargs[arg]:
                 for pipeline, sub_dir in pipeline_info_list:
                     manager.pipeline_register(
                         pipeline=pipeline,
