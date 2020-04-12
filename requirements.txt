@@ -97,7 +97,7 @@ six==1.14.0               # via apscheduler, freezegun, mohawk, packaging, pip-t
 spacy==2.2.4              # via -r requirements.in
 speaklater==1.3           # via flask-babelex
 sqlalchemy-utils==0.36.3  # via -r requirements.in, data-engineering-common
-sqlalchemy==1.3.15        # via -r requirements.in, alembic, flask-sqlalchemy, sqlalchemy-utils
+sqlalchemy==1.3.16        # via -r requirements.in, alembic, flask-sqlalchemy, sqlalchemy-utils
 srsly==1.0.2              # via spacy, thinc
 thinc==7.4.0              # via spacy
 toml==0.10.0              # via black
