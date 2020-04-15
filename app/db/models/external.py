@@ -2,7 +2,9 @@ from data_engineering.common.db.models import (
     _col,
     _date,
     _decimal,
+    _foreign_key,
     _int,
+    _table,
     _text,
     BaseModel,
 )
@@ -231,3 +233,23 @@ class DITBACIL1(BaseModel):
     importer = _col(_int)
     trade_flow_value = _col(_decimal)
     quantity = _col(_decimal)
+
+
+class LITECountryGroup(BaseModel):
+    __tablename__ = 'country_group'
+
+    id = _col(_int, primary_key=True, autoincrement=True)
+
+
+class LITERefCountryMapping(BaseModel):
+    __tablename__ = 'ref_country_mapping'
+
+    country_id = _col(_int, primary_key=True, autoincrement=True)
+    country_name = _col(_text)
+
+
+lite_country_group_entry = _table(
+    'country_group_entry',
+    _col('cg_id', _int, _foreign_key('country_group.id')),
+    _col('country_id', _int, _foreign_key('ref_country_mapping.country_id')),
+)
