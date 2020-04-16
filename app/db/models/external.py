@@ -257,5 +257,5 @@ spire_country_group_entry = _table(
     'country_group_entry',
     _col('cg_id', _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.country_group.id')),
     _col('country_id', _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.ref_country_mapping.country_id')),
-    schema=SPIRE_SCHEMA_NAME
+    schema=SPIRE_SCHEMA_NAME,
 )
