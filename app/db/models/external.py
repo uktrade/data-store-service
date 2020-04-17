@@ -360,6 +360,7 @@ class SPIRERefReportRating(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     rating = _col(_text, primary_key=True)
+    report_rating = _col(_text, nullable=False)
 
 
 class SPIREControlEntry(BaseModel):
