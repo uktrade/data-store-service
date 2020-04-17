@@ -1,8 +1,8 @@
 from data_engineering.common.db.models import (
     _col,
     _date,
-    _dt,
     _decimal,
+    _dt,
     _foreign_key,
     _int,
     _relationship,
@@ -341,7 +341,9 @@ class SPIREGoodsIncident(BaseModel):
     dest_country_id = _col(_int, nullable=False)
     source_country_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.country_group.id'))
     report_date = _col(_dt, nullable=False)
-    ela_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False)
+    ela_grp_id = _col(
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+    )
     start_date = _col(_dt, nullable=False)
     version_no = _col(_int, nullable=False)
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
@@ -421,7 +423,9 @@ class SPIREFootnoteEntry(BaseModel):
 
     fne_id = _col(_int, primary_key=True)
     fn_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.footnote.id'))
-    ela_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False)
+    ela_grp_id = _col(
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+    )
     goods_item_id = _col(_int)
     country_id = _col(_int)
     fnr_id = _col(_int)
@@ -444,7 +448,9 @@ class SPIREIncident(BaseModel):
     type = _col(_text, nullable=False)
     case_type = _col(_text, nullable=False)
     case_sub_type = _col(_text)
-    ela_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False)
+    ela_grp_id = _col(
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+    )
     ela_id = _col(_int)
     licence_id = _col(_int)
     report_date = _col(_dt, nullable=False)
@@ -544,7 +550,9 @@ class SPIREThirdParty(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     tp_id = _col(_int, primary_key=True)
-    ela_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False)
+    ela_grp_id = _col(
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+    )
     sh_id = _col(_int)
     country_id = _col(_int, nullable=False)
     ultimate_end_user_flag = _col(_int)
@@ -559,7 +567,9 @@ class SPIREUltimateEndUser(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ueu_id = _col(_int, primary_key=True)
-    ela_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False)
+    ela_grp_id = _col(
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+    )
     country_id = _col(_int, nullable=False)
     status_control = _col(_text, nullable=False)
     start_date = _col(_dt, nullable=False)
