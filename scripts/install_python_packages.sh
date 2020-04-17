@@ -3,4 +3,4 @@
 source ./scripts/functions.sh
 
 run "pip install --upgrade pip"
-run 'pip install -r /tmp/requirements.txt'
+run 'pip install -r /tmp/requirements.txt --no-cache-dir'

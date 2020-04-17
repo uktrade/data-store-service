@@ -4,6 +4,7 @@ from data_engineering.common.db.models import (
     _decimal,
     _foreign_key,
     _int,
+    _relationship,
     _table,
     _text,
     BaseModel,
@@ -238,6 +239,14 @@ class DITBACIL1(BaseModel):
 SPIRE_SCHEMA_NAME = 'dit.spire'
 
 
+spire_country_group_entry = _table(
+    'country_group_entry',
+    _col('cg_id', _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.country_group.id')),
+    _col('country_id', _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.ref_country_mapping.country_id')),
+    schema=SPIRE_SCHEMA_NAME,
+)
+
+
 class SPIRECountryGroup(BaseModel):
     __tablename__ = f'country_group'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
@@ -251,11 +260,4 @@ class SPIRERefCountryMapping(BaseModel):
 
     country_id = _col(_int, primary_key=True, autoincrement=True)
     country_name = _col(_text)
-
-
-spire_country_group_entry = _table(
-    'country_group_entry',
-    _col('cg_id', _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.country_group.id')),
-    _col('country_id', _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.ref_country_mapping.country_id')),
-    schema=SPIRE_SCHEMA_NAME,
-)
+    country_groups = _relationship("SPIRECountryGroup", secondary=spire_country_group_entry)
