@@ -248,7 +248,7 @@ class SPIRECountryGroup(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
-    country_group_entries = _relationship('SPIRECountryGroupEntry', backref="country_group")
+    country_group_entries = _relationship('SPIRECountryGroupEntry', backref='country_group')
 
 
 class SPIRERefCountryMapping(BaseModel):
@@ -280,7 +280,8 @@ class SPIREBatch(BaseModel):
     release_date = _col(_dt)
     staging_date = _col(_dt)
 
-    application_countries = _relationship('SPIREApplicationCountry', backref="batch")
+    application_countries = _relationship('SPIREApplicationCountry', backref='batch')
+    application = _relationship('SPIREApplication', backref='batch')
 
 
 class SPIREApplication(BaseModel):
@@ -296,8 +297,8 @@ class SPIREApplication(BaseModel):
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
     ela_id = _col(_int)
 
-    application_countries = _relationship('SPIREApplicationCountry', backref="application")
-    application_amendments = _relationship('SPIREApplicationAmendment', backref="application")
+    application_countries = _relationship('SPIREApplicationCountry', backref='application')
+    application_amendments = _relationship('SPIREApplicationAmendment', backref='application')
 
 
 class SPIREApplicationAmendment(BaseModel):

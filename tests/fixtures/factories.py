@@ -46,19 +46,6 @@ class SPIRERefCountryMappingFactory(BaseFactory):
         model = SPIRERefCountryMapping
 
 
-class SPIREApplicationFactory(BaseFactory):
-    case_type = factory.Faker('safe_color_name')
-    case_sub_type = factory.Faker('color_name')
-    initial_processing_time = factory.Faker('random_int')
-    case_closed_date = factory.Faker('date_this_century')
-    withheld_status = factory.Faker('word')
-    batch_id = None
-    ela_id = factory.Faker('random_int', min=1, max=50)
-
-    class Meta:
-        model = SPIREApplication
-
-
 class SPIREBatchFactory(BaseFactory):
     start_date = factory.Faker('date_between', start_date='-2y', end_date='-1y')
     end_date = factory.Faker('date_between', start_date='-1y')
@@ -86,6 +73,19 @@ class SPIREBatchFactory(BaseFactory):
 
     class Meta:
         model = SPIREBatch
+
+
+class SPIREApplicationFactory(BaseFactory):
+    case_type = factory.Faker('safe_color_name')
+    case_sub_type = factory.Faker('color_name')
+    initial_processing_time = factory.Faker('random_int')
+    case_closed_date = factory.Faker('date_this_century')
+    withheld_status = factory.Faker('word')
+    batch = factory.SubFactory(SPIREBatchFactory)
+    ela_id = factory.Faker('random_int', min=1, max=50)
+
+    class Meta:
+        model = SPIREApplication
 
 
 class SPIREApplicationCountryFactory(BaseFactory):
@@ -117,7 +117,7 @@ class SPIREApplicationAmendmentFactory(BaseFactory):
     amendment_closed_date = factory.Faker('date_this_century')
     application = factory.SubFactory(SPIREApplicationFactory)
     withheld_status = factory.Faker('word')
-    batch_id = None
+    batch_id = factory.Faker('random_int', min=1, max=50)
 
     @factory.lazy_attribute
     def ela_id(self):

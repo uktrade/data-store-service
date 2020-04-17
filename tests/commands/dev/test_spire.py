@@ -29,4 +29,4 @@ class TestPopulateSpireCommand:
         assert SPIREApplication.query.count() == 3
         assert SPIREApplicationAmendment.query.count() == 1
         assert SPIREApplicationCountry.query.count() == 1
-        assert SPIREBatch.query.count() == 2
+        assert SPIREBatch.query.count() == 5
