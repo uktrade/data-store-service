@@ -75,8 +75,8 @@ def populate_country_mapping(batch_size):
     )
 
     factories = {
-        'country_group_entry': SPIRECountryGroupEntryFactory.create_batch(size=batch_size),
-        'country_group': SPIRECountryGroupFactory.create_batch(size=batch_size),
+        'country_group_entries': SPIRECountryGroupEntryFactory.create_batch(size=batch_size),
+        'country_groups': SPIRECountryGroupFactory.create_batch(size=batch_size),
         'country_mappings': SPIRERefCountryMappingFactory.create_batch(size=batch_size),
     }
     return factories
