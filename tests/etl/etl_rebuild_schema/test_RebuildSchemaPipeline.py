@@ -36,8 +36,10 @@ def mock_RebuildSchemaPipeline_datafile_to_table():
 class TestCreateTable:
     def test(self, mock_create_table):
         dbi = mock.Mock()
+        
         pipeline = RebuildSchemaPipeline(dbi)
         pipeline._create_table()
+        
         assert mock_create_table.called_once_with(
             pipeline.data_column_types,
             dbi,
@@ -72,8 +74,10 @@ class TestProcess:
     ):
         dbi = mock.Mock()
         file_info = mock.Mock()
+        
         pipeline = RebuildSchemaPipeline(dbi)
         pipeline.process(file_info)
+        
         mock_RebuildSchemaPipeline_create_table.assert_called_once_with()
         mock_RebuildSchemaPipeline_datafile_to_table.assert_called_once_with(file_info)
 
@@ -81,7 +85,9 @@ class TestProcess:
 class TestRebuildSchemaPipeline:
     def test_l_tables_are_not_used(self):
         dbi = mock.Mock()
+        
         pipeline = RebuildSchemaPipeline(dbi)
+        
         assert pipeline.dataset is None
         assert pipeline.l1_helper_columns is None
         assert pipeline.L0_TABLE is None

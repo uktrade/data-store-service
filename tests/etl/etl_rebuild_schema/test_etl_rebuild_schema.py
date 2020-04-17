@@ -40,7 +40,6 @@ class TestCreateTableIntegrationTests:
 
         query = ''' select current_schema '''
         schema = dbi.execute_query(query)[0][0]
-
         query = f'''
         select
             count(1)
@@ -50,7 +49,5 @@ class TestCreateTableIntegrationTests:
         where table_name = '{table_name}'
             and table_schema = '{schema}'
         '''
-
         n_rows = dbi.execute_query(query)[0][0]
-
         assert n_rows == 1
