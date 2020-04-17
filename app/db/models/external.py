@@ -256,7 +256,6 @@ class SPIRERefCountryMapping(BaseModel):
 
     country_id = _col(_int, primary_key=True, autoincrement=True)
     country_name = _col(_text)
-    country_groups = _relationship("SPIRECountryGroup", secondary=spire_country_group_entry)
 
 
 class SPIRECountryGroupEntry(BaseModel):
@@ -300,7 +299,7 @@ class SPIREApplicationAmendment(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ela_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), primary_key=True)
-    ela_id = _col(_int, primary_key=True) ################################
+    ela_id = _col(_int, primary_key=True)
     case_type = _col(_text)
     case_sub_type = _col(_text)
     case_processing_time = _col(_int)
@@ -351,7 +350,7 @@ class SPIRERefReportRating(BaseModel):
     __tablename__ = 'ref_report_ratings'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
-    rating = _col(_text, primary_key=True, autoincrement=True)
+    rating = _col(_text, primary_key=True)
 
 
 class SPIREControlEntry(BaseModel):

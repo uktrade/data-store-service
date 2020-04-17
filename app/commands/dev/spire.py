@@ -67,7 +67,7 @@ def populate_country_mapping(batch_size):
     batch_group = SPIRECountryGroupFactory.create_batch(size=batch_size)
 
     country_mappings = SPIRERefCountryMappingFactory.create_batch(
-        size=batch_size, country_groups=[batch_group[0]]
+        size=batch_size
     )
     batch.extend(country_mappings)
     batch.extend(batch_group)
