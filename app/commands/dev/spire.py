@@ -84,9 +84,13 @@ def populate_country_mapping(batch_size):
 
 def populate_application(batch_size):
     click.echo('- Adding application data')
-    from tests.fixtures.factories import SPIREApplicationFactory
+    from tests.fixtures.factories import (
+        SPIREBatchFactory,
+        SPIREApplicationFactory,
+    )
 
     factories = {
+        'batches': SPIREBatchFactory.create_batch(size=batch_size),
         'applications': SPIREApplicationFactory.create_batch(size=batch_size),
     }
     return factories
