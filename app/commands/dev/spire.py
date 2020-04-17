@@ -57,6 +57,7 @@ def populate_spire_schema(batch_size):
     data_models = {
         **populate_country_mapping(batch_size),
         **populate_application(batch_size),
+        **populate_ars(batch_size),
     }
 
     for data_type, _models in data_models.items():
@@ -96,5 +97,23 @@ def populate_application(batch_size):
         'application_countries': SPIREApplicationCountryFactory.create_batch(size=batch_size),
         'applications': SPIREApplicationFactory.create_batch(size=batch_size),
         'application_amendments': SPIREApplicationAmendmentFactory.create_batch(size=batch_size),
+    }
+    return factories
+
+
+def populate_ars(batch_size):
+    click.echo('- Adding ars data')
+    from tests.fixtures.factories import (
+        SPIREArsFactory,
+        SPIREBatchFactory,
+        SPIREGoodsIncidentFactory,
+    )
+    batch = SPIREBatchFactory()
+
+    factories = {
+        'goods_incident': SPIREGoodsIncidentFactory.create_batch(
+            size=batch_size, batch=batch
+        ),
+        'ars': SPIREArsFactory.create_batch(size=batch_size),
     }
     return factories

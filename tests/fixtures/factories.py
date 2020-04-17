@@ -5,10 +5,12 @@ from app.db.models.external import (
     SPIREApplication,
     SPIREApplicationAmendment,
     SPIREApplicationCountry,
+    SPIREArs,
     SPIREBatch,
     SPIRECountryGroup,
     SPIRECountryGroupEntry,
     SPIRERefCountryMapping,
+    SPIREGoodsIncident,
 )
 
 
@@ -130,3 +132,32 @@ class SPIREApplicationAmendmentFactory(BaseFactory):
 
     class Meta:
         model = SPIREApplicationAmendment
+
+
+class SPIREGoodsIncidentFactory(BaseFactory):
+    start_date = factory.Faker('date_between', start_date='-2y', end_date='-1y')
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    type = factory.Faker('random_element', elements=['ISSUE'])
+    batch = factory.SubFactory(SPIREBatchFactory)
+    version_no = factory.Faker('random_int', min=1, max=3)
+    inc_id = factory.Faker('random_element', elements=[None] + list(range(1, 200)))
+    goods_item_id = factory.Faker('random_element', elements=[None] + list(range(1, 200)))
+    dest_country_id = factory.Faker('random_element', elements=[None] + list(range(1, 200)))
+    application = factory.SubFactory(SPIREApplicationFactory)
+    country_group = factory.SubFactory(SPIRECountryGroupFactory)
+
+    @factory.lazy_attribute
+    def report_date(self):
+        return factory.Faker('date_between', start_date=self.start_date).generate({})
+
+    class Meta:
+        model = SPIREGoodsIncident
+
+
+class SPIREArsFactory(BaseFactory):
+    ars_value = factory.Faker('sentence', nb_words=4, variable_nb_words=True)
+    ars_quantity = factory.Faker('random_element', elements=[None] + list(range(1, 20)))
+    goods_incident = factory.SubFactory(SPIREGoodsIncidentFactory)
+
+    class Meta:
+        model = SPIREArs

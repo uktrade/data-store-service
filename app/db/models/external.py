@@ -248,7 +248,9 @@ class SPIRECountryGroup(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
+
     country_group_entries = _relationship('SPIRECountryGroupEntry', backref='country_group')
+    goods_incidents = _relationship('SPIREGoodsIncident', backref='country_group')
 
 
 class SPIRERefCountryMapping(BaseModel):
@@ -282,6 +284,7 @@ class SPIREBatch(BaseModel):
 
     application_countries = _relationship('SPIREApplicationCountry', backref='batch')
     application = _relationship('SPIREApplication', backref='batch')
+    goods_incidents = _relationship('SPIREGoodsIncident', backref='batch')
 
 
 class SPIREApplication(BaseModel):
@@ -299,6 +302,7 @@ class SPIREApplication(BaseModel):
 
     application_countries = _relationship('SPIREApplicationCountry', backref='application')
     application_amendments = _relationship('SPIREApplicationAmendment', backref='application')
+    goods_incidents = _relationship('SPIREGoodsIncident', backref='application')
 
 
 class SPIREApplicationAmendment(BaseModel):
@@ -348,6 +352,8 @@ class SPIREGoodsIncident(BaseModel):
     version_no = _col(_int, nullable=False)
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     status_control = _col(_text, nullable=False)
+
+    ars = _relationship('SPIREArs', backref="goods_incident")
 
 
 class SPIREArs(BaseModel):
