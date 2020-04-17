@@ -279,6 +279,8 @@ class SPIREBatch(BaseModel):
     release_date = _col(_date)
     staging_date = _col(_date)
 
+    application_countries = _relationship('SPIREApplicationCountry', backref="batch")
+
 
 class SPIREApplication(BaseModel):
     __tablename__ = 'application'
@@ -292,6 +294,8 @@ class SPIREApplication(BaseModel):
     withheld_status = _col(_text)
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'))
     ela_id = _col(_int)
+
+    application_countries = _relationship('SPIREApplicationCountry', backref="application")
 
 
 class SPIREApplicationAmendment(BaseModel):

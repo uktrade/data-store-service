@@ -3,6 +3,7 @@ from flask import current_app as app
 
 from app.db.models.external import (
     SPIREApplication,
+    SPIREApplicationCountry,
     SPIREBatch,
     SPIRECountryGroup,
     SPIRECountryGroupEntry,
@@ -86,3 +87,27 @@ class SPIREBatchFactory(BaseFactory):
 
     class Meta:
         model = SPIREBatch
+
+
+class SPIREApplicationCountryFactory(BaseFactory):
+    start_date = factory.Faker('date_between', start_date='-2y', end_date='-1y')
+    application = factory.SubFactory(SPIREApplicationFactory)
+    batch = factory.SubFactory(SPIREBatchFactory)
+
+    @factory.lazy_attribute
+    def report_date(self):
+        return factory.Faker(
+            'date_between', start_date=self.start_date,
+        ).generate({})
+
+    @factory.lazy_attribute
+    def country_id(self):
+        last = SPIREApplicationCountry.query.order_by(
+            SPIREApplicationCountry.country_id.desc()
+        ).first()
+        if last:
+            return last.country_id + 1
+        return 1
+
+    class Meta:
+        model = SPIREApplicationCountry
