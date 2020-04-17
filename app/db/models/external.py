@@ -4,8 +4,6 @@ from data_engineering.common.db.models import (
     _decimal,
     _foreign_key,
     _int,
-    _relationship,
-    _table,
     _text,
     BaseModel,
 )
@@ -298,7 +296,9 @@ class SPIREApplicationAmendment(BaseModel):
     __tablename__ = 'application_amendment'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
-    ela_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), primary_key=True)
+    ela_grp_id = _col(
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), primary_key=True
+    )
     ela_id = _col(_int, primary_key=True)
     case_type = _col(_text)
     case_sub_type = _col(_text)
@@ -312,7 +312,9 @@ class SPIREApplicationCountry(BaseModel):
     __tablename__ = 'application_country'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
-    ela_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), primary_key=True)
+    ela_grp_id = _col(
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), primary_key=True
+    )
     country_id = _col(_int, primary_key=True)
     report_date = _col(_date)
     start_date = _col(_date)
@@ -358,7 +360,9 @@ class SPIREControlEntry(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     gi_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.goods_incident.id'), primary_key=True)
-    rating = _col(_text, _foreign_key(f'{SPIRE_SCHEMA_NAME}.ref_report_ratings.rating'), primary_key=True)
+    rating = _col(
+        _text, _foreign_key(f'{SPIRE_SCHEMA_NAME}.ref_report_ratings.rating'), primary_key=True
+    )
     value = _col(_int)
 
 
