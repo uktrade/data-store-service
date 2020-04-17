@@ -517,8 +517,8 @@ class SPIRERefDoNotReportValue(BaseModel):
     dnr_value = _col(_text, primary_key=True)
 
 
-class SPIREReturns(BaseModel):
-    __tablename__ = 'returns'
+class SPIREReturn(BaseModel):
+    __tablename__ = 'return'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     elr_id = _col(_int, primary_key=True)
