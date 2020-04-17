@@ -4,8 +4,8 @@ from data_engineering.common.db.models import (
     _decimal,
     _foreign_key,
     _int,
-    _text,
     _relationship,
+    _text,
     BaseModel,
 )
 
@@ -296,6 +296,7 @@ class SPIREApplication(BaseModel):
     ela_id = _col(_int)
 
     application_countries = _relationship('SPIREApplicationCountry', backref="application")
+    application_amendments = _relationship('SPIREApplicationAmendment', backref="application")
 
 
 class SPIREApplicationAmendment(BaseModel):

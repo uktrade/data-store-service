@@ -88,11 +88,13 @@ def populate_application(batch_size):
         SPIREBatchFactory,
         SPIREApplicationFactory,
         SPIREApplicationCountryFactory,
+        SPIREApplicationAmendmentFactory,
     )
 
     factories = {
         'batches': SPIREBatchFactory.create_batch(size=batch_size),
         'application_countries': SPIREApplicationCountryFactory.create_batch(size=batch_size),
         'applications': SPIREApplicationFactory.create_batch(size=batch_size),
+        'application_amendments': SPIREApplicationAmendmentFactory.create_batch(size=batch_size),
     }
     return factories

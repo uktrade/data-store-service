@@ -3,6 +3,7 @@ from flask import current_app as app
 
 from app.db.models.external import (
     SPIREApplication,
+    SPIREApplicationAmendment,
     SPIREApplicationCountry,
     SPIREBatch,
     SPIRECountryGroup,
@@ -63,9 +64,7 @@ class SPIREBatchFactory(BaseFactory):
     end_date = factory.Faker('date_between', start_date='-1y')
     batch_ref = factory.Faker('random_int', min=1, max=50)
 
-    status = factory.Faker(
-        'random_element', elements=('RELEASED',)
-    )
+    status = factory.Faker('random_element', elements=('RELEASED',))
 
     @factory.lazy_attribute
     def approve_date(self):
@@ -96,9 +95,7 @@ class SPIREApplicationCountryFactory(BaseFactory):
 
     @factory.lazy_attribute
     def report_date(self):
-        return factory.Faker(
-            'date_between', start_date=self.start_date,
-        ).generate({})
+        return factory.Faker('date_between', start_date=self.start_date,).generate({})
 
     @factory.lazy_attribute
     def country_id(self):
@@ -111,3 +108,25 @@ class SPIREApplicationCountryFactory(BaseFactory):
 
     class Meta:
         model = SPIREApplicationCountry
+
+
+class SPIREApplicationAmendmentFactory(BaseFactory):
+    case_type = factory.Faker('safe_color_name')
+    case_sub_type = factory.Faker('color_name')
+    case_processing_time = factory.Faker('random_int')
+    amendment_closed_date = factory.Faker('date_this_century')
+    application = factory.SubFactory(SPIREApplicationFactory)
+    withheld_status = factory.Faker('word')
+    batch_id = None
+
+    @factory.lazy_attribute
+    def ela_id(self):
+        last = SPIREApplicationAmendment.query.order_by(
+            SPIREApplicationAmendment.ela_id.desc()
+        ).first()
+        if last:
+            return last.ela_id + 1
+        return 1
+
+    class Meta:
+        model = SPIREApplicationAmendment
