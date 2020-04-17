@@ -4,6 +4,7 @@ from data_engineering.common.db.models import (
     _decimal,
     _foreign_key,
     _int,
+    _relationship,
     _text,
     BaseModel,
 )
@@ -246,6 +247,7 @@ class SPIRECountryGroup(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
+    country_group_entries = _relationship('SPIRECountryGroupEntry', backref="country_group")
 
 
 class SPIRERefCountryMapping(BaseModel):
@@ -277,6 +279,8 @@ class SPIREBatch(BaseModel):
     release_date = _col(_date)
     staging_date = _col(_date)
 
+    application_countries = _relationship('SPIREApplicationCountry', backref="batch")
+
 
 class SPIREApplication(BaseModel):
     __tablename__ = 'application'
@@ -290,6 +294,9 @@ class SPIREApplication(BaseModel):
     withheld_status = _col(_text)
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'))
     ela_id = _col(_int)
+
+    application_countries = _relationship('SPIREApplicationCountry', backref="application")
+    application_amendments = _relationship('SPIREApplicationAmendment', backref="application")
 
 
 class SPIREApplicationAmendment(BaseModel):

@@ -54,21 +54,47 @@ def populate_spire_schema(batch_size):
     Populate spire schema
     """
     click.echo('Populating schema')
-    populate_country_mapping(batch_size)
+    data_models = {
+        **populate_country_mapping(batch_size),
+        **populate_application(batch_size),
+    }
+
+    for data_type, _models in data_models.items():
+        for _model in _models:
+            app.db.session.add(_model)
+
     app.db.session.commit()
 
 
 def populate_country_mapping(batch_size):
     click.echo('- Adding country data')
-    from tests.fixtures.factories import SPIRECountryGroupFactory, SPIRERefCountryMappingFactory
+    from tests.fixtures.factories import (
+        SPIRECountryGroupFactory,
+        SPIRERefCountryMappingFactory,
+        SPIRECountryGroupEntryFactory,
+    )
 
-    batch = []
+    factories = {
+        'country_group_entries': SPIRECountryGroupEntryFactory.create_batch(size=batch_size),
+        'country_groups': SPIRECountryGroupFactory.create_batch(size=batch_size),
+        'country_mappings': SPIRERefCountryMappingFactory.create_batch(size=batch_size),
+    }
+    return factories
 
-    batch_group = SPIRECountryGroupFactory.create_batch(size=batch_size)
 
-    country_mappings = SPIRERefCountryMappingFactory.create_batch(size=batch_size)
-    batch.extend(country_mappings)
-    batch.extend(batch_group)
+def populate_application(batch_size):
+    click.echo('- Adding application data')
+    from tests.fixtures.factories import (
+        SPIREBatchFactory,
+        SPIREApplicationFactory,
+        SPIREApplicationCountryFactory,
+        SPIREApplicationAmendmentFactory,
+    )
 
-    for _country_model in batch:
-        app.db.session.add(_country_model)
+    factories = {
+        'batches': SPIREBatchFactory.create_batch(size=batch_size),
+        'application_countries': SPIREApplicationCountryFactory.create_batch(size=batch_size),
+        'applications': SPIREApplicationFactory.create_batch(size=batch_size),
+        'application_amendments': SPIREApplicationAmendmentFactory.create_batch(size=batch_size),
+    }
+    return factories
