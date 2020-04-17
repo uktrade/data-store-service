@@ -5,6 +5,7 @@ from data_engineering.common.db.models import (
     _foreign_key,
     _int,
     _text,
+    _relationship,
     BaseModel,
 )
 
@@ -246,6 +247,7 @@ class SPIRECountryGroup(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
+    country_group_entries = _relationship('SPIRECountryGroupEntry', backref="country_group")
 
 
 class SPIRERefCountryMapping(BaseModel):

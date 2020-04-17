@@ -54,21 +54,28 @@ def populate_spire_schema(batch_size):
     Populate spire schema
     """
     click.echo('Populating schema')
-    populate_country_mapping(batch_size)
+    data_models = {
+        **populate_country_mapping(batch_size),
+    }
+
+    for data_type, _models in data_models.items():
+        for _model in _models:
+            app.db.session.add(_model)
+
     app.db.session.commit()
 
 
 def populate_country_mapping(batch_size):
     click.echo('- Adding country data')
-    from tests.fixtures.factories import SPIRECountryGroupFactory, SPIRERefCountryMappingFactory
+    from tests.fixtures.factories import (
+        SPIRECountryGroupFactory,
+        SPIRERefCountryMappingFactory,
+        SPIRECountryGroupEntryFactory,
+    )
 
-    batch = []
-
-    batch_group = SPIRECountryGroupFactory.create_batch(size=batch_size)
-
-    country_mappings = SPIRERefCountryMappingFactory.create_batch(size=batch_size)
-    batch.extend(country_mappings)
-    batch.extend(batch_group)
-
-    for _country_model in batch:
-        app.db.session.add(_country_model)
+    factories = {
+        'country_group_entry': SPIRECountryGroupEntryFactory.create_batch(size=batch_size),
+        'country_group': SPIRECountryGroupFactory.create_batch(size=batch_size),
+        'country_mappings': SPIRERefCountryMappingFactory.create_batch(size=batch_size),
+    }
+    return factories

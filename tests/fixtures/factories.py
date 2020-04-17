@@ -4,6 +4,7 @@ from flask import current_app as app
 from app.db.models.external import (
     SPIRECountryGroup,
     SPIRERefCountryMapping,
+    SPIRECountryGroupEntry,
 )
 
 
@@ -18,17 +19,24 @@ class SPIRECountryGroupFactory(BaseFactory):
         model = SPIRECountryGroup
 
 
+class SPIRECountryGroupEntryFactory(BaseFactory):
+    country_group = factory.SubFactory(SPIRECountryGroupFactory)
+
+    @factory.lazy_attribute
+    def country_id(self):
+        last = SPIRECountryGroupEntry.query.order_by(
+            SPIRECountryGroupEntry.country_id.desc()
+        ).first()
+        if last:
+            return last.country_id + 1
+        return 1
+
+    class Meta:
+        model = SPIRECountryGroupEntry
+
+
 class SPIRERefCountryMappingFactory(BaseFactory):
     country_name = factory.Faker('word')
 
     class Meta:
         model = SPIRERefCountryMapping
-
-    @factory.post_generation
-    def country_groups(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        if extracted:
-            for country_group in extracted:
-                self.country_groups.append(country_group)
