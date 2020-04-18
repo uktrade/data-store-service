@@ -1,3 +1,4 @@
+from app.db.models.external import SPIRE_SCHEMA_NAME
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
 from app.etl.etl_dit_baci import DITBACIPipeline
 from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
@@ -18,4 +19,5 @@ def get_schemas():
         ComtradeCountryCodeAndISOPipeline.schema,
         DITEUCountryMembershipPipeline.schema,
         DITBACIPipeline.schema,
+        SPIRE_SCHEMA_NAME,
     ]

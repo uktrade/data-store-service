@@ -105,3 +105,5 @@ app/config/local.yml
 
 # npm
 node_modules/
+
+.csv/
