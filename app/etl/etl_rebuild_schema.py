@@ -1,63 +1,36 @@
-from io import BytesIO
+import csv
+import io
+from abc import ABCMeta, abstractmethod
 
-from app.etl.etl_base import DataPipeline
+from flask import current_app
 
-
-def _create_table(
-    data_column_types, dbi, table_name, drop_existing=False, unique_column_names=None
-):
-    if drop_existing:
-        dbi.drop_table(table_name)
-    columns = ','.join(f'{c} {t}' for c, t in data_column_types)
-    unique_constraint = (
-        f", UNIQUE({','.join(unique_column_names)})" if unique_column_names else None
-    )
-    stmt = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns}{unique_constraint or ''})"
-    dbi.execute_statement(stmt)
+from app.etl.etl_base import classproperty, DataPipeline
 
 
-class RebuildSchemaPipeline(DataPipeline):
+class RebuildSchemaPipeline(DataPipeline, metaclass=ABCMeta):
+    def __init__(self, dbi, **kwargs):
+        self.dbi = dbi
+        self.options = self.get_options(kwargs)
+        if not dbi:
+            current_app.logger.error(
+                f'warning: dbi ({dbi}) is not valid; '
+                'this pipeline instance cannot process datafiles or create schemas'
+            )
 
-    '''
-    Pipeline does not used the L tables to process the input data
-    '''
-
-    L0_TABLE = None
-    L1_TABLE = None
-    L2_TABLE = None
-
-    data_column_types = None
-    dataset = None
-    organisation = None
-    schema = None
-    table_name = None
-    unique_column_names = []
-
-    def _create_table(self):
-        return _create_table(
-            self.data_column_types,
-            self.dbi,
-            self.table_name,
-            drop_existing=True,
-            unique_column_names=self.unique_column_names,
-        )
-
-    def _datafile_to_table(self, file_info):
-        csv_data_no_empty_quotes = BytesIO(file_info.data.read().replace(b'""', b''))
-        self.dbi.dsv_buffer_to_table(
-            csv_buffer=csv_data_no_empty_quotes,
-            fq_table_name=self.table_name,
-            columns=None,
-            has_header=True,
-            sep=',',
-            quote='"',
-        )
-
-    @property
-    def l1_helper_columns(self):
-        ''' not used by the RebuildSchemaPipeline '''
-        return None
+    @classproperty
+    @abstractmethod
+    def sql_alchemy_model(cls):
+        ''' data model for this table '''
+        ...
 
     def process(self, file_info):
-        self._create_table()
-        self._datafile_to_table(file_info)
+        data = file_info.data.read()
+        data_text = io.TextIOWrapper(io.BytesIO(data))
+        csv_reader = csv.reader(data_text, delimiter=',')
+        headers = next(csv_reader)
+        session = self.dbi.db.create_scoped_session()
+        for row in csv_reader:
+            kwargs = {field: value for field, value in zip(headers, row)}
+            obj = self.sql_alchemy_model(**kwargs)
+            session.add(obj)
+        session.commit()

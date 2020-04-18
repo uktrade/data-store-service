@@ -1,9 +1,9 @@
 from abc import abstractmethod
 
-from app.etl.etl_base import DataPipeline
+from app.etl.etl_base import LDataPipeline
 
 
-class SnapshotDataPipeline(DataPipeline):
+class SnapshotDataPipeline(LDataPipeline):
     """ Abstract class for standard pipelines that ingest data snapshots
 
     This class implements the abstract process method of a CleanDataPipeline as:
