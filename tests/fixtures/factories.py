@@ -26,6 +26,7 @@ from app.db.models.external import (
     SPIREMediaFootnoteCountry,
     SPIREIncident,
     SPIREOglType,
+    SPIREReturn,
 )
 
 
@@ -405,3 +406,27 @@ class SPIREOglTypeFactory(BaseFactory):
 
     class Meta:
         model = SPIREOglType
+
+
+class SPIREReturnFactory(BaseFactory):
+    batch = factory.SubFactory(SPIREBatchFactory)
+    elr_version = factory.Faker('random_int', min=1, max=50)
+    end_user_type = factory.Faker('random_element', elements=['COM', 'IND', None, 'GOV', 'OTHER'])
+    status = factory.Faker('random_element', elements=['ACTIVE', 'WITHDRAWN'])
+    created_datetime = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    licence_type = factory.Faker(
+        'random_element', elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL']
+    )
+    el_id = factory.Faker('random_int', min=1, max=99999)
+    usage_count = factory.Faker('random_int', min=0, max=1)
+
+    @factory.lazy_attribute
+    def elr_id(self):
+        last = SPIREReturn.query.order_by(SPIREReturn.elr_id.desc()).first()
+        if last:
+            return last.elr_id + 1
+        return 1
+
+    class Meta:
+        model = SPIREReturn

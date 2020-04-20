@@ -156,11 +156,13 @@ def populate_misc(batch_size):
         SPIRERefDoNotReportValueFactory,
         SPIREEndUserFactory,
         SPIREOglTypeFactory,
+        SPIREReturnFactory,
     )
 
     factories = {
         'do_not_report': SPIRERefDoNotReportValueFactory.create_batch(size=batch_size),
         'end_users': SPIREEndUserFactory.create_batch(size=batch_size),
         'ogl_types': SPIREOglTypeFactory.create_batch(size=batch_size),
+        'returns': SPIREReturnFactory.create_batch(size=batch_size),
     }
     return factories
