@@ -244,7 +244,7 @@ SPIRE_SCHEMA_NAME = 'spire'
 
 
 class SPIRECountryGroup(BaseModel):
-    __tablename__ = f'country_group'
+    __tablename__ = f'country_groups'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
@@ -252,7 +252,7 @@ class SPIRECountryGroup(BaseModel):
 
 
 class SPIRERefCountryMapping(BaseModel):
-    __tablename__ = 'ref_country_mapping'
+    __tablename__ = 'ref_country_mappings'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     country_id = _col(_int, primary_key=True, autoincrement=True)
@@ -260,15 +260,15 @@ class SPIRERefCountryMapping(BaseModel):
 
 
 class SPIRECountryGroupEntry(BaseModel):
-    __tablename__ = 'country_group_entry'
+    __tablename__ = 'country_group_entries'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
-    cg_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.country_group.id'), primary_key=True)
+    cg_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.country_groups.id'), primary_key=True)
     country_id = _col(_int, primary_key=True)
 
 
 class SPIREBatch(BaseModel):
-    __tablename__ = 'batch'
+    __tablename__ = 'batches'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
@@ -285,7 +285,7 @@ class SPIREBatch(BaseModel):
 
 
 class SPIREApplication(BaseModel):
-    __tablename__ = 'application'
+    __tablename__ = 'applications'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ela_grp_id = _col(_int, primary_key=True, autoincrement=True)
@@ -294,7 +294,7 @@ class SPIREApplication(BaseModel):
     initial_processing_time = _col(_int, nullable=False)
     case_closed_date = _col(_dt, nullable=False)
     withheld_status = _col(_text)
-    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
+    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     ela_id = _col(_int)
 
     application_countries = _relationship('SPIREApplicationCountry', backref='application')
@@ -302,11 +302,11 @@ class SPIREApplication(BaseModel):
 
 
 class SPIREApplicationAmendment(BaseModel):
-    __tablename__ = 'application_amendment'
+    __tablename__ = 'application_amendments'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ela_grp_id = _col(
-        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), primary_key=True
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.applications.ela_grp_id'), primary_key=True
     )
     ela_id = _col(_int, primary_key=True)
     case_type = _col(_text, nullable=False)
@@ -318,20 +318,20 @@ class SPIREApplicationAmendment(BaseModel):
 
 
 class SPIREApplicationCountry(BaseModel):
-    __tablename__ = 'application_country'
+    __tablename__ = 'application_countries'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ela_grp_id = _col(
-        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), primary_key=True
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.applications.ela_grp_id'), primary_key=True
     )
     country_id = _col(_int, primary_key=True)
     report_date = _col(_dt, nullable=False)
     start_date = _col(_dt, nullable=False)
-    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
+    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
 
 
 class SPIREGoodsIncident(BaseModel):
-    __tablename__ = 'goods_incident'
+    __tablename__ = 'goods_incidents'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
@@ -339,14 +339,14 @@ class SPIREGoodsIncident(BaseModel):
     type = _col(_text, nullable=False)
     goods_item_id = _col(_int, nullable=False)
     dest_country_id = _col(_int, nullable=False)
-    source_country_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.country_group.id'))
+    source_country_grp_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.country_groups.id'))
     report_date = _col(_dt, nullable=False)
     ela_grp_id = _col(
-        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.applications.ela_grp_id'), nullable=False
     )
     start_date = _col(_dt, nullable=False)
     version_no = _col(_int, nullable=False)
-    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
+    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     status_control = _col(_text, nullable=False)
 
 
@@ -354,7 +354,7 @@ class SPIREArs(BaseModel):
     __tablename__ = 'ars'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
-    gi_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.goods_incident.id'), primary_key=True)
+    gi_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.goods_incidents.id'), primary_key=True)
     ars_value = _col(_text, primary_key=True)
     ars_quantity = _col(_int)
 
@@ -368,10 +368,10 @@ class SPIRERefReportRating(BaseModel):
 
 
 class SPIREControlEntry(BaseModel):
-    __tablename__ = 'control_entry'
+    __tablename__ = 'control_entries'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
-    gi_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.goods_incident.id'), primary_key=True)
+    gi_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.goods_incidents.id'), primary_key=True)
     rating = _col(
         _text, _foreign_key(f'{SPIRE_SCHEMA_NAME}.ref_report_ratings.rating'), primary_key=True
     )
@@ -379,7 +379,7 @@ class SPIREControlEntry(BaseModel):
 
 
 class SPIREEndUser(BaseModel):
-    __tablename__ = 'end_user'
+    __tablename__ = 'end_users'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     eu_id = _col(_int, primary_key=True)
@@ -394,7 +394,7 @@ class SPIREEndUser(BaseModel):
 
 
 class SPIREFootnote(BaseModel):
-    __tablename__ = 'footnote'
+    __tablename__ = 'footnotes'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
@@ -403,11 +403,11 @@ class SPIREFootnote(BaseModel):
 
 
 class SPIREMediaFootnoteDetail(BaseModel):
-    __tablename__ = 'media_footnote_detail'
+    __tablename__ = 'media_footnote_details'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
-    mf_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.media_footnote.id'), nullable=False)
+    mf_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.media_footnotes.id'), nullable=False)
     status_control = _col(_text)
     start_datetime = _col(_dt, nullable=False)
     end_datetime = _col(_dt)
@@ -418,38 +418,38 @@ class SPIREMediaFootnoteDetail(BaseModel):
 
 
 class SPIREFootnoteEntry(BaseModel):
-    __tablename__ = 'footnote_entry'
+    __tablename__ = 'footnote_entries'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     fne_id = _col(_int, primary_key=True)
-    fn_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.footnote.id'))
+    fn_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.footnotes.id'))
     ela_grp_id = _col(
-        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.applications.ela_grp_id'), nullable=False
     )
     goods_item_id = _col(_int)
     country_id = _col(_int)
     fnr_id = _col(_int)
     start_date = _col(_dt, nullable=False)
     version_no = _col(_int, primary_key=True, nullable=False)
-    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
+    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     status_control = _col(_text, nullable=False)
-    mfd_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.media_footnote_detail.id'))
+    mfd_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.media_footnote_details.id'))
     mf_grp_id = _col(_int)
     mf_free_text = _col(_text)
 
 
 class SPIREIncident(BaseModel):
-    __tablename__ = 'incident'
+    __tablename__ = 'incidents'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     inc_id = _col(_int, primary_key=True)
-    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
+    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     status = _col(_text, nullable=False)
     type = _col(_text, nullable=False)
     case_type = _col(_text, nullable=False)
     case_sub_type = _col(_text)
     ela_grp_id = _col(
-        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.applications.ela_grp_id'), nullable=False
     )
     ela_id = _col(_int)
     licence_id = _col(_int)
@@ -469,7 +469,7 @@ class SPIREIncident(BaseModel):
 
 
 class SPIREMediaFootnoteCountry(BaseModel):
-    __tablename__ = 'media_footnote_country'
+    __tablename__ = 'media_footnote_countries'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
@@ -483,14 +483,14 @@ class SPIREMediaFootnoteCountry(BaseModel):
 
 
 class SPIREMediaFootnote(BaseModel):
-    __tablename__ = 'media_footnote'
+    __tablename__ = 'media_footnotes'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
 
 
 class SPIREOglType(BaseModel):
-    __tablename__ = 'ogl_type'
+    __tablename__ = 'ogl_types'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
@@ -502,15 +502,15 @@ class SPIREOglType(BaseModel):
 
 
 class SPIREReasonForRefusal(BaseModel):
-    __tablename__ = 'reason_for_refusal'
+    __tablename__ = 'reasons_for_refusal'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
-    gi_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.goods_incident.id'), primary_key=True)
+    gi_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.goods_incidents.id'), primary_key=True)
     reason_for_refusal = _col(_text, primary_key=True)
 
 
 class SPIRERefArsSubject(BaseModel):
-    __tablename__ = 'ref_ars_subject'
+    __tablename__ = 'ref_ars_subjects'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ars_value = _col(_text, primary_key=True)
@@ -518,7 +518,7 @@ class SPIRERefArsSubject(BaseModel):
 
 
 class SPIRERefDoNotReportValue(BaseModel):
-    __tablename__ = 'ref_do_not_report_value'
+    __tablename__ = 'ref_do_not_report_values'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     dnr_type = _col(_text, primary_key=True)
@@ -526,7 +526,7 @@ class SPIRERefDoNotReportValue(BaseModel):
 
 
 class SPIREReturn(BaseModel):
-    __tablename__ = 'return'
+    __tablename__ = 'returns'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     elr_id = _col(_int, primary_key=True)
@@ -534,7 +534,7 @@ class SPIREReturn(BaseModel):
     status = _col(_text, nullable=False)
     created_datetime = _col(_dt, nullable=False)
     status_control = _col(_text, nullable=False)
-    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
+    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     licence_type = _col(_text, nullable=False)
     el_id = _col(_int, nullable=False)
     ogl_id = _col(_int)
@@ -546,34 +546,34 @@ class SPIREReturn(BaseModel):
 
 
 class SPIREThirdParty(BaseModel):
-    __tablename__ = 'third_party'
+    __tablename__ = 'third_parties'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     tp_id = _col(_int, primary_key=True)
     ela_grp_id = _col(
-        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.applications.ela_grp_id'), nullable=False
     )
     sh_id = _col(_int)
     country_id = _col(_int, nullable=False)
     ultimate_end_user_flag = _col(_int)
     start_date = _col(_dt, nullable=False)
     version_no = _col(_int, primary_key=True)
-    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
+    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     status_control = _col(_text, nullable=False)
 
 
 class SPIREUltimateEndUser(BaseModel):
-    __tablename__ = 'ultimate_end_user'
+    __tablename__ = 'ultimate_end_users'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ueu_id = _col(_int, primary_key=True)
     ela_grp_id = _col(
-        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.application.ela_grp_id'), nullable=False
+        _int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.applications.ela_grp_id'), nullable=False
     )
     country_id = _col(_int, nullable=False)
     status_control = _col(_text, nullable=False)
     start_date = _col(_dt, nullable=False)
     version_no = _col(_int, primary_key=True)
-    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batch.id'), nullable=False)
+    batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     sh_id = _col(_int)
     ultimate_end_user_flag = _col(_int)
