@@ -27,6 +27,7 @@ from app.db.models.external import (
     SPIREIncident,
     SPIREOglType,
     SPIREReturn,
+    SPIREThirdParty,
 )
 
 
@@ -430,3 +431,23 @@ class SPIREReturnFactory(BaseFactory):
 
     class Meta:
         model = SPIREReturn
+
+
+class SPIREThirdPartyFactory(BaseFactory):
+    application = factory.SubFactory(SPIREApplicationFactory)
+    batch = factory.SubFactory(SPIREBatchFactory)
+    country_id = factory.Faker('random_int', min=1, max=200)
+    start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    version_no = factory.Faker('random_int', min=1, max=3)
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    ultimate_end_user_flag = factory.Faker('random_int', min=1, max=200)
+
+    @factory.lazy_attribute
+    def tp_id(self):
+        last = SPIREThirdParty.query.order_by(SPIREThirdParty.tp_id.desc()).first()
+        if last:
+            return last.tp_id + 1
+        return 1
+
+    class Meta:
+        model = SPIREThirdParty

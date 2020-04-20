@@ -157,6 +157,7 @@ def populate_misc(batch_size):
         SPIREEndUserFactory,
         SPIREOglTypeFactory,
         SPIREReturnFactory,
+        SPIREThirdPartyFactory,
     )
 
     factories = {
@@ -164,5 +165,6 @@ def populate_misc(batch_size):
         'end_users': SPIREEndUserFactory.create_batch(size=batch_size),
         'ogl_types': SPIREOglTypeFactory.create_batch(size=batch_size),
         'returns': SPIREReturnFactory.create_batch(size=batch_size),
+        'third_parties': SPIREThirdPartyFactory.create_batch(size=batch_size),
     }
     return factories
