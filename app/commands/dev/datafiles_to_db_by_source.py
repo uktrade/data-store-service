@@ -8,6 +8,7 @@ from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
 from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
 from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
 from app.etl.etl_spire_country_group import SPIRECountryGroupPipeline
+from app.etl.etl_spire_ref_country_mapping import SPIRERefCountryMappingPipeline
 from app.etl.etl_world_bank_bound_rates import WorldBankBoundRatesPipeline
 from app.etl.etl_world_bank_tariff import (
     WorldBankTariffPipeline,
@@ -34,7 +35,10 @@ arg_to_pipeline_config_list = {
         (WorldBankTariffPipeline, 'world_bank/tariff'),
         (WorldBankTariffTransformPipeline, None),
     ],
-    SPIRECountryGroupPipeline.data_source: [(SPIRECountryGroupPipeline, 'spire/country_group')],
+    SPIRECountryGroupPipeline.data_source: [
+        (SPIRECountryGroupPipeline, 'spire/country_group'),
+        (SPIRERefCountryMappingPipeline, 'spire/ref_country_mapping'),
+    ],
 }
 
 
