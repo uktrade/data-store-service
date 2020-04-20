@@ -47,8 +47,8 @@ class SPIRERefCountryMappingFactory(BaseFactory):
 
 
 class SPIREBatchFactory(BaseFactory):
-    start_date = factory.Faker('date_between', start_date='-2y', end_date='-1y')
-    end_date = factory.Faker('date_between', start_date='-1y')
+    start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    end_date = factory.Faker('date_time_between', start_date='-1y')
     batch_ref = factory.Faker('random_int', min=1, max=50)
 
     status = factory.Faker('random_element', elements=('RELEASED',))
@@ -56,19 +56,19 @@ class SPIREBatchFactory(BaseFactory):
     @factory.lazy_attribute
     def approve_date(self):
         return factory.Faker(
-            'date_between', start_date=self.start_date, end_date=self.end_date
+            'date_time_between', start_date=self.start_date, end_date=self.end_date
         ).generate({})
 
     @factory.lazy_attribute
     def release_date(self):
         return factory.Faker(
-            'date_between', start_date=self.staging_date, end_date=self.end_date
+            'date_time_between', start_date=self.staging_date, end_date=self.end_date
         ).generate({})
 
     @factory.lazy_attribute
     def staging_date(self):
         return factory.Faker(
-            'date_between', start_date=self.approve_date, end_date=self.end_date
+            'date_time_between', start_date=self.approve_date, end_date=self.end_date
         ).generate({})
 
     class Meta:
@@ -89,13 +89,13 @@ class SPIREApplicationFactory(BaseFactory):
 
 
 class SPIREApplicationCountryFactory(BaseFactory):
-    start_date = factory.Faker('date_between', start_date='-2y', end_date='-1y')
+    start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     application = factory.SubFactory(SPIREApplicationFactory)
     batch = factory.SubFactory(SPIREBatchFactory)
 
     @factory.lazy_attribute
     def report_date(self):
-        return factory.Faker('date_between', start_date=self.start_date,).generate({})
+        return factory.Faker('date_time_between', start_date=self.start_date,).generate({})
 
     @factory.lazy_attribute
     def country_id(self):
