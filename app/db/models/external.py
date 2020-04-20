@@ -375,7 +375,7 @@ class SPIREControlEntry(BaseModel):
     rating = _col(
         _text, _foreign_key(f'{SPIRE_SCHEMA_NAME}.ref_report_ratings.rating'), primary_key=True
     )
-    value = _col(_int)
+    value = _col(_decimal)
 
 
 class SPIREEndUser(BaseModel):
