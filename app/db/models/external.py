@@ -355,6 +355,7 @@ class SPIREGoodsIncident(BaseModel):
 
     ars = _relationship('SPIREArs', backref="goods_incident")
     reasons_for_refusal = _relationship('SPIREReasonForRefusal', backref='goods_incident')
+    control_entries = _relationship('SPIREControlEntry', backref='goods_incident')
 
 
 class SPIREArs(BaseModel):
@@ -372,6 +373,8 @@ class SPIRERefReportRating(BaseModel):
 
     rating = _col(_text, primary_key=True)
     report_rating = _col(_text, nullable=False)
+
+    control_entries = _relationship('SPIREControlEntry', backref='ref_report_rating')
 
 
 class SPIREControlEntry(BaseModel):

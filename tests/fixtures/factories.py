@@ -9,15 +9,17 @@ from app.db.models.external import (
     SPIREApplicationCountry,
     SPIREArs,
     SPIREBatch,
+    SPIREControlEntry,
     SPIRECountryGroup,
     SPIRECountryGroupEntry,
     SPIREFootnote,
     SPIREGoodsIncident,
     SPIREMediaFootnote,
+    SPIREReasonForRefusal,
     SPIRERefArsSubject,
     SPIRERefCountryMapping,
     SPIRERefDoNotReportValue,
-    SPIREReasonForRefusal,
+    SPIRERefReportRating,
 )
 
 
@@ -209,3 +211,19 @@ class SPIREReasonForRefusalFactory(BaseFactory):
 
     class Meta:
         model = SPIREReasonForRefusal
+
+
+class SPIRERefReportRatingFactory(BaseFactory):
+    rating = factory.Faker('sentence', nb_words=4)
+
+    class Meta:
+        model = SPIRERefReportRating
+
+
+class SPIREControlEntryFactory(BaseFactory):
+    value = factory.Faker('random_int', min=1, max=3)
+    ref_report_rating = factory.SubFactory(SPIRERefReportRatingFactory)
+    goods_incident = factory.SubFactory(SPIREGoodsIncidentFactory)
+
+    class Meta:
+        model = SPIREControlEntry
