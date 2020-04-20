@@ -58,6 +58,7 @@ def populate_spire_schema(batch_size):
         **populate_country_mapping(batch_size),
         **populate_application(batch_size),
         **populate_ars(batch_size),
+        **populate_footnotes(batch_size),
     }
 
     for data_type, _models in data_models.items():
@@ -108,12 +109,25 @@ def populate_ars(batch_size):
         SPIREBatchFactory,
         SPIREGoodsIncidentFactory,
     )
+
     batch = SPIREBatchFactory()
 
     factories = {
-        'goods_incident': SPIREGoodsIncidentFactory.create_batch(
-            size=batch_size, batch=batch
-        ),
+        'goods_incidents': SPIREGoodsIncidentFactory.create_batch(size=batch_size, batch=batch),
         'ars': SPIREArsFactory.create_batch(size=batch_size),
+    }
+    return factories
+
+
+def populate_footnotes(batch_size):
+    click.echo('- Adding footnotes data')
+    from tests.fixtures.factories import (
+        SPIREMediaFootnoteFactory,
+        SPIREFootnoteFactory,
+    )
+
+    factories = {
+        'media_footnotes': SPIREMediaFootnoteFactory.create_batch(size=batch_size),
+        'footnotes': SPIREFootnoteFactory.create_batch(size=batch_size),
     }
     return factories

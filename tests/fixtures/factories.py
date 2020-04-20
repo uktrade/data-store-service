@@ -1,3 +1,5 @@
+import random
+
 import factory
 from flask import current_app as app
 
@@ -9,8 +11,10 @@ from app.db.models.external import (
     SPIREBatch,
     SPIRECountryGroup,
     SPIRECountryGroupEntry,
-    SPIRERefCountryMapping,
+    SPIREFootnote,
     SPIREGoodsIncident,
+    SPIREMediaFootnote,
+    SPIRERefCountryMapping,
 )
 
 
@@ -161,3 +165,20 @@ class SPIREArsFactory(BaseFactory):
 
     class Meta:
         model = SPIREArs
+
+
+class SPIREMediaFootnoteFactory(BaseFactory):
+    class Meta:
+        model = SPIREMediaFootnote
+
+
+class SPIREFootnoteFactory(BaseFactory):
+    status = factory.Faker('random_element', elements=['CURRENT', 'DELETED'])
+
+    @factory.lazy_attribute
+    def text(self):
+        paragraphs = factory.Faker('paragraphs', nb=random.randint(0, 3)).generate({})
+        return '\n'.join(paragraphs)
+
+    class Meta:
+        model = SPIREFootnote
