@@ -88,10 +88,10 @@ def populate_country_mapping(batch_size):
 def populate_application(batch_size):
     click.echo('- Adding application data')
     from tests.fixtures.factories import (
-        SPIREBatchFactory,
-        SPIREApplicationFactory,
-        SPIREApplicationCountryFactory,
         SPIREApplicationAmendmentFactory,
+        SPIREApplicationCountryFactory,
+        SPIREApplicationFactory,
+        SPIREBatchFactory,
     )
 
     factories = {
@@ -108,12 +108,12 @@ def populate_ars(batch_size):
     from tests.fixtures.factories import (
         SPIREArsFactory,
         SPIREBatchFactory,
-        SPIREGoodsIncidentFactory,
-        SPIRERefArsSubjectFactory,
-        SPIREReasonForRefusalFactory,
-        SPIRERefReportRatingFactory,
         SPIREControlEntryFactory,
+        SPIREGoodsIncidentFactory,
         SPIREIncidentFactory,
+        SPIREReasonForRefusalFactory,
+        SPIRERefArsSubjectFactory,
+        SPIRERefReportRatingFactory,
     )
 
     batch = SPIREBatchFactory()
@@ -133,11 +133,11 @@ def populate_ars(batch_size):
 def populate_footnotes(batch_size):
     click.echo('- Adding footnotes data')
     from tests.fixtures.factories import (
-        SPIREMediaFootnoteFactory,
-        SPIREMediaFootnoteDetailFactory,
-        SPIREFootnoteFactory,
         SPIREFootnoteEntryFactory,
+        SPIREFootnoteFactory,
         SPIREMediaFootnoteCountryFactory,
+        SPIREMediaFootnoteDetailFactory,
+        SPIREMediaFootnoteFactory,
     )
 
     factories = {
@@ -153,9 +153,9 @@ def populate_footnotes(batch_size):
 def populate_misc(batch_size):
     click.echo('- Adding misc data')
     from tests.fixtures.factories import (
-        SPIRERefDoNotReportValueFactory,
         SPIREEndUserFactory,
         SPIREOglTypeFactory,
+        SPIRERefDoNotReportValueFactory,
         SPIREReturnFactory,
         SPIREThirdPartyFactory,
         SPIREUltimateEndUserFactory,
