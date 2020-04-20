@@ -285,6 +285,7 @@ class SPIREBatch(BaseModel):
     application_countries = _relationship('SPIREApplicationCountry', backref='batch')
     application = _relationship('SPIREApplication', backref='batch')
     goods_incidents = _relationship('SPIREGoodsIncident', backref='batch')
+    footnote_entries = _relationship('SPIREFootnoteEntry', backref='batch')
 
 
 class SPIREApplication(BaseModel):
@@ -303,6 +304,7 @@ class SPIREApplication(BaseModel):
     application_countries = _relationship('SPIREApplicationCountry', backref='application')
     application_amendments = _relationship('SPIREApplicationAmendment', backref='application')
     goods_incidents = _relationship('SPIREGoodsIncident', backref='application')
+    footnote_entries = _relationship('SPIREFootnoteEntry', backref='application')
 
 
 class SPIREApplicationAmendment(BaseModel):
@@ -410,6 +412,7 @@ class SPIREFootnote(BaseModel):
     id = _col(_int, primary_key=True)
     text = _col(_text)
     status = _col(_text, nullable=False)
+    footnote_entries = _relationship('SPIREFootnoteEntry', backref='footnote')
 
 
 class SPIREMediaFootnoteDetail(BaseModel):
@@ -425,6 +428,8 @@ class SPIREMediaFootnoteDetail(BaseModel):
     display_text = _col(_text, nullable=False)
     single_footnote_text = _col(_text, nullable=False)
     joint_footnote_text = _col(_text)
+
+    footnote_entries = _relationship('SPIREFootnoteEntry', backref='media_footnote_detail')
 
 
 class SPIREFootnoteEntry(BaseModel):
@@ -497,6 +502,7 @@ class SPIREMediaFootnote(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
+    media_footnote_details = _relationship('SPIREMediaFootnoteDetail', backref='media_footnote')
 
 
 class SPIREOglType(BaseModel):

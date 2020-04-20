@@ -21,6 +21,8 @@ from app.db.models.external import (
     SPIRERefDoNotReportValue,
     SPIRERefReportRating,
     SPIREEndUser,
+    SPIREFootnoteEntry,
+    SPIREMediaFootnoteDetail,
 )
 
 
@@ -150,9 +152,9 @@ class SPIREGoodsIncidentFactory(BaseFactory):
     type = factory.Faker('random_element', elements=['ISSUE'])
     batch = factory.SubFactory(SPIREBatchFactory)
     version_no = factory.Faker('random_int', min=1, max=3)
-    inc_id = factory.Faker('random_element', elements=[None] + list(range(1, 200)))
-    goods_item_id = factory.Faker('random_element', elements=[None] + list(range(1, 200)))
-    dest_country_id = factory.Faker('random_element', elements=[None] + list(range(1, 200)))
+    inc_id = factory.Faker('random_element', elements=list(range(1, 200)))
+    goods_item_id = factory.Faker('random_element', elements=list(range(1, 200)))
+    dest_country_id = factory.Faker('random_element', elements=list(range(1, 200)))
     application = factory.SubFactory(SPIREApplicationFactory)
     country_group = factory.SubFactory(SPIRECountryGroupFactory)
 
@@ -233,7 +235,7 @@ class SPIREControlEntryFactory(BaseFactory):
 
 class SPIREEndUserFactory(BaseFactory):
     ela_grp_id = factory.Faker('random_number', digits=6, fix_len=True)
-    end_user_type = factory.Faker('random_element', elements=['COM', 'IND', 'NULL', 'GOV', 'OTHER'])
+    end_user_type = factory.Faker('random_element', elements=['COM', 'IND', None, 'GOV', 'OTHER'])
     status_control = factory.Faker('random_element', elements=['A', 'C'])
     version_number = factory.Faker('random_int', min=1, max=3)
     country_id = factory.Faker('random_int', min=1, max=200)
@@ -252,3 +254,50 @@ class SPIREEndUserFactory(BaseFactory):
 
     class Meta:
         model = SPIREEndUser
+
+
+class SPIREMediaFootnoteDetailFactory(BaseFactory):
+    media_footnote = factory.SubFactory(SPIREMediaFootnoteFactory)
+    start_datetime = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    footnote_type = factory.Faker('random_element', elements=['STANDARD', 'END_USER'])
+    display_text = factory.Faker('sentence')
+    single_footnote_text = factory.Faker('paragraph')
+    joint_footnote_text = factory.Faker('paragraph')
+
+    @factory.lazy_attribute
+    def end_datetime(self):
+        if not random.randint(0, 3):
+            return factory.Faker('date_between', start_date=self.start_datetime).generate({})
+        return
+
+    class Meta:
+        model = SPIREMediaFootnoteDetail
+
+
+class SPIREFootnoteEntryFactory(BaseFactory):
+    batch = factory.SubFactory(SPIREBatchFactory)
+    footnote = factory.SubFactory(SPIREFootnoteFactory)
+    application = factory.SubFactory(SPIREApplicationFactory)
+    media_footnote_detail = factory.SubFactory(SPIREMediaFootnoteDetailFactory)
+
+    goods_item_id = factory.Faker('random_int', min=1, max=200)
+    country_id = factory.Faker('random_int', min=1, max=200)
+    fnr_id = factory.Faker('random_int', min=500, max=2000)
+    start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    version_no = factory.Faker('random_int', min=1, max=3)
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    mf_grp_id = factory.Faker('random_element', elements=[1, 2, 3, None])
+    mf_free_text = factory.Faker('sentence')
+
+    @factory.lazy_attribute
+    def fne_id(self):
+        last = SPIREFootnoteEntry.query.order_by(
+            SPIREFootnoteEntry.fne_id.desc()
+        ).first()
+        if last:
+            return last.fne_id + 1
+        return 1
+
+    class Meta:
+        model = SPIREFootnoteEntry

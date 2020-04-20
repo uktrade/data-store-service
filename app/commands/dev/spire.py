@@ -132,12 +132,16 @@ def populate_footnotes(batch_size):
     click.echo('- Adding footnotes data')
     from tests.fixtures.factories import (
         SPIREMediaFootnoteFactory,
+        SPIREMediaFootnoteDetailFactory,
         SPIREFootnoteFactory,
+        SPIREFootnoteEntryFactory,
     )
 
     factories = {
         'media_footnotes': SPIREMediaFootnoteFactory.create_batch(size=batch_size),
+        'media_footnote_details': SPIREMediaFootnoteDetailFactory.create_batch(size=batch_size),
         'footnotes': SPIREFootnoteFactory.create_batch(size=batch_size),
+        'footnote_entries': SPIREFootnoteEntryFactory.create_batch(size=batch_size),
     }
     return factories
 
