@@ -146,9 +146,11 @@ def populate_misc(batch_size):
     click.echo('- Adding misc data')
     from tests.fixtures.factories import (
         SPIRERefDoNotReportValueFactory,
+        SPIREEndUserFactory,
     )
 
     factories = {
         'do_not_report': SPIRERefDoNotReportValueFactory.create_batch(size=batch_size),
+        'end_users': SPIREEndUserFactory.create_batch(size=batch_size),
     }
     return factories

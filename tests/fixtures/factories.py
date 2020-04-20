@@ -20,6 +20,7 @@ from app.db.models.external import (
     SPIRERefCountryMapping,
     SPIRERefDoNotReportValue,
     SPIRERefReportRating,
+    SPIREEndUser,
 )
 
 
@@ -227,3 +228,26 @@ class SPIREControlEntryFactory(BaseFactory):
 
     class Meta:
         model = SPIREControlEntry
+
+
+class SPIREEndUserFactory(BaseFactory):
+    ela_grp_id = factory.Faker('random_number', digits=6, fix_len=True)
+    end_user_type = factory.Faker('random_element', elements=['COM', 'IND', 'NULL', 'GOV', 'OTHER'])
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    version_number = factory.Faker('random_int', min=1, max=3)
+    country_id = factory.Faker('random_int', min=1, max=200)
+    end_user_count = factory.Faker('random_int', min=1, max=4)
+    start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    batch_id = factory.Faker('random_int', min=1, max=50)
+
+    @factory.lazy_attribute
+    def eu_id(self):
+        last = SPIREEndUser.query.order_by(
+            SPIREEndUser.eu_id.desc()
+        ).first()
+        if last:
+            return last.eu_id + 1
+        return 1
+
+    class Meta:
+        model = SPIREEndUser
