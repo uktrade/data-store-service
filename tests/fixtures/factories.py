@@ -28,6 +28,7 @@ from app.db.models.external import (
     SPIREOglType,
     SPIREReturn,
     SPIREThirdParty,
+    SPIREUltimateEndUser,
 )
 
 
@@ -451,3 +452,22 @@ class SPIREThirdPartyFactory(BaseFactory):
 
     class Meta:
         model = SPIREThirdParty
+
+
+class SPIREUltimateEndUserFactory(BaseFactory):
+    application = factory.SubFactory(SPIREApplicationFactory)
+    batch = factory.SubFactory(SPIREBatchFactory)
+    country_id = factory.Faker('random_int', min=1, max=200)
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    version_no = factory.Faker('random_int', min=1, max=3)
+
+    @factory.lazy_attribute
+    def ueu_id(self):
+        last = SPIREUltimateEndUser.query.order_by(SPIREUltimateEndUser.ueu_id.desc()).first()
+        if last:
+            return last.ueu_id + 1
+        return 1
+
+    class Meta:
+        model = SPIREUltimateEndUser
