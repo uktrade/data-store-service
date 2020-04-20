@@ -43,3 +43,21 @@ class TestProcess:
         expected = [mock.call(a='0', b='1'), mock.call(a='2', b='3')]
 
         assert calls == expected
+
+    def test_mapping(self, app_with_db, mock_sql_alchemy_model):
+
+        dbi = mock.Mock()
+        fieldnames = ['a', 'b']
+        rows = [[0, 1], [2, 3]]
+        data = convert_to_csv_bytes(fieldnames, rows)
+        file_info = mock.Mock()
+        file_info.data.read.return_value = data
+
+        pipeline = RebuildSchemaPipeline(dbi)
+        pipeline.csv_to_model_mapping = {'a': 'c', 'b': 'd'}
+        pipeline.process(file_info)
+
+        calls = mock_sql_alchemy_model.call_args_list
+        expected = [mock.call(c='0', d='1'), mock.call(c='2', d='3')]
+
+        assert calls == expected
