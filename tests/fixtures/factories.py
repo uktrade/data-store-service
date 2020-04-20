@@ -25,6 +25,7 @@ from app.db.models.external import (
     SPIREMediaFootnoteDetail,
     SPIREMediaFootnoteCountry,
     SPIREIncident,
+    SPIREOglType,
 )
 
 
@@ -388,3 +389,19 @@ class SPIREIncidentFactory(BaseFactory):
 
     class Meta:
         model = SPIREIncident
+
+
+class SPIREOglTypeFactory(BaseFactory):
+    title = factory.Faker('sentence', nb_words=4)
+    start_datetime = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    display_order = factory.Faker('random_int', min=100, max=999)
+    f680_flag = factory.Faker('random_element', elements=['Y', 'N', None])
+
+    @factory.lazy_attribute
+    def end_datetime(self):
+        if not random.randint(0, 3):
+            return factory.Faker('date_between', start_date=self.start_datetime).generate({})
+        return
+
+    class Meta:
+        model = SPIREOglType
