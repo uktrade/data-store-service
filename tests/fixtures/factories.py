@@ -24,6 +24,7 @@ from app.db.models.external import (
     SPIREFootnoteEntry,
     SPIREMediaFootnoteDetail,
     SPIREMediaFootnoteCountry,
+    SPIREIncident,
 )
 
 
@@ -246,9 +247,7 @@ class SPIREEndUserFactory(BaseFactory):
 
     @factory.lazy_attribute
     def eu_id(self):
-        last = SPIREEndUser.query.order_by(
-            SPIREEndUser.eu_id.desc()
-        ).first()
+        last = SPIREEndUser.query.order_by(SPIREEndUser.eu_id.desc()).first()
         if last:
             return last.eu_id + 1
         return 1
@@ -293,9 +292,7 @@ class SPIREFootnoteEntryFactory(BaseFactory):
 
     @factory.lazy_attribute
     def fne_id(self):
-        last = SPIREFootnoteEntry.query.order_by(
-            SPIREFootnoteEntry.fne_id.desc()
-        ).first()
+        last = SPIREFootnoteEntry.query.order_by(SPIREFootnoteEntry.fne_id.desc()).first()
         if last:
             return last.fne_id + 1
         return 1
@@ -320,3 +317,74 @@ class SPIREMediaFootnoteCountryFactory(BaseFactory):
 
     class Meta:
         model = SPIREMediaFootnoteCountry
+
+
+class SPIREIncidentFactory(BaseFactory):
+    batch = factory.SubFactory(SPIREBatchFactory)
+    status = factory.Faker('random_element', elements=['READY'])
+    type = factory.Faker(
+        'random_element',
+        elements=[
+            'ISSUE',
+            'DEREGISTRATION',
+            'REDUCTION',
+            'REFUSAL',
+            'REVOKE',
+            'SURRENDER',
+            'SUSPENSION',
+        ],
+    )
+    case_type = factory.Faker(
+        'random_element', elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL']
+    )
+    case_sub_type = factory.Faker(
+        'random_element',
+        elements=[
+            'CRYPTO',
+            'MEDIA',
+            'DEALER',
+            'MIL_DUAL',
+            None,
+            'PERMANENT',
+            'TEMPORARY',
+            'TRANSHIPMENT',
+            'UKCONTSHELF',
+        ],
+    )
+    application = factory.SubFactory(SPIREApplicationFactory)
+    report_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    version_no = factory.Faker('random_int', min=1, max=3)
+    temporary_licence_flag = factory.Faker('random_int', min=0, max=1)
+    licence_conversion_flag = factory.Faker('random_int', min=0, max=1)
+    incorporation_flag = factory.Faker('random_int', min=0, max=1)
+    mil_flag = factory.Faker('random_int', min=0, max=1)
+    other_flag = factory.Faker('random_int', min=0, max=1)
+    torture_flag = factory.Faker('random_int', min=0, max=1)
+    licence_id = factory.Faker('random_int', min=1, max=99999)
+
+    @factory.lazy_attribute
+    def ogl_id(self):
+        if not random.randint(0, 4):
+            return factory.Faker('random_int', min=1, max=100).generate({})
+        return
+
+    @factory.lazy_attribute
+    def else_id(self):
+        if not random.randint(0, 4):
+            return factory.Faker('random_int', min=1, max=100).generate({})
+        return
+
+    @factory.lazy_attribute
+    def start_date(self):
+        return factory.Faker('date_time_between', start_date=self.report_date).generate({})
+
+    @factory.lazy_attribute
+    def inc_id(self):
+        last = SPIREIncident.query.order_by(SPIREIncident.inc_id.desc()).first()
+        if last:
+            return last.inc_id + 1
+        return 1
+
+    class Meta:
+        model = SPIREIncident

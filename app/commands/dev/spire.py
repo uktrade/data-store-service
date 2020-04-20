@@ -113,11 +113,13 @@ def populate_ars(batch_size):
         SPIREReasonForRefusalFactory,
         SPIRERefReportRatingFactory,
         SPIREControlEntryFactory,
+        SPIREIncidentFactory,
     )
 
     batch = SPIREBatchFactory()
 
     factories = {
+        'incidents': SPIREIncidentFactory.create_batch(size=batch_size),
         'goods_incidents': SPIREGoodsIncidentFactory.create_batch(size=batch_size, batch=batch),
         'ars': SPIREArsFactory.create_batch(size=batch_size),
         'ars_subjects': SPIRERefArsSubjectFactory.create_batch(size=batch_size),

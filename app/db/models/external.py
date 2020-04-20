@@ -286,6 +286,7 @@ class SPIREBatch(BaseModel):
     application = _relationship('SPIREApplication', backref='batch')
     goods_incidents = _relationship('SPIREGoodsIncident', backref='batch')
     footnote_entries = _relationship('SPIREFootnoteEntry', backref='batch')
+    incidents = _relationship('SPIREIncident', backref='batch')
 
 
 class SPIREApplication(BaseModel):
@@ -305,6 +306,7 @@ class SPIREApplication(BaseModel):
     application_amendments = _relationship('SPIREApplicationAmendment', backref='application')
     goods_incidents = _relationship('SPIREGoodsIncident', backref='application')
     footnote_entries = _relationship('SPIREFootnoteEntry', backref='application')
+    incidents = _relationship('SPIREIncident', backref='application')
 
 
 class SPIREApplicationAmendment(BaseModel):
