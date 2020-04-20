@@ -23,6 +23,7 @@ from app.db.models.external import (
     SPIREEndUser,
     SPIREFootnoteEntry,
     SPIREMediaFootnoteDetail,
+    SPIREMediaFootnoteCountry,
 )
 
 
@@ -301,3 +302,21 @@ class SPIREFootnoteEntryFactory(BaseFactory):
 
     class Meta:
         model = SPIREFootnoteEntry
+
+
+class SPIREMediaFootnoteCountryFactory(BaseFactory):
+    ela_grp_id = factory.Faker('random_number', digits=6, fix_len=True)
+    mf_grp_id = factory.Faker('random_element', elements=[1, 2, 3])
+    country_id = factory.Faker('random_int', min=1, max=200)
+    country_name = factory.Faker('word')
+    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    start_datetime = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
+
+    @factory.lazy_attribute
+    def end_datetime(self):
+        if not random.randint(0, 3):
+            return factory.Faker('date_between', start_date=self.start_datetime).generate({})
+        return
+
+    class Meta:
+        model = SPIREMediaFootnoteCountry

@@ -135,11 +135,13 @@ def populate_footnotes(batch_size):
         SPIREMediaFootnoteDetailFactory,
         SPIREFootnoteFactory,
         SPIREFootnoteEntryFactory,
+        SPIREMediaFootnoteCountryFactory,
     )
 
     factories = {
         'media_footnotes': SPIREMediaFootnoteFactory.create_batch(size=batch_size),
         'media_footnote_details': SPIREMediaFootnoteDetailFactory.create_batch(size=batch_size),
+        'media_footnote_countries': SPIREMediaFootnoteCountryFactory.create_batch(size=batch_size),
         'footnotes': SPIREFootnoteFactory.create_batch(size=batch_size),
         'footnote_entries': SPIREFootnoteEntryFactory.create_batch(size=batch_size),
     }
