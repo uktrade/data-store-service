@@ -14,7 +14,10 @@ from app.db.models.external import (
     SPIREFootnote,
     SPIREGoodsIncident,
     SPIREMediaFootnote,
+    SPIRERefArsSubject,
     SPIRERefCountryMapping,
+    SPIRERefDoNotReportValue,
+    SPIREReasonForRefusal,
 )
 
 
@@ -182,3 +185,27 @@ class SPIREFootnoteFactory(BaseFactory):
 
     class Meta:
         model = SPIREFootnote
+
+
+class SPIRERefArsSubjectFactory(BaseFactory):
+    ars_subject = factory.Faker('sentence', nb_words=2, variable_nb_words=False)
+    ars_value = factory.Faker('sentence', nb_words=8)
+
+    class Meta:
+        model = SPIRERefArsSubject
+
+
+class SPIRERefDoNotReportValueFactory(BaseFactory):
+    dnr_type = factory.Faker('random_element', elements=['ARS_SUBJECT', 'CE'])
+    dnr_value = factory.Faker('sentence', nb_words=8)
+
+    class Meta:
+        model = SPIRERefDoNotReportValue
+
+
+class SPIREReasonForRefusalFactory(BaseFactory):
+    goods_incident = factory.SubFactory(SPIREGoodsIncidentFactory)
+    reason_for_refusal = factory.Faker('word')
+
+    class Meta:
+        model = SPIREReasonForRefusal

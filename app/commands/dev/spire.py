@@ -59,6 +59,7 @@ def populate_spire_schema(batch_size):
         **populate_application(batch_size),
         **populate_ars(batch_size),
         **populate_footnotes(batch_size),
+        **populate_misc(batch_size),
     }
 
     for data_type, _models in data_models.items():
@@ -108,6 +109,8 @@ def populate_ars(batch_size):
         SPIREArsFactory,
         SPIREBatchFactory,
         SPIREGoodsIncidentFactory,
+        SPIRERefArsSubjectFactory,
+        SPIREReasonForRefusalFactory,
     )
 
     batch = SPIREBatchFactory()
@@ -115,6 +118,8 @@ def populate_ars(batch_size):
     factories = {
         'goods_incidents': SPIREGoodsIncidentFactory.create_batch(size=batch_size, batch=batch),
         'ars': SPIREArsFactory.create_batch(size=batch_size),
+        'ars_subject': SPIRERefArsSubjectFactory.create_batch(size=batch_size),
+        'reason_for_refusal': SPIREReasonForRefusalFactory.create_batch(size=batch_size),
     }
     return factories
 
@@ -129,5 +134,17 @@ def populate_footnotes(batch_size):
     factories = {
         'media_footnotes': SPIREMediaFootnoteFactory.create_batch(size=batch_size),
         'footnotes': SPIREFootnoteFactory.create_batch(size=batch_size),
+    }
+    return factories
+
+
+def populate_misc(batch_size):
+    click.echo('- Adding misc data')
+    from tests.fixtures.factories import (
+        SPIRERefDoNotReportValueFactory,
+    )
+
+    factories = {
+        'do_not_report': SPIRERefDoNotReportValueFactory.create_batch(size=batch_size),
     }
     return factories

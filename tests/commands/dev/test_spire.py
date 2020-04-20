@@ -23,10 +23,10 @@ class TestPopulateSpireCommand:
         # sub factory a new related object is created
 
         assert SPIRERefCountryMapping.query.count() == 1
-        assert SPIRECountryGroup.query.count() == 2
+        assert SPIRECountryGroup.query.count() == 5
         assert SPIRECountryGroupEntry.query.count() == 1
 
-        assert SPIREApplication.query.count() == 3
+        assert SPIREApplication.query.count() == 6
         assert SPIREApplicationAmendment.query.count() == 1
         assert SPIREApplicationCountry.query.count() == 1
         assert SPIREBatch.query.count() == 5

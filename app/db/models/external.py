@@ -354,6 +354,7 @@ class SPIREGoodsIncident(BaseModel):
     status_control = _col(_text, nullable=False)
 
     ars = _relationship('SPIREArs', backref="goods_incident")
+    reasons_for_refusal = _relationship('SPIREReasonForRefusal', backref='goods_incident')
 
 
 class SPIREArs(BaseModel):
