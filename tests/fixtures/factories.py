@@ -216,13 +216,14 @@ class SPIREReasonForRefusalFactory(BaseFactory):
 
 class SPIRERefReportRatingFactory(BaseFactory):
     rating = factory.Faker('sentence', nb_words=4)
+    report_rating = factory.Faker('random_element', elements=['IRN', 'ML1', 'ML10', 'ML11'])
 
     class Meta:
         model = SPIRERefReportRating
 
 
 class SPIREControlEntryFactory(BaseFactory):
-    value = factory.Faker('random_int', min=1, max=3)
+    value = factory.Faker('pydecimal', positive=True, right_digits=2, left_digits=6)
     ref_report_rating = factory.SubFactory(SPIRERefReportRatingFactory)
     goods_incident = factory.SubFactory(SPIREGoodsIncidentFactory)
 
