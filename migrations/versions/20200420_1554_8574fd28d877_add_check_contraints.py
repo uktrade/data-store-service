@@ -43,14 +43,30 @@ def schema_upgrades():
     op.create_check_constraint(
         'applications_check_1',
         'applications',
-        condition="case_type IN ('SIEL', 'OIEL', 'SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL')",
+        condition="""
+            case_type IN ('SIEL', 'OIEL', 'SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL')
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
     op.create_check_constraint(
         'applications_check_2',
         'applications',
-        condition="(case_type = 'SIEL' AND case_sub_type IN ('PERMANENT', 'TEMPORARY', 'TRANSHIPMENT')) OR (case_type = 'OIEL' AND case_sub_type IN ('DEALER', 'MEDIA', 'MIL_DUAL', 'UKCONTSHELF','CRYPTO')) OR (case_type IN ('SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL') AND case_sub_type IS NULL)",
+        condition="""
+            (
+                case_type = 'SIEL' AND case_sub_type IN ('PERMANENT', 'TEMPORARY', 'TRANSHIPMENT')
+            )
+            OR
+            (
+                case_type = 'OIEL'
+                AND case_sub_type IN ('DEALER', 'MEDIA', 'MIL_DUAL', 'UKCONTSHELF','CRYPTO')
+            )
+            OR
+            (
+                case_type IN ('SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL')
+                AND case_sub_type IS NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
@@ -71,7 +87,20 @@ def schema_upgrades():
     op.create_check_constraint(
         'batches_check_2',
         'batches',
-        condition="(batch_ref LIKE 'C%' AND start_date IS NULL AND end_date IS NULL) OR (batch_ref NOT LIKE 'C%' AND start_date IS NOT NULL AND date_trunc('day', start_date) = start_date AND end_date IS NOT NULL AND date_trunc('day', end_date) = end_date AND start_date <= end_date)",
+        condition="""
+            (
+                batch_ref LIKE 'C%' AND start_date IS NULL AND end_date IS NULL
+            )
+            OR
+            (
+                batch_ref NOT LIKE 'C%'
+                AND start_date IS NOT NULL
+                AND date_trunc('day', start_date) = start_date
+                AND end_date IS NOT NULL
+                AND date_trunc('day', end_date) = end_date
+                AND start_date <= end_date
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
@@ -85,7 +114,23 @@ def schema_upgrades():
     op.create_check_constraint(
         'footnote_entries_check_1',
         'footnote_entries',
-        condition="(goods_item_id IS NULL AND country_id IS NULL AND fnr_id IS NULL) OR (goods_item_id IS NOT NULL AND country_id IS NULL AND fnr_id IS NULL) OR (goods_item_id IS NULL AND country_id IS NOT NULL AND fnr_id IS NULL) OR (goods_item_id IS NULL AND country_id IS NOT NULL AND fnr_id IS NOT NULL)",
+        condition="""
+            (
+                goods_item_id IS NULL AND country_id IS NULL AND fnr_id IS NULL
+            )
+            OR
+            (
+                goods_item_id IS NOT NULL AND country_id IS NULL AND fnr_id IS NULL
+            )
+            OR
+            (
+                goods_item_id IS NULL AND country_id IS NOT NULL AND fnr_id IS NULL
+            )
+            OR
+            (
+                goods_item_id IS NULL AND country_id IS NOT NULL AND fnr_id IS NOT NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
@@ -99,7 +144,25 @@ def schema_upgrades():
     op.create_check_constraint(
         'footnote_entries_check_3',
         'footnote_entries',
-        condition="(fn_id IS NOT NULL AND mfd_id IS NULL AND mf_free_text IS NULL AND mf_grp_id IS NULL) OR (fn_id IS NULL AND mfd_id IS NOT NULL AND mf_free_text IS NULL AND mf_grp_id IS NOT NULL) OR (fn_id IS NULL AND mfd_id IS NULL AND mf_free_text IS NOT NULL AND mf_grp_id IS NOT NULL)",
+        condition="""
+            (
+                fn_id IS NOT NULL AND mfd_id IS NULL AND mf_free_text IS NULL AND mf_grp_id IS NULL
+            )
+            OR
+            (
+                fn_id IS NULL
+                AND mfd_id IS NOT NULL
+                AND mf_free_text IS NULL
+                AND mf_grp_id IS NOT NULL
+            )
+            OR
+            (
+                fn_id IS NULL
+                AND mfd_id IS NULL
+                AND mf_free_text IS NOT NULL
+                AND mf_grp_id IS NOT NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
@@ -134,7 +197,15 @@ def schema_upgrades():
     op.create_check_constraint(
         'incidents_check_3',
         'incidents',
-        condition="(case_type != 'OGEL' AND ogl_id IS NULL) OR (case_type = 'OGEL' AND ogl_id IS NOT NULL)",
+        condition="""
+            (
+                case_type != 'OGEL' AND ogl_id IS NULL
+            )
+            OR
+            (
+                case_type = 'OGEL' AND ogl_id IS NOT NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
@@ -148,35 +219,74 @@ def schema_upgrades():
     op.create_check_constraint(
         'incidents_check_5',
         'incidents',
-        condition="(type != 'REFUSAL' AND licence_id IS NOT NULL) OR (type = 'REFUSAL' AND licence_id IS NULL)",
+        condition="""
+            (
+                type != 'REFUSAL' AND licence_id IS NOT NULL
+            )
+            OR
+            (
+                type = 'REFUSAL' AND licence_id IS NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
     op.create_check_constraint(
         'incidents_check_6',
         'incidents',
-        condition="(type = 'SUSPENSION' AND else_id IS NOT NULL) OR (type != 'SUSPENSION' AND else_id IS NULL)",
+        condition="""
+            (
+                type = 'SUSPENSION' AND else_id IS NOT NULL
+            )
+            OR
+            (
+                type != 'SUSPENSION' AND else_id IS NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
     op.create_check_constraint(
         'incidents_check_7',
         'incidents',
-        condition="type IN ('REFUSAL', 'ISSUE', 'REDUCTION', 'REVOKE', 'DEREGISTRATION', 'SUSPENSION', 'SURRENDER')",
+        condition="""
+            type IN (
+                'REFUSAL', 'ISSUE', 'REDUCTION', 'REVOKE', 'DEREGISTRATION',
+                'SUSPENSION', 'SURRENDER'
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
     op.create_check_constraint(
         'incidents_check_8',
         'incidents',
-        condition="case_type IN ('SIEL', 'OIEL', 'SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL')",
+        condition="""
+            case_type IN (
+                'SIEL', 'OIEL', 'SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL'
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
     op.create_check_constraint(
         'incidents_check_9',
         'incidents',
-        condition="(case_type = 'SIEL' AND case_sub_type IN ('PERMANENT', 'TEMPORARY', 'TRANSHIPMENT')) OR (case_type = 'OIEL' AND case_sub_type IN ('DEALER', 'MEDIA', 'MIL_DUAL', 'UKCONTSHELF','CRYPTO')) OR (case_type IN ('SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL') AND case_sub_type IS NULL)",
+        condition="""
+            (
+                case_type = 'SIEL' AND case_sub_type IN ('PERMANENT', 'TEMPORARY', 'TRANSHIPMENT')
+            )
+            OR
+            (
+                case_type = 'OIEL'
+                AND case_sub_type IN ('DEALER', 'MEDIA', 'MIL_DUAL', 'UKCONTSHELF','CRYPTO')
+            )
+            OR
+            (
+                case_type IN ('SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL')
+                AND case_sub_type IS NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
@@ -218,14 +328,30 @@ def schema_upgrades():
     op.create_check_constraint(
         'media_footnote_countries_check',
         'media_footnote_countries',
-        condition="(status_control = 'C' AND end_datetime IS NULL) OR (status_control IS NULL AND end_datetime IS NOT NULL)",
+        condition="""
+            (
+                status_control = 'C' AND end_datetime IS NULL
+            )
+            OR
+            (
+                status_control IS NULL AND end_datetime IS NOT NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
     op.create_check_constraint(
         'media_footnote_details_check_1',
         'media_footnote_details',
-        condition="(status_control = 'C' AND end_datetime IS NULL) OR (status_control IS NULL AND end_datetime IS NOT NULL)",
+        condition="""
+            (
+                status_control = 'C' AND end_datetime IS NULL
+            )
+            OR
+            (
+                status_control IS NULL AND end_datetime IS NOT NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
@@ -267,7 +393,15 @@ def schema_upgrades():
     op.create_check_constraint(
         'returns_check_5',
         'returns',
-        condition="(licence_type = 'OGEL' AND ogl_id IS NOT NULL) OR (licence_type != 'OGL' AND ogl_id IS NULL)",
+        condition="""
+            (
+                licence_type = 'OGEL' AND ogl_id IS NOT NULL
+            )
+            OR
+            (
+                licence_type != 'OGL' AND ogl_id IS NULL
+            )
+        """,
         schema=quoted_name('spire', quote=True),
     )
 
