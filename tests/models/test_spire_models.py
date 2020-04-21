@@ -17,7 +17,7 @@ from tests.fixtures.factories import (
 )
 
 
-def test_application_fk_constraint(app_with_db):
+def test_application_fk_constraint(app_with_migrated_db):
     with pytest.raises(IntegrityError):
         SPIREApplicationFactory(batch=None)
 
