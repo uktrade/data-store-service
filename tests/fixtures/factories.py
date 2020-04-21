@@ -75,13 +75,11 @@ class SPIRERefCountryMappingFactory(BaseFactory):
 class SPIREBatchFactory(BaseFactory):
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     approve_date = factory.Faker('date_time_between', start_date='-1y')
-
     status = factory.Faker('random_element', elements=['RELEASED', 'STAGING'])
 
     @factory.lazy_attribute
     def batch_ref(self):
         batch_ref = str(factory.Faker('random_int', min=1, max=50).generate({}))
-        return batch_ref
         if not random.randint(0, 3):
             return f'C{batch_ref}'
         return batch_ref
@@ -112,7 +110,20 @@ class SPIREApplicationFactory(BaseFactory):
         'random_element',
         elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL', 'TA_SIEL'],
     )
-    case_sub_type = factory.Faker('color_name')
+    case_sub_type = factory.Faker(
+        'random_element',
+        elements=[
+            'CRYPTO',
+            'MEDIA',
+            'DEALER',
+            'MIL_DUAL',
+            None,
+            'PERMANENT',
+            'TEMPORARY',
+            'TRANSHIPMENT',
+            'UKCONTSHELF',
+        ],
+    )
     initial_processing_time = factory.Faker('random_int')
     case_closed_date = factory.Faker('date_this_century')
     withheld_status = factory.Faker('word')
