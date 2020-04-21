@@ -2,6 +2,7 @@ import random
 
 import factory
 from flask import current_app as app
+from sqlalchemy.orm.scoping import scoped_session
 
 from app.db.models.external import (
     SPIREApplication,
@@ -32,10 +33,15 @@ from app.db.models.external import (
 )
 
 
+def get_session():
+    return app.db.session
+
+
 class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         abstract = True
-        sqlalchemy_session = app.db.session
+        sqlalchemy_session = scoped_session(get_session)
+        sqlalchemy_session_persistence = 'commit'
 
 
 class SPIRECountryGroupFactory(BaseFactory):
@@ -68,35 +74,44 @@ class SPIRERefCountryMappingFactory(BaseFactory):
 
 class SPIREBatchFactory(BaseFactory):
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
-    end_date = factory.Faker('date_time_between', start_date='-1y')
-    batch_ref = factory.Faker('random_int', min=1, max=50)
+    approve_date = factory.Faker('date_time_between', start_date='-1y')
 
     status = factory.Faker('random_element', elements=['RELEASED', 'STAGING'])
 
     @factory.lazy_attribute
-    def approve_date(self):
-        return factory.Faker(
-            'date_time_between', start_date=self.start_date, end_date=self.end_date
-        ).generate({})
+    def batch_ref(self):
+        batch_ref = str(factory.Faker('random_int', min=1, max=50).generate({}))
+        return batch_ref
+        if not random.randint(0, 3):
+            return f'C{batch_ref}'
+        return batch_ref
+
+    @factory.lazy_attribute
+    def end_date(self):
+        if self.start_date and self.approve_date:
+            return factory.Faker(
+                'date_time_between', start_date=self.start_date, end_date=self.approve_date
+            ).generate({})
 
     @factory.lazy_attribute
     def release_date(self):
-        return factory.Faker(
-            'date_time_between', start_date=self.staging_date, end_date=self.end_date
-        ).generate({})
+        if self.approve_date and self.end_date:
+            return factory.Faker('date_time_between', start_date=self.approve_date,).generate({})
 
     @factory.lazy_attribute
     def staging_date(self):
-        return factory.Faker(
-            'date_time_between', start_date=self.approve_date, end_date=self.end_date
-        ).generate({})
+        if self.approve_date and self.end_date:
+            return factory.Faker('date_time_between', start_date=self.approve_date,).generate({})
 
     class Meta:
         model = SPIREBatch
 
 
 class SPIREApplicationFactory(BaseFactory):
-    case_type = factory.Faker('safe_color_name')
+    case_type = factory.Faker(
+        'random_element',
+        elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL', 'TA_SIEL'],
+    )
     case_sub_type = factory.Faker('color_name')
     initial_processing_time = factory.Faker('random_int')
     case_closed_date = factory.Faker('date_this_century')
