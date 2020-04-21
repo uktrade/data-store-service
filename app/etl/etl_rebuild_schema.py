@@ -1,11 +1,13 @@
 import csv
 import io
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
+
+from sqlalchemy import DDL
 
 from app.etl.etl_base import classproperty, DataPipeline
 
 
-class RebuildSchemaPipeline(DataPipeline, metaclass=ABCMeta):
+class RebuildSchemaPipeline(DataPipeline):
 
     csv_to_model_mapping = None
 
@@ -17,11 +19,17 @@ class RebuildSchemaPipeline(DataPipeline, metaclass=ABCMeta):
         if self.csv_to_model_mapping is not None:
             headers = [self.csv_to_model_mapping[header] for header in headers]
         session = self.dbi.db.create_scoped_session()
-        for row in csv_reader:
-            kwargs = {field: value for field, value in zip(headers, row)}
-            obj = self.sql_alchemy_model(**kwargs)
-            session.add(obj)
-        session.commit()
+        session.execute(DDL('SET session_replication_role = replica;'))
+        try:
+            objects = []
+            for row in csv_reader:
+                kwargs = {field: value for field, value in zip(headers, row)}
+                obj = self.sql_alchemy_model(**kwargs)
+                objects.append(obj)
+            session.bulk_save_objects(objects)
+            session.commit()
+        finally:
+            session.execute(DDL('SET session_replication_role = DEFAULT;'))
 
     @classproperty
     @abstractmethod
