@@ -9,6 +9,7 @@ from data_engineering.common.db.models import (
     _text,
     BaseModel,
 )
+from sqlalchemy import Index
 
 from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
 from app.etl.etl_dit_baci import DITBACIPipeline
@@ -188,6 +189,11 @@ class WorldBankTariffTransformL1(BaseModel):
     eu_part_rate = _col(_decimal)
     country_average = _col(_decimal)
     world_average = _col(_decimal)
+
+    Index(f"{__tablename__}_product_idx", product, postgresql_using='hash')
+    Index(f"{__tablename__}_reporter_idx", reporter, postgresql_using='hash')
+    Index(f"{__tablename__}_partner_idx", partner, postgresql_using='hash')
+    Index(f"{__tablename__}_year_idx", year, postgresql_using='hash')
 
 
 class ComtradeCountryCodeAndISOL1(BaseModel):
