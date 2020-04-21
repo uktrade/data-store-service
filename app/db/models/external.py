@@ -248,7 +248,9 @@ class SPIRECountryGroup(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
+
     country_group_entries = _relationship('SPIRECountryGroupEntry', backref='country_group')
+    goods_incidents = _relationship('SPIREGoodsIncident', backref='country_group')
 
 
 class SPIRERefCountryMapping(BaseModel):
@@ -282,6 +284,12 @@ class SPIREBatch(BaseModel):
 
     application_countries = _relationship('SPIREApplicationCountry', backref='batch')
     application = _relationship('SPIREApplication', backref='batch')
+    goods_incidents = _relationship('SPIREGoodsIncident', backref='batch')
+    footnote_entries = _relationship('SPIREFootnoteEntry', backref='batch')
+    incidents = _relationship('SPIREIncident', backref='batch')
+    returns = _relationship('SPIREReturn', backref='batch')
+    third_parties = _relationship('SPIREThirdParty', backref='batch')
+    ultimate_end_users = _relationship('SPIREUltimateEndUser', backref='batch')
 
 
 class SPIREApplication(BaseModel):
@@ -299,6 +307,11 @@ class SPIREApplication(BaseModel):
 
     application_countries = _relationship('SPIREApplicationCountry', backref='application')
     application_amendments = _relationship('SPIREApplicationAmendment', backref='application')
+    goods_incidents = _relationship('SPIREGoodsIncident', backref='application')
+    footnote_entries = _relationship('SPIREFootnoteEntry', backref='application')
+    incidents = _relationship('SPIREIncident', backref='application')
+    third_parties = _relationship('SPIREThirdParty', backref='application')
+    ultimate_end_users = _relationship('SPIREUltimateEndUser', backref='application')
 
 
 class SPIREApplicationAmendment(BaseModel):
@@ -349,6 +362,10 @@ class SPIREGoodsIncident(BaseModel):
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     status_control = _col(_text, nullable=False)
 
+    ars = _relationship('SPIREArs', backref="goods_incident")
+    reasons_for_refusal = _relationship('SPIREReasonForRefusal', backref='goods_incident')
+    control_entries = _relationship('SPIREControlEntry', backref='goods_incident')
+
 
 class SPIREArs(BaseModel):
     __tablename__ = 'ars'
@@ -365,6 +382,8 @@ class SPIRERefReportRating(BaseModel):
 
     rating = _col(_text, primary_key=True)
     report_rating = _col(_text, nullable=False)
+
+    control_entries = _relationship('SPIREControlEntry', backref='ref_report_rating')
 
 
 class SPIREControlEntry(BaseModel):
@@ -400,6 +419,7 @@ class SPIREFootnote(BaseModel):
     id = _col(_int, primary_key=True)
     text = _col(_text)
     status = _col(_text, nullable=False)
+    footnote_entries = _relationship('SPIREFootnoteEntry', backref='footnote')
 
 
 class SPIREMediaFootnoteDetail(BaseModel):
@@ -415,6 +435,8 @@ class SPIREMediaFootnoteDetail(BaseModel):
     display_text = _col(_text, nullable=False)
     single_footnote_text = _col(_text, nullable=False)
     joint_footnote_text = _col(_text)
+
+    footnote_entries = _relationship('SPIREFootnoteEntry', backref='media_footnote_detail')
 
 
 class SPIREFootnoteEntry(BaseModel):
@@ -487,6 +509,7 @@ class SPIREMediaFootnote(BaseModel):
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
+    media_footnote_details = _relationship('SPIREMediaFootnoteDetail', backref='media_footnote')
 
 
 class SPIREOglType(BaseModel):

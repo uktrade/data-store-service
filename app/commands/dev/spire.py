@@ -57,12 +57,14 @@ def populate_spire_schema(batch_size):
     data_models = {
         **populate_country_mapping(batch_size),
         **populate_application(batch_size),
+        **populate_ars(batch_size),
+        **populate_footnotes(batch_size),
+        **populate_misc(batch_size),
     }
 
     for data_type, _models in data_models.items():
         for _model in _models:
             app.db.session.add(_model)
-
     app.db.session.commit()
 
 
@@ -85,10 +87,10 @@ def populate_country_mapping(batch_size):
 def populate_application(batch_size):
     click.echo('- Adding application data')
     from tests.fixtures.factories import (
-        SPIREBatchFactory,
-        SPIREApplicationFactory,
-        SPIREApplicationCountryFactory,
         SPIREApplicationAmendmentFactory,
+        SPIREApplicationCountryFactory,
+        SPIREApplicationFactory,
+        SPIREBatchFactory,
     )
 
     factories = {
@@ -96,5 +98,74 @@ def populate_application(batch_size):
         'application_countries': SPIREApplicationCountryFactory.create_batch(size=batch_size),
         'applications': SPIREApplicationFactory.create_batch(size=batch_size),
         'application_amendments': SPIREApplicationAmendmentFactory.create_batch(size=batch_size),
+    }
+    return factories
+
+
+def populate_ars(batch_size):
+    click.echo('- Adding ars data')
+    from tests.fixtures.factories import (
+        SPIREArsFactory,
+        SPIREBatchFactory,
+        SPIREControlEntryFactory,
+        SPIREGoodsIncidentFactory,
+        SPIREIncidentFactory,
+        SPIREReasonForRefusalFactory,
+        SPIRERefArsSubjectFactory,
+        SPIRERefReportRatingFactory,
+    )
+
+    batch = SPIREBatchFactory()
+
+    factories = {
+        'incidents': SPIREIncidentFactory.create_batch(size=batch_size),
+        'goods_incidents': SPIREGoodsIncidentFactory.create_batch(size=batch_size, batch=batch),
+        'ars': SPIREArsFactory.create_batch(size=batch_size),
+        'ars_subjects': SPIRERefArsSubjectFactory.create_batch(size=batch_size),
+        'reasons_for_refusal': SPIREReasonForRefusalFactory.create_batch(size=batch_size),
+        'ref_report_ratings': SPIRERefReportRatingFactory.create_batch(size=batch_size),
+        'control_entries': SPIREControlEntryFactory.create_batch(size=batch_size),
+    }
+    return factories
+
+
+def populate_footnotes(batch_size):
+    click.echo('- Adding footnotes data')
+    from tests.fixtures.factories import (
+        SPIREFootnoteEntryFactory,
+        SPIREFootnoteFactory,
+        SPIREMediaFootnoteCountryFactory,
+        SPIREMediaFootnoteDetailFactory,
+        SPIREMediaFootnoteFactory,
+    )
+
+    factories = {
+        'media_footnotes': SPIREMediaFootnoteFactory.create_batch(size=batch_size),
+        'media_footnote_details': SPIREMediaFootnoteDetailFactory.create_batch(size=batch_size),
+        'media_footnote_countries': SPIREMediaFootnoteCountryFactory.create_batch(size=batch_size),
+        'footnotes': SPIREFootnoteFactory.create_batch(size=batch_size),
+        'footnote_entries': SPIREFootnoteEntryFactory.create_batch(size=batch_size),
+    }
+    return factories
+
+
+def populate_misc(batch_size):
+    click.echo('- Adding misc data')
+    from tests.fixtures.factories import (
+        SPIREEndUserFactory,
+        SPIREOglTypeFactory,
+        SPIRERefDoNotReportValueFactory,
+        SPIREReturnFactory,
+        SPIREThirdPartyFactory,
+        SPIREUltimateEndUserFactory,
+    )
+
+    factories = {
+        'do_not_report': SPIRERefDoNotReportValueFactory.create_batch(size=batch_size),
+        'end_users': SPIREEndUserFactory.create_batch(size=batch_size),
+        'ultimate_end_users': SPIREUltimateEndUserFactory.create_batch(size=batch_size),
+        'ogl_types': SPIREOglTypeFactory.create_batch(size=batch_size),
+        'returns': SPIREReturnFactory.create_batch(size=batch_size),
+        'third_parties': SPIREThirdPartyFactory.create_batch(size=batch_size),
     }
     return factories
