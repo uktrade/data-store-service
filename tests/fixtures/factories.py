@@ -226,7 +226,7 @@ class SPIREReasonForRefusalFactory(BaseFactory):
 
 
 class SPIRERefReportRatingFactory(BaseFactory):
-    rating = factory.Faker('sentence', nb_words=4)
+    rating = factory.Faker('sentence', nb_words=8, variable_nb_words=False)
     report_rating = factory.Faker('random_element', elements=['IRN', 'ML1', 'ML10', 'ML11'])
 
     class Meta:

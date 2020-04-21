@@ -65,7 +65,6 @@ def populate_spire_schema(batch_size):
     for data_type, _models in data_models.items():
         for _model in _models:
             app.db.session.add(_model)
-
     app.db.session.commit()
 
 
