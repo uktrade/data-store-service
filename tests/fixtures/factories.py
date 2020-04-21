@@ -71,7 +71,7 @@ class SPIREBatchFactory(BaseFactory):
     end_date = factory.Faker('date_time_between', start_date='-1y')
     batch_ref = factory.Faker('random_int', min=1, max=50)
 
-    status = factory.Faker('random_element', elements=('RELEASED',))
+    status = factory.Faker('random_element', elements=['RELEASED', 'STAGING'])
 
     @factory.lazy_attribute
     def approve_date(self):
@@ -131,12 +131,15 @@ class SPIREApplicationCountryFactory(BaseFactory):
 
 
 class SPIREApplicationAmendmentFactory(BaseFactory):
-    case_type = factory.Faker('safe_color_name')
+    case_type = factory.Faker(
+        'random_element',
+        elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL', 'TA_SIEL'],
+    )
     case_sub_type = factory.Faker('color_name')
     case_processing_time = factory.Faker('random_int')
     amendment_closed_date = factory.Faker('date_this_century')
     application = factory.SubFactory(SPIREApplicationFactory)
-    withheld_status = factory.Faker('word')
+    withheld_status = factory.Faker('random_element', elements=['PENDING', 'WITHHELD'])
     batch_id = factory.Faker('random_int', min=1, max=50)
 
     @factory.lazy_attribute
@@ -155,7 +158,7 @@ class SPIREApplicationAmendmentFactory(BaseFactory):
 class SPIREGoodsIncidentFactory(BaseFactory):
     start_date = factory.Faker('date_between', start_date='-2y', end_date='-1y')
     status_control = factory.Faker('random_element', elements=['A', 'C'])
-    type = factory.Faker('random_element', elements=['ISSUE'])
+    type = factory.Faker('random_element', elements=['ISSUE', 'REFUSAL', 'REVOKE', 'SURRENDER'])
     batch = factory.SubFactory(SPIREBatchFactory)
     version_no = factory.Faker('random_int', min=1, max=3)
     inc_id = factory.Faker('random_element', elements=list(range(1, 200)))
@@ -187,7 +190,7 @@ class SPIREMediaFootnoteFactory(BaseFactory):
 
 
 class SPIREFootnoteFactory(BaseFactory):
-    status = factory.Faker('random_element', elements=['CURRENT', 'DELETED'])
+    status = factory.Faker('random_element', elements=['CURRENT', 'DELETED', 'ARCHIVED'])
 
     @factory.lazy_attribute
     def text(self):
@@ -325,7 +328,7 @@ class SPIREMediaFootnoteCountryFactory(BaseFactory):
 
 class SPIREIncidentFactory(BaseFactory):
     batch = factory.SubFactory(SPIREBatchFactory)
-    status = factory.Faker('random_element', elements=['READY'])
+    status = factory.Faker('random_element', elements=['READY', 'FOR_ATTENTION'])
     type = factory.Faker(
         'random_element',
         elements=[
@@ -339,7 +342,8 @@ class SPIREIncidentFactory(BaseFactory):
         ],
     )
     case_type = factory.Faker(
-        'random_element', elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL']
+        'random_element',
+        elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL', 'TA_SIEL'],
     )
     case_sub_type = factory.Faker(
         'random_element',
@@ -416,10 +420,8 @@ class SPIREReturnFactory(BaseFactory):
     end_user_type = factory.Faker('random_element', elements=['COM', 'IND', None, 'GOV', 'OTHER'])
     status = factory.Faker('random_element', elements=['ACTIVE', 'WITHDRAWN'])
     created_datetime = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
-    status_control = factory.Faker('random_element', elements=['A', 'C'])
-    licence_type = factory.Faker(
-        'random_element', elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL']
-    )
+    status_control = factory.Faker('random_element', elements=['A', 'C', 'P'])
+    licence_type = factory.Faker('random_element', elements=['OGEL', 'OIEL', 'OITCL'])
     el_id = factory.Faker('random_int', min=1, max=99999)
     usage_count = factory.Faker('random_int', min=0, max=1)
 
@@ -440,8 +442,8 @@ class SPIREThirdPartyFactory(BaseFactory):
     country_id = factory.Faker('random_int', min=1, max=200)
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     version_no = factory.Faker('random_int', min=1, max=3)
-    status_control = factory.Faker('random_element', elements=['A', 'C'])
-    ultimate_end_user_flag = factory.Faker('random_int', min=1, max=200)
+    status_control = factory.Faker('random_element', elements=['A', 'C', 'P', 'D'])
+    ultimate_end_user_flag = factory.Faker('random_element', elements=[0, 1, None])
 
     @factory.lazy_attribute
     def tp_id(self):
