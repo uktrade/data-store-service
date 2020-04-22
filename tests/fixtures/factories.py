@@ -138,8 +138,7 @@ class SPIREApplicationFactory(BaseFactory):
             ).generate({})
         if self.case_type == 'OIEL':
             return factory.Faker(
-                'random_element',
-                elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
+                'random_element', elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
             ).generate({})
 
     class Meta:
@@ -446,8 +445,7 @@ class SPIREIncidentFactory(BaseFactory):
             ).generate({})
         if self.case_type == 'OIEL':
             return factory.Faker(
-                'random_element',
-                elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
+                'random_element', elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
             ).generate({})
 
     class Meta:
