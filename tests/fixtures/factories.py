@@ -327,8 +327,8 @@ class SPIREFootnoteEntryFactory(BaseFactory):
     media_footnote_detail = None
 
     goods_item_id = factory.Faker('random_int', min=1, max=200)
-    country_id = factory.Faker('random_int', min=1, max=200)
-    fnr_id = factory.Faker('random_element', elements=[1, 2, 3, 4, 5, None])
+    country_id = None
+    fnr_id = None
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     version_no = factory.Faker('random_int', min=1, max=3)
     status_control = factory.Faker('random_element', elements=['A', 'C'])

@@ -117,7 +117,7 @@ def test_footnotes_check_constraint(app_with_migrated_db, status, raise_exceptio
 
 
 @pytest.mark.parametrize(
-    'goods_item_id,country_id,footnote,raise_exception',
+    'goods_item_id,country_id,fnr_id,raise_exception',
     (
         (1, None, None, False),
         (None, None, None, False),
@@ -129,22 +129,15 @@ def test_footnotes_check_constraint(app_with_migrated_db, status, raise_exceptio
     ),
 )
 def test_footnote_entries_check_constraint_1(
-    app_with_migrated_db, goods_item_id, country_id, footnote, raise_exception
+    app_with_migrated_db, goods_item_id, country_id, fnr_id, raise_exception
 ):
-    if footnote:
-        footnote = SPIREFootnoteFactory()
-    else:
-        footnote = None
-
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREFootnoteEntryFactory(
-                goods_item_id=goods_item_id, country_id=country_id, footnote=footnote
+                goods_item_id=goods_item_id, country_id=country_id, fnr_id=fnr_id
             )
     else:
-        SPIREFootnoteEntryFactory(
-            goods_item_id=goods_item_id, country_id=country_id, footnote=footnote
-        )
+        SPIREFootnoteEntryFactory(goods_item_id=goods_item_id, country_id=country_id, fnr_id=fnr_id)
 
 
 @pytest.mark.parametrize(
@@ -160,29 +153,41 @@ def test_footnote_entries_check_constraint_2(app_with_migrated_db, version_no, r
 
 
 @pytest.mark.parametrize(
-    'fn_id,mfd_id,mf_free_text,mf_grp_id,raise_exception',
+    'footnote,media_footnote_detail,mf_free_text,mf_grp_id,raise_exception',
     (
-        (1, None, None, None, False),
-        (None, 1, None, 1, False),
-        (1, 1, 'HELLO', 1, False),
-        (1, 1, None, 1, True),
+        (True, None, None, None, False),
+        (None, True, None, 1, False),
+        (None, None, 'HELLO', 1, False),
+        (True, True, None, 1, True),
         (None, None, None, 1, True),
-        (None, 1, None, None, True),
+        (None, True, None, None, True),
         (None, None, None, None, True),
         (None, None, 'HELLO', None, True),
     ),
 )
 def test_footnote_entries_check_constraint_3(
-    app_with_migrated_db, fn_id, mfd_id, mf_free_text, mf_grp_id, raise_exception
+    app_with_migrated_db, footnote, media_footnote_detail, mf_free_text, mf_grp_id, raise_exception
 ):
+    if footnote:
+        footnote = SPIREFootnoteFactory()
+
+    if media_footnote_detail:
+        media_footnote_detail = SPIREMediaFootnoteDetailFactory()
+
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREFootnoteEntryFactory(
-                fn_id=fn_id, mf_grp_id=mf_grp_id, mfd_id=mfd_id, mf_free_text=mf_free_text
+                footnote=footnote,
+                mf_grp_id=mf_grp_id,
+                media_footnote_detail=media_footnote_detail,
+                mf_free_text=mf_free_text,
             )
     else:
         SPIREFootnoteEntryFactory(
-            fn_id=fn_id, mf_grp_id=mf_grp_id, mfd_id=mfd_id, mf_free_text=mf_free_text
+            footnote=footnote,
+            mf_grp_id=mf_grp_id,
+            media_footnote_detail=media_footnote_detail,
+            mf_free_text=mf_free_text,
         )
 
 
