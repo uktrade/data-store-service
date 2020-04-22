@@ -151,8 +151,11 @@ class SPIREApplicationFactory(BaseFactory):
 
 class SPIREApplicationCountryFactory(BaseFactory):
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
-    application = factory.SubFactory(SPIREApplicationFactory)
     batch = factory.SubFactory(SPIREBatchFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory,
+        batch=factory.SelfAttribute('..batch')
+    )
 
     @factory.lazy_attribute
     def report_date(self):
@@ -205,7 +208,10 @@ class SPIREGoodsIncidentFactory(BaseFactory):
     inc_id = factory.Faker('random_element', elements=list(range(1, 200)))
     goods_item_id = factory.Faker('random_element', elements=list(range(1, 200)))
     dest_country_id = factory.Faker('random_element', elements=list(range(1, 200)))
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory,
+        batch=factory.SelfAttribute('..batch')
+    )
     country_group = factory.SubFactory(SPIRECountryGroupFactory)
 
     @factory.lazy_attribute
@@ -327,7 +333,11 @@ class SPIREMediaFootnoteDetailFactory(BaseFactory):
 class SPIREFootnoteEntryFactory(BaseFactory):
     batch = factory.SubFactory(SPIREBatchFactory)
     footnote = factory.SubFactory(SPIREFootnoteFactory)
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory,
+        batch=factory.SelfAttribute('..batch')
+    )
+
     media_footnote_detail = None
 
     goods_item_id = factory.Faker('random_int', min=1, max=200)
@@ -400,7 +410,10 @@ class SPIREIncidentFactory(BaseFactory):
         'random_element',
         elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL', 'TA_SIEL'],
     )
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory,
+        batch=factory.SelfAttribute('..batch')
+    )
     report_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     status_control = factory.Faker('random_element', elements=['A', 'C'])
     version_no = factory.Faker('random_int', min=0, max=3)
@@ -500,7 +513,10 @@ class SPIREReturnFactory(BaseFactory):
 
 
 class SPIREThirdPartyFactory(BaseFactory):
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory,
+        batch=factory.SelfAttribute('..batch')
+    )
     batch = factory.SubFactory(SPIREBatchFactory)
     country_id = factory.Faker('random_int', min=1, max=200)
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
@@ -520,7 +536,10 @@ class SPIREThirdPartyFactory(BaseFactory):
 
 
 class SPIREUltimateEndUserFactory(BaseFactory):
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory,
+        batch=factory.SelfAttribute('..batch')
+    )
     batch = factory.SubFactory(SPIREBatchFactory)
     country_id = factory.Faker('random_int', min=1, max=200)
     status_control = factory.Faker('random_element', elements=['A', 'C', 'P', 'D'])
