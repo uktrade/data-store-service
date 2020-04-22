@@ -105,7 +105,16 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
         drop_existing = not self.options.continue_transform
         self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=drop_existing)
         self._l0_to_l1()
+        self.create_indices()
         self.finish_processing()
+
+    def create_indices(self):
+        for field in ['product', 'reporter', 'partner', 'year']:
+            stmt = f"""
+                CREATE INDEX IF NOT EXISTS "{self.L1_TABLE}.temp_{field}_idx"
+                ON {self._l1_temp_table} USING hash ({field});
+            """
+            self.dbi.execute_statement(stmt, raise_if_fail=True)
 
     def finish_processing(self):
         # swap tables to minimize api downtime
@@ -241,11 +250,11 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                     select * from {self._fq(self.tariffs_with_eu_reporter_rates_vn)}
                     where product = '{product}'
                 ) t1
-                full join (
+                left join (
                     select * from {self._fq(self.eu_partner_rates_vn)}
                     where product = '{product}'
                 ) t2 using (product, year, reporter, eu_part)
-                full join (
+                left join (
                     select * from {self._fq(self.tariffs_with_world_partner_rates_vn)}
                     where product = '{product}'
                 ) t3 using (product, year, partner, reporter)
@@ -783,7 +792,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                 t2.eu_part,
                 eu_rep_rate
             from all_tariffs t1
-            full join {self._fq(self.eu_reporter_rates_vn)} t2
+            left join {self._fq(self.eu_reporter_rates_vn)} t2
                 using (product, year, reporter, partner)
         )
         """

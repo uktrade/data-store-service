@@ -102,20 +102,58 @@ class TestWorldBankTariffPipeline:
         add_dit_eu_country_membership(eu_country_memberships)
         add_world_bank_bound_rates(bound_rates)
 
-    def test_pipeline(self):
+    def test_pipeline(self, add_dit_baci):
+        add_dit_baci(
+            [
+                {
+                    'id': 1,
+                    'year': 2018,
+                    'product_category': 201,
+                    'exporter': 381,
+                    'importer': 705,
+                    'trade_flow_value': 0,
+                    'quantity': 0,
+                }
+            ]
+        )
         pipeline = WorldBankTariffPipeline(self.dbi, force=True)
         fi = FileInfo.from_path(file_1)
         pipeline.process(fi)
 
         # check L0
-        expected_rows = [(48, 1999, 201, 0, 'AHS', 5.0, 20,)]
-
-        assert rows_equal_table(self.dbi, expected_rows, pipeline._l0_table, pipeline, top_rows=1)
+        expected_rows = [
+            (48, 1999, 201, 0, 'AHS', 5.0, 20),
+            (262, 2005, 201, 380, 'BND', 40.0, 40),
+            (266, 1998, 201, 0, 'AHS', 20.0, 20),
+        ]
+        assert rows_equal_table(self.dbi, expected_rows, pipeline._l0_table, pipeline)
 
         # check L1
         pipeline = WorldBankTariffTransformPipeline(self.dbi, force=True)
         pipeline.process()
-        assert rows_equal_table(self.dbi, [], pipeline._l1_table, pipeline, top_rows=1)
+        expected_rows = [(201, 'SVN', 'ITA', 2018, None, None, None, None, None, None, None, None)]
+        assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
+
+        # check second run with different baci updates L1
+        add_dit_baci(
+            [
+                {
+                    'id': 2,
+                    'year': 2018,
+                    'product_category': 201,
+                    'exporter': 36,
+                    'importer': 705,
+                    'trade_flow_value': 0,
+                    'quantity': 0,
+                }
+            ]
+        )
+        pipeline.process()
+        expected_rows = [
+            (201, 'SVN', 'AUS', 2018, None, None, None, None, None, None, None, None),
+            (201, 'SVN', 'ITA', 2018, None, None, None, None, None, None, None, None),
+        ]
+        assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
 
     @pytest.mark.parametrize(
         'file_name,baci,required_countries,only_products,expected_rows',
@@ -151,8 +189,8 @@ class TestWorldBankTariffPipeline:
                         'id': 1,
                         'year': 2017,
                         'product_category': 201,
-                        'exporter': 36,
-                        'importer': 705,
+                        'exporter': 36,  # partner: AUS
+                        'importer': 705,  # reporter: SVN
                         'trade_flow_value': 0,
                         'quantity': 0,
                     },
@@ -160,8 +198,17 @@ class TestWorldBankTariffPipeline:
                         'id': 2,
                         'year': 2017,
                         'product_category': 201,
-                        'exporter': 36,
-                        'importer': 724,
+                        'exporter': 36,  # partner: AUS
+                        'importer': 724,  # reporter: ESP
+                        'trade_flow_value': 0,
+                        'quantity': 0,
+                    },
+                    {
+                        'id': 3,
+                        'year': 2017,
+                        'product_category': 201,
+                        'exporter': 705,  # partner: SVN
+                        'importer': 724,  # reporter: ESP
                         'trade_flow_value': 0,
                         'quantity': 0,
                     },
@@ -180,8 +227,8 @@ class TestWorldBankTariffPipeline:
                     # EU - EU has zero rate
                     (201, 'SVN', 'AUS', 2017, 20, 20, None, None, 81.96, None, 20, 20),
                     # app has precedence on eu_rep_rate, eu_part_rate and world_average
-                    (201, 'SVN', 'ESP', 2017, 0.0, None, None, None, 0.0, None, 20.0, 20.0),
-                    # EU - EU has zero rate
+                    # (201, 'SVN', 'ESP', 2017, 0.0, None, None, None, 0.0, None, 20.0, 20.0),
+                    # excluded because not in baci spine
                 ],
             ),
             (
@@ -231,12 +278,12 @@ class TestWorldBankTariffPipeline:
                 [
                     (201, 'AGO', 'BRA', 2017, 5.0, None, 5.0, None, None, None, 10.0, 15.5),
                     # mfn_rate used from AGO - WLD
-                    (201, 'AGO', 'DZA', 2017, 5.0, None, 5.0, None, None, None, 10.0, 15.5),
-                    # expanded to include required country and mfn_rate used from  AGO - WLD
+                    # (201, 'AGO', 'DZA', 2017, 5.0, None, 5.0, None, None, None, 10.0, 15.5),
+                    # excluded because not present in baci spine
                     (201, 'AGO', 'ZAF', 2017, 10.0, 10.0, 5.0, None, None, None, 10.0, 15.5),
                     # app rate has precedence on mfn_rate
-                    (201, 'DZA', 'AGO', 2017, 30.0, None, 30.0, None, None, None, 21.0, 15.5),
-                    # expanded to include required country and mfn_rate used from  AGO - WLD
+                    # (201, 'DZA', 'AGO', 2017, 30.0, None, 30.0, None, None, None, 21.0, 15.5),
+                    # excluded because not present in baci spine
                     (201, 'DZA', 'BRA', 2017, 21.0, 21.0, 30.0, None, None, None, 21.0, 15.5),
                     # app rate has precedence on mfn_rate
                     (201, 'DZA', 'ZAF', 2017, 30.0, None, 30.0, None, None, None, 21.0, 15.5),
