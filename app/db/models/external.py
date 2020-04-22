@@ -287,7 +287,7 @@ class SPIREBatch(BaseModel):
     staging_date = _col(_dt)
 
     application_countries = _relationship('SPIREApplicationCountry', backref='batch')
-    application = _relationship('SPIREApplication', backref='batch')
+    applications = _relationship('SPIREApplication', backref='batch')
     goods_incidents = _relationship('SPIREGoodsIncident', backref='batch')
     footnote_entries = _relationship('SPIREFootnoteEntry', backref='batch')
     incidents = _relationship('SPIREIncident', backref='batch')
