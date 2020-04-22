@@ -399,7 +399,7 @@ def schema_upgrades():
             )
             OR
             (
-                licence_type != 'OGL' AND ogl_id IS NULL
+                licence_type != 'OGEL' AND ogl_id IS NULL
             )
         """,
         schema=quoted_name('spire', quote=True),
