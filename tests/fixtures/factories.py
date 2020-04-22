@@ -86,9 +86,7 @@ class SPIREBatchFactory(BaseFactory):
     @factory.lazy_attribute
     def start_date(self):
         if self.batch_ref[0] != 'C':
-            return factory.Faker(
-                'date_between', start_date='-2y', end_date='-1y'
-            ).generate({})
+            return factory.Faker('date_between', start_date='-2y', end_date='-1y').generate({})
 
     @factory.lazy_attribute
     def end_date(self):
