@@ -5,6 +5,7 @@ from flask import current_app as app
 from sqlalchemy.orm.scoping import scoped_session
 
 from app.db.models.external import (
+    BaseModel,
     SPIREApplication,
     SPIREApplicationAmendment,
     SPIREApplicationCountry,
@@ -37,6 +38,14 @@ def get_session():
     return app.db.session
 
 
+def set_pk(model: BaseModel, field: str) -> int:
+    order = getattr(model, field)
+    last = model.query.order_by(order.desc()).first()
+    if last:
+        return getattr(last, field) + 1
+    return 1
+
+
 class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         abstract = True
@@ -54,12 +63,7 @@ class SPIRECountryGroupEntryFactory(BaseFactory):
 
     @factory.lazy_attribute
     def country_id(self):
-        last = SPIRECountryGroupEntry.query.order_by(
-            SPIRECountryGroupEntry.country_id.desc()
-        ).first()
-        if last:
-            return last.country_id + 1
-        return 1
+        return set_pk(SPIRECountryGroupEntry, 'country_id')
 
     class Meta:
         model = SPIRECountryGroupEntry
@@ -151,8 +155,10 @@ class SPIREApplicationFactory(BaseFactory):
 
 class SPIREApplicationCountryFactory(BaseFactory):
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
-    application = factory.SubFactory(SPIREApplicationFactory)
     batch = factory.SubFactory(SPIREBatchFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
+    )
 
     @factory.lazy_attribute
     def report_date(self):
@@ -160,12 +166,7 @@ class SPIREApplicationCountryFactory(BaseFactory):
 
     @factory.lazy_attribute
     def country_id(self):
-        last = SPIREApplicationCountry.query.order_by(
-            SPIREApplicationCountry.country_id.desc()
-        ).first()
-        if last:
-            return last.country_id + 1
-        return 1
+        return set_pk(SPIREApplicationCountry, 'country_id')
 
     class Meta:
         model = SPIREApplicationCountry
@@ -185,12 +186,7 @@ class SPIREApplicationAmendmentFactory(BaseFactory):
 
     @factory.lazy_attribute
     def ela_id(self):
-        last = SPIREApplicationAmendment.query.order_by(
-            SPIREApplicationAmendment.ela_id.desc()
-        ).first()
-        if last:
-            return last.ela_id + 1
-        return 1
+        return set_pk(SPIREApplicationAmendment, 'ela_id')
 
     class Meta:
         model = SPIREApplicationAmendment
@@ -205,7 +201,9 @@ class SPIREGoodsIncidentFactory(BaseFactory):
     inc_id = factory.Faker('random_element', elements=list(range(1, 200)))
     goods_item_id = factory.Faker('random_element', elements=list(range(1, 200)))
     dest_country_id = factory.Faker('random_element', elements=list(range(1, 200)))
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
+    )
     country_group = factory.SubFactory(SPIRECountryGroupFactory)
 
     @factory.lazy_attribute
@@ -260,7 +258,7 @@ class SPIRERefDoNotReportValueFactory(BaseFactory):
 
 class SPIREReasonForRefusalFactory(BaseFactory):
     goods_incident = factory.SubFactory(SPIREGoodsIncidentFactory)
-    reason_for_refusal = factory.Faker('word')
+    reason_for_refusal = factory.Faker('sentence', nb_words=8, variable_nb_words=False)
 
     class Meta:
         model = SPIREReasonForRefusal
@@ -295,10 +293,7 @@ class SPIREEndUserFactory(BaseFactory):
 
     @factory.lazy_attribute
     def eu_id(self):
-        last = SPIREEndUser.query.order_by(SPIREEndUser.eu_id.desc()).first()
-        if last:
-            return last.eu_id + 1
-        return 1
+        return set_pk(SPIREEndUser, 'eu_id')
 
     class Meta:
         model = SPIREEndUser
@@ -327,7 +322,10 @@ class SPIREMediaFootnoteDetailFactory(BaseFactory):
 class SPIREFootnoteEntryFactory(BaseFactory):
     batch = factory.SubFactory(SPIREBatchFactory)
     footnote = factory.SubFactory(SPIREFootnoteFactory)
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
+    )
+
     media_footnote_detail = None
 
     goods_item_id = factory.Faker('random_int', min=1, max=200)
@@ -339,10 +337,7 @@ class SPIREFootnoteEntryFactory(BaseFactory):
 
     @factory.lazy_attribute
     def fne_id(self):
-        last = SPIREFootnoteEntry.query.order_by(SPIREFootnoteEntry.fne_id.desc()).first()
-        if last:
-            return last.fne_id + 1
-        return 1
+        return set_pk(SPIREFootnoteEntry, 'fne_id')
 
     @factory.lazy_attribute
     def mf_free_text(self):
@@ -400,7 +395,9 @@ class SPIREIncidentFactory(BaseFactory):
         'random_element',
         elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL', 'TA_SIEL'],
     )
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
+    )
     report_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     status_control = factory.Faker('random_element', elements=['A', 'C'])
     version_no = factory.Faker('random_int', min=0, max=3)
@@ -435,10 +432,7 @@ class SPIREIncidentFactory(BaseFactory):
 
     @factory.lazy_attribute
     def inc_id(self):
-        last = SPIREIncident.query.order_by(SPIREIncident.inc_id.desc()).first()
-        if last:
-            return last.inc_id + 1
-        return 1
+        return set_pk(SPIREIncident, 'inc_id')
 
     @factory.lazy_attribute
     def case_sub_type(self):
@@ -484,10 +478,7 @@ class SPIREReturnFactory(BaseFactory):
 
     @factory.lazy_attribute
     def elr_id(self):
-        last = SPIREReturn.query.order_by(SPIREReturn.elr_id.desc()).first()
-        if last:
-            return last.elr_id + 1
-        return 1
+        return set_pk(SPIREReturn, 'elr_id')
 
     @factory.lazy_attribute
     def ogl_id(self):
@@ -500,7 +491,9 @@ class SPIREReturnFactory(BaseFactory):
 
 
 class SPIREThirdPartyFactory(BaseFactory):
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
+    )
     batch = factory.SubFactory(SPIREBatchFactory)
     country_id = factory.Faker('random_int', min=1, max=200)
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
@@ -510,17 +503,16 @@ class SPIREThirdPartyFactory(BaseFactory):
 
     @factory.lazy_attribute
     def tp_id(self):
-        last = SPIREThirdParty.query.order_by(SPIREThirdParty.tp_id.desc()).first()
-        if last:
-            return last.tp_id + 1
-        return 1
+        return set_pk(SPIREThirdParty, 'tp_id')
 
     class Meta:
         model = SPIREThirdParty
 
 
 class SPIREUltimateEndUserFactory(BaseFactory):
-    application = factory.SubFactory(SPIREApplicationFactory)
+    application = factory.SubFactory(
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
+    )
     batch = factory.SubFactory(SPIREBatchFactory)
     country_id = factory.Faker('random_int', min=1, max=200)
     status_control = factory.Faker('random_element', elements=['A', 'C', 'P', 'D'])
@@ -529,10 +521,7 @@ class SPIREUltimateEndUserFactory(BaseFactory):
 
     @factory.lazy_attribute
     def ueu_id(self):
-        last = SPIREUltimateEndUser.query.order_by(SPIREUltimateEndUser.ueu_id.desc()).first()
-        if last:
-            return last.ueu_id + 1
-        return 1
+        return set_pk(SPIREUltimateEndUser, 'ueu_id')
 
     class Meta:
         model = SPIREUltimateEndUser
