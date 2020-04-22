@@ -364,15 +364,14 @@ class SPIREMediaFootnoteCountryFactory(BaseFactory):
     mf_grp_id = factory.Faker('random_element', elements=[1, 2, 3])
     country_id = factory.Faker('random_int', min=1, max=200)
     country_name = factory.Faker('word')
-    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    status_control = factory.Faker('random_element', elements=['C', None])
     start_datetime = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
 
     @factory.lazy_attribute
     def end_datetime(self):
         if self.status_control == 'C':
             return
-        if not self.status_control:
-            return factory.Faker('date_between', start_date=self.start_datetime).generate({})
+        return factory.Faker('date_between', start_date=self.start_datetime).generate({})
 
     class Meta:
         model = SPIREMediaFootnoteCountry
