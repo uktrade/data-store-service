@@ -35,10 +35,6 @@ class DataPipeline(metaclass=ABCMeta):
 
     """
 
-    L0_TABLE = 'L0'
-    L1_TABLE = 'L1'
-    L2_TABLE = 'L2'
-
     def set_option_defaults(self, options):
         options.setdefault('force', False)
         return options
@@ -46,13 +42,6 @@ class DataPipeline(metaclass=ABCMeta):
     def get_options(self, options):
         options = self.set_option_defaults(options)
         return namedtuple('Options', options.keys())(*options.values())
-
-    @property
-    def l1_helper_columns(self):
-        return [
-            ('id', 'serial primary key'),  # primary key
-            ('data_source_row_id', 'int'),  # reference to L0 id column
-        ]
 
     def __init__(self, dbi, **kwargs):
         self.dbi = dbi
@@ -120,3 +109,17 @@ class DataPipeline(metaclass=ABCMeta):
         if table[0] == table[-1] == '"':
             return table
         return f'"{self.schema}"."{table}"'
+
+
+class LDataPipeline(DataPipeline, metaclass=ABCMeta):
+
+    L0_TABLE = 'L0'
+    L1_TABLE = 'L1'
+    L2_TABLE = 'L2'
+
+    @property
+    def l1_helper_columns(self):
+        return [
+            ('id', 'serial primary key'),  # primary key
+            ('data_source_row_id', 'int'),  # reference to L0 id column
+        ]

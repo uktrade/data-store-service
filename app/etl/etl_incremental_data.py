@@ -1,9 +1,9 @@
 from abc import abstractmethod
 
-from app.etl.etl_base import DataPipeline
+from app.etl.etl_base import LDataPipeline
 
 
-class IncrementalDataPipeline(DataPipeline):
+class IncrementalDataPipeline(LDataPipeline):
     """ Abstract class for standard pipelines that ingests data incrementally
     (i.e. not snapshot data)
 
