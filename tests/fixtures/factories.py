@@ -73,7 +73,6 @@ class SPIRERefCountryMappingFactory(BaseFactory):
 
 
 class SPIREBatchFactory(BaseFactory):
-    start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     approve_date = factory.Faker('date_time_between', start_date='-1y')
     status = factory.Faker('random_element', elements=['RELEASED', 'STAGING'])
 
@@ -85,10 +84,17 @@ class SPIREBatchFactory(BaseFactory):
         return batch_ref
 
     @factory.lazy_attribute
-    def end_date(self):
-        if self.start_date and self.approve_date:
+    def start_date(self):
+        if self.batch_ref[0] != 'C':
             return factory.Faker(
-                'date_time_between', start_date=self.start_date, end_date=self.approve_date
+                'date_between', start_date='-2y', end_date='-1y'
+            ).generate({})
+
+    @factory.lazy_attribute
+    def end_date(self):
+        if self.batch_ref[0] != 'C' and self.start_date and self.approve_date:
+            return factory.Faker(
+                'date_between', start_date=self.start_date, end_date=self.approve_date
             ).generate({})
 
     @factory.lazy_attribute

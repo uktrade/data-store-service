@@ -93,10 +93,10 @@ def test_batch_check_constraint_1(app_with_migrated_db, status, raise_exception)
 @pytest.mark.parametrize(
     'batch_ref,start_date,end_date,raise_exception',
     (
-        ('10', None, None, None),
-        ('10', datetime.datetime(2020, 1, 1), datetime.datetime(2020, 2, 1), None,),
-        ('C10', None, None, True),
-        ('10', datetime.datetime(2020, 1, 1), None, True,),
+        ('10', None, None, True),
+        ('10', datetime.datetime(2020, 1, 1), datetime.datetime(2020, 2, 1), False),
+        ('C10', None, None, False),
+        ('10', datetime.datetime(2020, 1, 1), None, True),
     ),
 )
 def test_batch_check_constraint_2(
