@@ -63,9 +63,9 @@ class TestPopulateSpireCommand:
         # Footnotes
         assert SPIREFootnote.query.count() == 2
         assert SPIREFootnoteEntry.query.count() == 1
-        assert SPIREMediaFootnote.query.count() == 3
+        assert SPIREMediaFootnote.query.count() == 2
         assert SPIREMediaFootnoteCountry.query.count() == 1
-        assert SPIREMediaFootnoteDetail.query.count() == 2
+        assert SPIREMediaFootnoteDetail.query.count() == 1
 
         # Misc
         assert SPIRERefDoNotReportValue.query.count() == 1
