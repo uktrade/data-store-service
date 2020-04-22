@@ -21,6 +21,7 @@ from tests.fixtures.factories import (
 def test_application_fk_constraint(app_with_migrated_db):
     with pytest.raises(IntegrityError):
         SPIREApplicationFactory(batch=None)
+    app_with_migrated_db.db.session.rollback()
 
 
 @pytest.mark.parametrize('case_type,raise_exception', (('HELLO', True), ('OIEL', False),))
@@ -28,6 +29,7 @@ def test_application_check_constraint_1(app_with_migrated_db, case_type, raise_e
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREApplicationFactory(case_type=case_type)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREApplicationFactory(case_type=case_type)
 
@@ -59,6 +61,7 @@ def test_application_check_constraint_2(
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREApplicationFactory(case_type=case_type, case_sub_type=case_sub_type)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREApplicationFactory(case_type=case_type, case_sub_type=case_sub_type)
 
@@ -70,6 +73,7 @@ def test_application_check_constraint_3(app_with_migrated_db, withheld_status, r
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREApplicationFactory(withheld_status=withheld_status)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREApplicationFactory(withheld_status=withheld_status)
 
@@ -81,6 +85,7 @@ def test_batch_check_constraint_1(app_with_migrated_db, status, raise_exception)
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREBatchFactory(status=status)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREBatchFactory(status=status)
 
@@ -102,6 +107,7 @@ def test_batch_check_constraint_2(
     else:
         with pytest.raises(IntegrityError):
             SPIREBatchFactory(batch_ref=batch_ref, start_date=start_date, end_date=end_date)
+        app_with_migrated_db.db.session.rollback()
 
 
 @pytest.mark.parametrize(
@@ -112,6 +118,7 @@ def test_footnotes_check_constraint(app_with_migrated_db, status, raise_exceptio
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREFootnoteFactory(status=status)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREFootnoteFactory(status=status)
 
@@ -136,6 +143,7 @@ def test_footnote_entries_check_constraint_1(
             SPIREFootnoteEntryFactory(
                 goods_item_id=goods_item_id, country_id=country_id, fnr_id=fnr_id
             )
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREFootnoteEntryFactory(goods_item_id=goods_item_id, country_id=country_id, fnr_id=fnr_id)
 
@@ -148,6 +156,7 @@ def test_footnote_entries_check_constraint_2(app_with_migrated_db, version_no, r
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREFootnoteEntryFactory(version_no=version_no)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREFootnoteEntryFactory(version_no=version_no)
 
@@ -182,6 +191,7 @@ def test_footnote_entries_check_constraint_3(
                 media_footnote_detail=media_footnote_detail,
                 mf_free_text=mf_free_text,
             )
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREFootnoteEntryFactory(
             footnote=footnote,
@@ -206,6 +216,7 @@ def test_goods_incident_check_constraint_1(app_with_migrated_db, _type, raise_ex
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREGoodsIncidentFactory(type=_type)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREGoodsIncidentFactory(type=_type)
 
@@ -218,6 +229,7 @@ def test_goods_incident_check_constraint_2(app_with_migrated_db, version_no, rai
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREGoodsIncidentFactory(version_no=version_no)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREGoodsIncidentFactory(version_no=version_no)
 
@@ -236,6 +248,7 @@ def test_incident_check_constraint_1(app_with_migrated_db, status, raise_excepti
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(status=status)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(status=status)
 
@@ -248,6 +261,7 @@ def test_incident_check_constraint_2(app_with_migrated_db, version_no, raise_exc
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(version_no=version_no)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(version_no=version_no)
 
@@ -260,6 +274,7 @@ def test_incident_check_constraint_3(app_with_migrated_db, case_type, ogl_id, ra
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(case_type=case_type, ogl_id=ogl_id)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(case_type=case_type, ogl_id=ogl_id)
 
@@ -272,6 +287,7 @@ def test_incident_check_constraint_4(app_with_migrated_db, temporary_licence_fla
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(temporary_licence_flag=temporary_licence_flag)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(temporary_licence_flag=temporary_licence_flag)
 
@@ -284,6 +300,7 @@ def test_incident_check_constraint_5(app_with_migrated_db, _type, licence_id, ra
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(type=_type, licence_id=licence_id)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(type=_type, licence_id=licence_id)
 
@@ -296,6 +313,7 @@ def test_incident_check_constraint_6(app_with_migrated_db, _type, else_id, raise
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(type=_type, else_id=else_id)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(type=_type, else_id=else_id)
 
@@ -317,6 +335,7 @@ def test_incident_check_constraint_7(app_with_migrated_db, _type, raise_exceptio
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(type=_type)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(type=_type)
 
@@ -339,6 +358,7 @@ def test_incident_check_constraint_8(app_with_migrated_db, case_type, raise_exce
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(case_type=case_type)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(case_type=case_type)
 
@@ -370,6 +390,7 @@ def test_incident_check_constraint_9(
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(case_type=case_type, case_sub_type=case_sub_type)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(case_type=case_type, case_sub_type=case_sub_type)
 
@@ -384,6 +405,7 @@ def test_incident_check_constraint_10(
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(licence_conversion_flag=licence_conversion_flag)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(licence_conversion_flag=licence_conversion_flag)
 
@@ -396,6 +418,7 @@ def test_incident_check_constraint_11(app_with_migrated_db, incorporation_flag, 
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(incorporation_flag=incorporation_flag)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(incorporation_flag=incorporation_flag)
 
@@ -408,6 +431,7 @@ def test_incident_check_constraint_12(app_with_migrated_db, mil_flag, raise_exce
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(mil_flag=mil_flag)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(mil_flag=mil_flag)
 
@@ -420,6 +444,7 @@ def test_incident_check_constraint_13(app_with_migrated_db, other_flag, raise_ex
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(other_flag=other_flag)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(other_flag=other_flag)
 
@@ -432,6 +457,7 @@ def test_incident_check_constraint_14(app_with_migrated_db, torture_flag, raise_
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(torture_flag=torture_flag)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREIncidentFactory(torture_flag=torture_flag)
 
@@ -454,6 +480,7 @@ def test_media_footnote_countries_check_1(
             SPIREMediaFootnoteCountryFactory(
                 status_control=status_control, end_datetime=end_datetime
             )
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREMediaFootnoteCountryFactory(status_control=status_control, end_datetime=end_datetime)
 
@@ -476,6 +503,7 @@ def test_media_footnote_detail_check_1(
             SPIREMediaFootnoteDetailFactory(
                 status_control=status_control, end_datetime=end_datetime
             )
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREMediaFootnoteDetailFactory(status_control=status_control, end_datetime=end_datetime)
 
@@ -487,6 +515,7 @@ def test_media_footnote_detail_check_2(app_with_migrated_db, footnote_type, rais
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREMediaFootnoteDetailFactory(footnote_type=footnote_type)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREMediaFootnoteDetailFactory(footnote_type=footnote_type)
 
@@ -499,6 +528,7 @@ def test_return_check_constraint_1(app_with_migrated_db, elr_version, raise_exce
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREReturnFactory(elr_version=elr_version)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREReturnFactory(elr_version=elr_version)
 
@@ -510,6 +540,7 @@ def test_return_check_constraint_2(app_with_migrated_db, status, raise_exception
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREReturnFactory(status=status)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREReturnFactory(status=status)
 
@@ -522,6 +553,7 @@ def test_return_check_constraint_3(app_with_migrated_db, status_control, raise_e
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREReturnFactory(status_control=status_control)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREReturnFactory(status_control=status_control)
 
@@ -543,6 +575,7 @@ def test_return_check_constraint_4_and_5(
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREReturnFactory(licence_type=licence_type, ogl_id=ogl_id)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREReturnFactory(licence_type=licence_type, ogl_id=ogl_id),
 
@@ -564,6 +597,7 @@ def test_third_party_check_constraint_1(
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREThirdPartyFactory(ultimate_end_user_flag=ultimate_end_user_flag)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREThirdPartyFactory(ultimate_end_user_flag=ultimate_end_user_flag)
 
@@ -576,6 +610,7 @@ def test_third_party_check_constraint_2(app_with_migrated_db, version_no, raise_
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREThirdPartyFactory(version_no=version_no)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREThirdPartyFactory(version_no=version_no)
 
@@ -588,6 +623,7 @@ def test_ultimate_end_user_check_constraint_1(app_with_migrated_db, version_no, 
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREUltimateEndUserFactory(version_no=version_no)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREUltimateEndUserFactory(version_no=version_no)
 
@@ -602,5 +638,6 @@ def test_ultimate_end_user_check_constraint_2(
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREUltimateEndUserFactory(status_control=status_control)
+        app_with_migrated_db.db.session.rollback()
     else:
         SPIREUltimateEndUserFactory(status_control=status_control)

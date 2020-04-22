@@ -9,7 +9,7 @@ pytest_plugins = [
 ]
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='module')
 def app_with_migrated_db(app):
     app.db.session.close_all()
     app.db.engine.dispose()
