@@ -1,12 +1,13 @@
 import datetime
+
 import pytest
-from sqlalchemy.exc import IntegrityError, DataError
+from sqlalchemy.exc import DataError, IntegrityError
 
 from tests.fixtures.factories import (
     SPIREApplicationFactory,
     SPIREBatchFactory,
-    SPIREFootnoteFactory,
     SPIREFootnoteEntryFactory,
+    SPIREFootnoteFactory,
     SPIREGoodsIncidentFactory,
     SPIREIncidentFactory,
     SPIREMediaFootnoteCountryFactory,
@@ -22,13 +23,7 @@ def test_application_fk_constraint(app_with_migrated_db):
         SPIREApplicationFactory(batch=None)
 
 
-@pytest.mark.parametrize(
-    'case_type,raise_exception',
-    (
-        ('HELLO', True),
-        ('OIEL', False),
-    )
-)
+@pytest.mark.parametrize('case_type,raise_exception', (('HELLO', True), ('OIEL', False),))
 def test_application_check_constraint_1(app_with_migrated_db, case_type, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
@@ -56,9 +51,11 @@ def test_application_check_constraint_1(app_with_migrated_db, case_type, raise_e
         ('TA_SIEL', None, False),
         ('TA_OIEL', None, False),
         ('GPL', 'MEDIA', True),
-    )
+    ),
 )
-def test_application_check_constraint_2(app_with_migrated_db, case_type, case_sub_type, raise_exception):
+def test_application_check_constraint_2(
+    app_with_migrated_db, case_type, case_sub_type, raise_exception
+):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREApplicationFactory(case_type=case_type, case_sub_type=case_sub_type)
@@ -67,12 +64,7 @@ def test_application_check_constraint_2(app_with_migrated_db, case_type, case_su
 
 
 @pytest.mark.parametrize(
-    'withheld_status,raise_exception',
-    (
-        ('HELLO', True),
-        ('PENDING', False),
-        ('WITHHELD', False),
-    )
+    'withheld_status,raise_exception', (('HELLO', True), ('PENDING', False), ('WITHHELD', False),)
 )
 def test_application_check_constraint_3(app_with_migrated_db, withheld_status, raise_exception):
     if raise_exception:
@@ -83,12 +75,7 @@ def test_application_check_constraint_3(app_with_migrated_db, withheld_status, r
 
 
 @pytest.mark.parametrize(
-    'status,raise_exception',
-    (
-        ('HELLO', True),
-        ('RELEASED', False),
-        ('STAGING', False),
-    )
+    'status,raise_exception', (('HELLO', True), ('RELEASED', False), ('STAGING', False),)
 )
 def test_batch_check_constraint_1(app_with_migrated_db, status, raise_exception):
     if raise_exception:
@@ -101,21 +88,15 @@ def test_batch_check_constraint_1(app_with_migrated_db, status, raise_exception)
 @pytest.mark.parametrize(
     'batch_ref,start_date,end_date,raise_exception',
     (
-        (
-            '10', None, None, None
-        ),
-        (
-            '10', datetime.datetime(2020, 1, 1), datetime.datetime(2020, 2, 1), None,
-        ),
-        (
-            'C10', None, None, True
-        ),
-        (
-            '10', datetime.datetime(2020, 1, 1), None, True,
-        )
-    )
+        ('10', None, None, None),
+        ('10', datetime.datetime(2020, 1, 1), datetime.datetime(2020, 2, 1), None,),
+        ('C10', None, None, True),
+        ('10', datetime.datetime(2020, 1, 1), None, True,),
+    ),
 )
-def test_batch_check_constraint_2(app_with_migrated_db, batch_ref, start_date, end_date, raise_exception):
+def test_batch_check_constraint_2(
+    app_with_migrated_db, batch_ref, start_date, end_date, raise_exception
+):
     if not raise_exception:
         SPIREBatchFactory(batch_ref=batch_ref, start_date=start_date, end_date=end_date)
     else:
@@ -125,12 +106,7 @@ def test_batch_check_constraint_2(app_with_migrated_db, batch_ref, start_date, e
 
 @pytest.mark.parametrize(
     'status,raise_exception',
-    (
-        ('HELLO', True),
-        ('CURRENT', False),
-        ('DELETED', False),
-        ('ARCHIVED', False),
-    )
+    (('HELLO', True), ('CURRENT', False), ('DELETED', False), ('ARCHIVED', False),),
 )
 def test_footnotes_check_constraint(app_with_migrated_db, status, raise_exception):
     if raise_exception:
@@ -150,7 +126,7 @@ def test_footnotes_check_constraint(app_with_migrated_db, status, raise_exceptio
         (1, 1, 1, True),
         (1, None, 1, True),
         (1, 1, None, True),
-    )
+    ),
 )
 def test_footnote_entries_check_constraint_1(
     app_with_migrated_db, goods_item_id, country_id, footnote, raise_exception
@@ -163,23 +139,19 @@ def test_footnote_entries_check_constraint_1(
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREFootnoteEntryFactory(
-                goods_item_id=goods_item_id, country_id=country_id, footnote=footnote)
+                goods_item_id=goods_item_id, country_id=country_id, footnote=footnote
+            )
     else:
-        SPIREFootnoteEntryFactory(goods_item_id=goods_item_id, country_id=country_id, footnote=footnote)
+        SPIREFootnoteEntryFactory(
+            goods_item_id=goods_item_id, country_id=country_id, footnote=footnote
+        )
 
 
 @pytest.mark.parametrize(
     'version_no,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), ('HELLO', DataError)),
 )
-def test_footnote_entries_check_constraint_2(
-    app_with_migrated_db, version_no, raise_exception
-):
+def test_footnote_entries_check_constraint_2(app_with_migrated_db, version_no, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREFootnoteEntryFactory(version_no=version_no)
@@ -205,11 +177,13 @@ def test_footnote_entries_check_constraint_3(
 ):
     if raise_exception:
         with pytest.raises(IntegrityError):
-            SPIREFootnoteEntryFactory(fn_id=fn_id, mf_grp_id=mf_grp_id, mfd_id=mfd_id,
-                                      mf_free_text=mf_free_text)
+            SPIREFootnoteEntryFactory(
+                fn_id=fn_id, mf_grp_id=mf_grp_id, mfd_id=mfd_id, mf_free_text=mf_free_text
+            )
     else:
-        SPIREFootnoteEntryFactory(fn_id=fn_id, mf_grp_id=mf_grp_id, mfd_id=mfd_id,
-                                  mf_free_text=mf_free_text)
+        SPIREFootnoteEntryFactory(
+            fn_id=fn_id, mf_grp_id=mf_grp_id, mfd_id=mfd_id, mf_free_text=mf_free_text
+        )
 
 
 @pytest.mark.parametrize(
@@ -221,7 +195,7 @@ def test_footnote_entries_check_constraint_3(
         ('ISSUE', False),
         ('REVOKE', False),
         ('SURRENDER', False),
-    )
+    ),
 )
 def test_goods_incident_check_constraint_1(app_with_migrated_db, _type, raise_exception):
     if raise_exception:
@@ -233,16 +207,9 @@ def test_goods_incident_check_constraint_1(app_with_migrated_db, _type, raise_ex
 
 @pytest.mark.parametrize(
     'version_no,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), ('HELLO', DataError)),
 )
-def test_goods_incident_check_constraint_2(
-    app_with_migrated_db, version_no, raise_exception
-):
+def test_goods_incident_check_constraint_2(app_with_migrated_db, version_no, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREGoodsIncidentFactory(version_no=version_no)
@@ -258,7 +225,7 @@ def test_goods_incident_check_constraint_2(
         ('STAGING', True),
         ('READY', False),
         ('FOR_ATTENTION', False),
-    )
+    ),
 )
 def test_incident_check_constraint_1(app_with_migrated_db, status, raise_exception):
     if raise_exception:
@@ -270,16 +237,9 @@ def test_incident_check_constraint_1(app_with_migrated_db, status, raise_excepti
 
 @pytest.mark.parametrize(
     'version_no,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), ('HELLO', DataError)),
 )
-def test_incident_check_constraint_2(
-    app_with_migrated_db, version_no, raise_exception
-):
+def test_incident_check_constraint_2(app_with_migrated_db, version_no, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(version_no=version_no)
@@ -289,16 +249,9 @@ def test_incident_check_constraint_2(
 
 @pytest.mark.parametrize(
     'case_type,ogl_id,raise_exception',
-    (
-        ('GPL', None, False),
-        ('OGEL', 1, False),
-        ('OGEL', None, True),
-        ('GPL', 1, True),
-    ),
+    (('GPL', None, False), ('OGEL', 1, False), ('OGEL', None, True), ('GPL', 1, True),),
 )
-def test_incident_check_constraint_3(
-    app_with_migrated_db, case_type, ogl_id, raise_exception
-):
+def test_incident_check_constraint_3(app_with_migrated_db, case_type, ogl_id, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(case_type=case_type, ogl_id=ogl_id)
@@ -308,17 +261,9 @@ def test_incident_check_constraint_3(
 
 @pytest.mark.parametrize(
     'temporary_licence_flag,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        (2, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), (2, IntegrityError), ('HELLO', DataError)),
 )
-def test_incident_check_constraint_4(
-    app_with_migrated_db, temporary_licence_flag, raise_exception
-):
+def test_incident_check_constraint_4(app_with_migrated_db, temporary_licence_flag, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(temporary_licence_flag=temporary_licence_flag)
@@ -328,16 +273,9 @@ def test_incident_check_constraint_4(
 
 @pytest.mark.parametrize(
     '_type,licence_id,raise_exception',
-    (
-        ('REFUSAL', None, False),
-        ('REFUSAL', 1, True),
-        (None, None, True),
-        ('ISSUE', 1, False),
-    ),
+    (('REFUSAL', None, False), ('REFUSAL', 1, True), (None, None, True), ('ISSUE', 1, False),),
 )
-def test_incident_check_constraint_5(
-    app_with_migrated_db, _type, licence_id, raise_exception
-):
+def test_incident_check_constraint_5(app_with_migrated_db, _type, licence_id, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(type=_type, licence_id=licence_id)
@@ -347,16 +285,9 @@ def test_incident_check_constraint_5(
 
 @pytest.mark.parametrize(
     '_type,else_id,raise_exception',
-    (
-        ('SUSPENSION', 1, False),
-        ('SUSPENSION', None, True),
-        (None, None, True),
-        ('ISSUE', 1, True),
-    ),
+    (('SUSPENSION', 1, False), ('SUSPENSION', None, True), (None, None, True), ('ISSUE', 1, True),),
 )
-def test_incident_check_constraint_6(
-    app_with_migrated_db, _type, else_id, raise_exception
-):
+def test_incident_check_constraint_6(app_with_migrated_db, _type, else_id, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(type=_type, else_id=else_id)
@@ -377,9 +308,7 @@ def test_incident_check_constraint_6(
         ('HELLO', True),
     ),
 )
-def test_incident_check_constraint_7(
-    app_with_migrated_db, _type, raise_exception
-):
+def test_incident_check_constraint_7(app_with_migrated_db, _type, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(type=_type)
@@ -401,9 +330,7 @@ def test_incident_check_constraint_7(
         ('HELLO', True),
     ),
 )
-def test_incident_check_constraint_8(
-    app_with_migrated_db, case_type, raise_exception
-):
+def test_incident_check_constraint_8(app_with_migrated_db, case_type, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(case_type=case_type)
@@ -430,9 +357,11 @@ def test_incident_check_constraint_8(
         ('TA_SIEL', None, False),
         ('TA_OIEL', None, False),
         ('GPL', 'MEDIA', True),
-    )
+    ),
 )
-def test_incident_check_constraint_9(app_with_migrated_db, case_type, case_sub_type, raise_exception):
+def test_incident_check_constraint_9(
+    app_with_migrated_db, case_type, case_sub_type, raise_exception
+):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREIncidentFactory(case_type=case_type, case_sub_type=case_sub_type)
@@ -442,13 +371,7 @@ def test_incident_check_constraint_9(app_with_migrated_db, case_type, case_sub_t
 
 @pytest.mark.parametrize(
     'licence_conversion_flag,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        (2, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), (2, IntegrityError), ('HELLO', DataError)),
 )
 def test_incident_check_constraint_10(
     app_with_migrated_db, licence_conversion_flag, raise_exception
@@ -462,17 +385,9 @@ def test_incident_check_constraint_10(
 
 @pytest.mark.parametrize(
     'incorporation_flag,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        (2, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), (2, IntegrityError), ('HELLO', DataError)),
 )
-def test_incident_check_constraint_11(
-    app_with_migrated_db, incorporation_flag, raise_exception
-):
+def test_incident_check_constraint_11(app_with_migrated_db, incorporation_flag, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(incorporation_flag=incorporation_flag)
@@ -482,17 +397,9 @@ def test_incident_check_constraint_11(
 
 @pytest.mark.parametrize(
     'mil_flag,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        (2, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), (2, IntegrityError), ('HELLO', DataError)),
 )
-def test_incident_check_constraint_12(
-    app_with_migrated_db, mil_flag, raise_exception
-):
+def test_incident_check_constraint_12(app_with_migrated_db, mil_flag, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(mil_flag=mil_flag)
@@ -502,17 +409,9 @@ def test_incident_check_constraint_12(
 
 @pytest.mark.parametrize(
     'other_flag,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        (2, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), (2, IntegrityError), ('HELLO', DataError)),
 )
-def test_incident_check_constraint_13(
-    app_with_migrated_db, other_flag, raise_exception
-):
+def test_incident_check_constraint_13(app_with_migrated_db, other_flag, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(other_flag=other_flag)
@@ -522,17 +421,9 @@ def test_incident_check_constraint_13(
 
 @pytest.mark.parametrize(
     'torture_flag,raise_exception',
-    (
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        (2, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((1, False), (0, False), (-1, IntegrityError), (2, IntegrityError), ('HELLO', DataError)),
 )
-def test_incident_check_constraint_14(
-    app_with_migrated_db, torture_flag, raise_exception
-):
+def test_incident_check_constraint_14(app_with_migrated_db, torture_flag, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREIncidentFactory(torture_flag=torture_flag)
@@ -555,7 +446,9 @@ def test_media_footnote_countries_check_1(
 ):
     if raise_exception:
         with pytest.raises(IntegrityError):
-            SPIREMediaFootnoteCountryFactory(status_control=status_control, end_datetime=end_datetime)
+            SPIREMediaFootnoteCountryFactory(
+                status_control=status_control, end_datetime=end_datetime
+            )
     else:
         SPIREMediaFootnoteCountryFactory(status_control=status_control, end_datetime=end_datetime)
 
@@ -575,22 +468,17 @@ def test_media_footnote_detail_check_1(
 ):
     if raise_exception:
         with pytest.raises(IntegrityError):
-            SPIREMediaFootnoteDetailFactory(status_control=status_control, end_datetime=end_datetime)
+            SPIREMediaFootnoteDetailFactory(
+                status_control=status_control, end_datetime=end_datetime
+            )
     else:
         SPIREMediaFootnoteDetailFactory(status_control=status_control, end_datetime=end_datetime)
 
 
 @pytest.mark.parametrize(
-    'footnote_type,raise_exception',
-    (
-        ('STANDARD', False),
-        ('END_USER', False),
-        ('HELLO', True),
-    ),
+    'footnote_type,raise_exception', (('STANDARD', False), ('END_USER', False), ('HELLO', True),),
 )
-def test_media_footnote_detail_check_2(
-    app_with_migrated_db, footnote_type, raise_exception
-):
+def test_media_footnote_detail_check_2(app_with_migrated_db, footnote_type, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREMediaFootnoteDetailFactory(footnote_type=footnote_type)
@@ -600,17 +488,9 @@ def test_media_footnote_detail_check_2(
 
 @pytest.mark.parametrize(
     'elr_version,raise_exception',
-    (
-        (10, None),
-        (1, None),
-        (0, IntegrityError),
-        (-1, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((10, None), (1, None), (0, IntegrityError), (-1, IntegrityError), ('HELLO', DataError)),
 )
-def test_return_check_constraint_1(
-    app_with_migrated_db, elr_version, raise_exception
-):
+def test_return_check_constraint_1(app_with_migrated_db, elr_version, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREReturnFactory(elr_version=elr_version)
@@ -619,16 +499,9 @@ def test_return_check_constraint_1(
 
 
 @pytest.mark.parametrize(
-    'status,raise_exception',
-    (
-        ('HELLO', True),
-        ('WITHDRAWN', False),
-        ('ACTIVE', False),
-    ),
+    'status,raise_exception', (('HELLO', True), ('WITHDRAWN', False), ('ACTIVE', False),),
 )
-def test_return_check_constraint_2(
-    app_with_migrated_db, status, raise_exception
-):
+def test_return_check_constraint_2(app_with_migrated_db, status, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREReturnFactory(status=status)
@@ -638,17 +511,9 @@ def test_return_check_constraint_2(
 
 @pytest.mark.parametrize(
     'status_control,raise_exception',
-    (
-        ('HELLO', True),
-        ('A', False),
-        ('P', False),
-        ('C', False),
-        ('D', True),
-    ),
+    (('HELLO', True), ('A', False), ('P', False), ('C', False), ('D', True),),
 )
-def test_return_check_constraint_3(
-    app_with_migrated_db, status_control, raise_exception
-):
+def test_return_check_constraint_3(app_with_migrated_db, status_control, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
             SPIREReturnFactory(status_control=status_control)
@@ -685,7 +550,7 @@ def test_return_check_constraint_4_and_5(
         (None, None),
         (-1, IntegrityError),
         (20, IntegrityError),
-        ('HELLO', DataError)
+        ('HELLO', DataError),
     ),
 )
 def test_third_party_check_constraint_1(
@@ -700,17 +565,9 @@ def test_third_party_check_constraint_1(
 
 @pytest.mark.parametrize(
     'version_no,raise_exception',
-    (
-        (56, False),
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((56, False), (1, False), (0, False), (-1, IntegrityError), ('HELLO', DataError)),
 )
-def test_third_party_check_constraint_2(
-    app_with_migrated_db, version_no, raise_exception
-):
+def test_third_party_check_constraint_2(app_with_migrated_db, version_no, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREThirdPartyFactory(version_no=version_no)
@@ -720,17 +577,9 @@ def test_third_party_check_constraint_2(
 
 @pytest.mark.parametrize(
     'version_no,raise_exception',
-    (
-        (56, False),
-        (1, False),
-        (0, False),
-        (-1, IntegrityError),
-        ('HELLO', DataError)
-    ),
+    ((56, False), (1, False), (0, False), (-1, IntegrityError), ('HELLO', DataError)),
 )
-def test_ultimate_end_user_check_constraint_1(
-    app_with_migrated_db, version_no, raise_exception
-):
+def test_ultimate_end_user_check_constraint_1(app_with_migrated_db, version_no, raise_exception):
     if raise_exception:
         with pytest.raises(raise_exception):
             SPIREUltimateEndUserFactory(version_no=version_no)
@@ -740,14 +589,7 @@ def test_ultimate_end_user_check_constraint_1(
 
 @pytest.mark.parametrize(
     'status_control,raise_exception',
-    (
-        ('HELLO', True),
-        ('A', False),
-        ('P', False),
-        ('C', False),
-        ('D', False),
-        ('X', True),
-    ),
+    (('HELLO', True), ('A', False), ('P', False), ('C', False), ('D', False), ('X', True),),
 )
 def test_ultimate_end_user_check_constraint_2(
     app_with_migrated_db, status_control, raise_exception

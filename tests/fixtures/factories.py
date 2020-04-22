@@ -134,24 +134,13 @@ class SPIREApplicationFactory(BaseFactory):
     def case_sub_type(self):
         if self.case_type == 'SIEL':
             return factory.Faker(
-                    'random_element',
-                    elements=[
-                        'PERMANENT',
-                        'TEMPORARY',
-                        'TRANSHIPMENT',
-                    ],
-                ).generate({})
+                'random_element', elements=['PERMANENT', 'TEMPORARY', 'TRANSHIPMENT'],
+            ).generate({})
         if self.case_type == 'OIEL':
             return factory.Faker(
-                    'random_element',
-                    elements=[
-                        'CRYPTO',
-                        'MEDIA',
-                        'DEALER',
-                        'MIL_DUAL',
-                        'UKCONTSHELF',
-                    ],
-                ).generate({})
+                'random_element',
+                elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
+            ).generate({})
 
     class Meta:
         model = SPIREApplication
@@ -453,24 +442,13 @@ class SPIREIncidentFactory(BaseFactory):
     def case_sub_type(self):
         if self.case_type == 'SIEL':
             return factory.Faker(
-                    'random_element',
-                    elements=[
-                        'PERMANENT',
-                        'TEMPORARY',
-                        'TRANSHIPMENT',
-                    ],
-                ).generate({})
+                'random_element', elements=['PERMANENT', 'TEMPORARY', 'TRANSHIPMENT'],
+            ).generate({})
         if self.case_type == 'OIEL':
             return factory.Faker(
-                    'random_element',
-                    elements=[
-                        'CRYPTO',
-                        'MEDIA',
-                        'DEALER',
-                        'MIL_DUAL',
-                        'UKCONTSHELF',
-                    ],
-                ).generate({})
+                'random_element',
+                elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
+            ).generate({})
 
     class Meta:
         model = SPIREIncident
