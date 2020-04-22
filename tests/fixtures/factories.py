@@ -126,9 +126,32 @@ class SPIREApplicationFactory(BaseFactory):
     )
     initial_processing_time = factory.Faker('random_int')
     case_closed_date = factory.Faker('date_this_century')
-    withheld_status = factory.Faker('word')
+    withheld_status = factory.Faker('random_element', elements=['PENDING', 'WITHHELD', None])
     batch = factory.SubFactory(SPIREBatchFactory)
     ela_id = factory.Faker('random_int', min=1, max=50)
+
+    @factory.lazy_attribute
+    def case_sub_type(self):
+        if self.case_type == 'SIEL':
+            return factory.Faker(
+                    'random_element',
+                    elements=[
+                        'PERMANENT',
+                        'TEMPORARY',
+                        'TRANSHIPMENT',
+                    ],
+                ).generate({})
+        if self.case_type == 'OIEL':
+            return factory.Faker(
+                    'random_element',
+                    elements=[
+                        'CRYPTO',
+                        'MEDIA',
+                        'DEALER',
+                        'MIL_DUAL',
+                        'UKCONTSHELF',
+                    ],
+                ).generate({})
 
     class Meta:
         model = SPIREApplication
@@ -186,7 +209,7 @@ class SPIREGoodsIncidentFactory(BaseFactory):
     status_control = factory.Faker('random_element', elements=['A', 'C'])
     type = factory.Faker('random_element', elements=['ISSUE', 'REFUSAL', 'REVOKE', 'SURRENDER'])
     batch = factory.SubFactory(SPIREBatchFactory)
-    version_no = factory.Faker('random_int', min=1, max=3)
+    version_no = factory.Faker('random_int', min=0, max=3)
     inc_id = factory.Faker('random_element', elements=list(range(1, 200)))
     goods_item_id = factory.Faker('random_element', elements=list(range(1, 200)))
     dest_country_id = factory.Faker('random_element', elements=list(range(1, 200)))
@@ -292,7 +315,7 @@ class SPIREEndUserFactory(BaseFactory):
 class SPIREMediaFootnoteDetailFactory(BaseFactory):
     media_footnote = factory.SubFactory(SPIREMediaFootnoteFactory)
     start_datetime = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
-    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    status_control = factory.Faker('random_element', elements=[None, 'C'])
     footnote_type = factory.Faker('random_element', elements=['STANDARD', 'END_USER'])
     display_text = factory.Faker('sentence')
     single_footnote_text = factory.Faker('paragraph')
@@ -300,9 +323,10 @@ class SPIREMediaFootnoteDetailFactory(BaseFactory):
 
     @factory.lazy_attribute
     def end_datetime(self):
-        if not random.randint(0, 3):
+        if self.status_control == 'C':
+            return
+        if not self.status_control:
             return factory.Faker('date_between', start_date=self.start_datetime).generate({})
-        return
 
     class Meta:
         model = SPIREMediaFootnoteDetail
@@ -312,16 +336,14 @@ class SPIREFootnoteEntryFactory(BaseFactory):
     batch = factory.SubFactory(SPIREBatchFactory)
     footnote = factory.SubFactory(SPIREFootnoteFactory)
     application = factory.SubFactory(SPIREApplicationFactory)
-    media_footnote_detail = factory.SubFactory(SPIREMediaFootnoteDetailFactory)
+    media_footnote_detail = None
 
     goods_item_id = factory.Faker('random_int', min=1, max=200)
     country_id = factory.Faker('random_int', min=1, max=200)
-    fnr_id = factory.Faker('random_int', min=500, max=2000)
+    fnr_id = factory.Faker('random_element', elements=[1, 2, 3, 4, 5, None])
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     version_no = factory.Faker('random_int', min=1, max=3)
     status_control = factory.Faker('random_element', elements=['A', 'C'])
-    mf_grp_id = factory.Faker('random_element', elements=[1, 2, 3, None])
-    mf_free_text = factory.Faker('sentence')
 
     @factory.lazy_attribute
     def fne_id(self):
@@ -329,6 +351,21 @@ class SPIREFootnoteEntryFactory(BaseFactory):
         if last:
             return last.fne_id + 1
         return 1
+
+    @factory.lazy_attribute
+    def mf_free_text(self):
+        if self.footnote:
+            return
+        if self.media_footnote_detail:
+            return
+        return factory.Faker('sentence').generate({})
+
+    @factory.lazy_attribute
+    def mf_grp_id(self):
+        if self.footnote:
+            return
+        if self.mf_free_text or self.media_footnote_detail:
+            return factory.Faker('random_element', elements=[1, 2, 3]).generate({})
 
     class Meta:
         model = SPIREFootnoteEntry
@@ -344,9 +381,10 @@ class SPIREMediaFootnoteCountryFactory(BaseFactory):
 
     @factory.lazy_attribute
     def end_datetime(self):
-        if not random.randint(0, 3):
+        if self.status_control == 'C':
+            return
+        if not self.status_control:
             return factory.Faker('date_between', start_date=self.start_datetime).generate({})
-        return
 
     class Meta:
         model = SPIREMediaFootnoteCountry
@@ -371,42 +409,33 @@ class SPIREIncidentFactory(BaseFactory):
         'random_element',
         elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL', 'TA_SIEL'],
     )
-    case_sub_type = factory.Faker(
-        'random_element',
-        elements=[
-            'CRYPTO',
-            'MEDIA',
-            'DEALER',
-            'MIL_DUAL',
-            None,
-            'PERMANENT',
-            'TEMPORARY',
-            'TRANSHIPMENT',
-            'UKCONTSHELF',
-        ],
-    )
     application = factory.SubFactory(SPIREApplicationFactory)
     report_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     status_control = factory.Faker('random_element', elements=['A', 'C'])
-    version_no = factory.Faker('random_int', min=1, max=3)
+    version_no = factory.Faker('random_int', min=0, max=3)
     temporary_licence_flag = factory.Faker('random_int', min=0, max=1)
     licence_conversion_flag = factory.Faker('random_int', min=0, max=1)
     incorporation_flag = factory.Faker('random_int', min=0, max=1)
     mil_flag = factory.Faker('random_int', min=0, max=1)
     other_flag = factory.Faker('random_int', min=0, max=1)
     torture_flag = factory.Faker('random_int', min=0, max=1)
-    licence_id = factory.Faker('random_int', min=1, max=99999)
 
     @factory.lazy_attribute
     def ogl_id(self):
-        if not random.randint(0, 4):
+        if self.case_type == 'OGEL':
             return factory.Faker('random_int', min=1, max=100).generate({})
         return
 
     @factory.lazy_attribute
     def else_id(self):
-        if not random.randint(0, 4):
+        if self.type == 'SUSPENSION':
             return factory.Faker('random_int', min=1, max=100).generate({})
+        return
+
+    @factory.lazy_attribute
+    def licence_id(self):
+        if self.type != 'REFUSAL':
+            return factory.Faker('random_int', min=1, max=99999).generate({})
         return
 
     @factory.lazy_attribute
@@ -419,6 +448,29 @@ class SPIREIncidentFactory(BaseFactory):
         if last:
             return last.inc_id + 1
         return 1
+
+    @factory.lazy_attribute
+    def case_sub_type(self):
+        if self.case_type == 'SIEL':
+            return factory.Faker(
+                    'random_element',
+                    elements=[
+                        'PERMANENT',
+                        'TEMPORARY',
+                        'TRANSHIPMENT',
+                    ],
+                ).generate({})
+        if self.case_type == 'OIEL':
+            return factory.Faker(
+                    'random_element',
+                    elements=[
+                        'CRYPTO',
+                        'MEDIA',
+                        'DEALER',
+                        'MIL_DUAL',
+                        'UKCONTSHELF',
+                    ],
+                ).generate({})
 
     class Meta:
         model = SPIREIncident
@@ -458,6 +510,12 @@ class SPIREReturnFactory(BaseFactory):
             return last.elr_id + 1
         return 1
 
+    @factory.lazy_attribute
+    def ogl_id(self):
+        if self.licence_type == 'OGEL':
+            return factory.Faker('random_int', min=1, max=100).generate({})
+        return
+
     class Meta:
         model = SPIREReturn
 
@@ -467,7 +525,7 @@ class SPIREThirdPartyFactory(BaseFactory):
     batch = factory.SubFactory(SPIREBatchFactory)
     country_id = factory.Faker('random_int', min=1, max=200)
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
-    version_no = factory.Faker('random_int', min=1, max=3)
+    version_no = factory.Faker('random_int', min=0, max=3)
     status_control = factory.Faker('random_element', elements=['A', 'C', 'P', 'D'])
     ultimate_end_user_flag = factory.Faker('random_element', elements=[0, 1, None])
 
@@ -486,9 +544,9 @@ class SPIREUltimateEndUserFactory(BaseFactory):
     application = factory.SubFactory(SPIREApplicationFactory)
     batch = factory.SubFactory(SPIREBatchFactory)
     country_id = factory.Faker('random_int', min=1, max=200)
-    status_control = factory.Faker('random_element', elements=['A', 'C'])
+    status_control = factory.Faker('random_element', elements=['A', 'C', 'P', 'D'])
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
-    version_no = factory.Faker('random_int', min=1, max=3)
+    version_no = factory.Faker('random_int', min=0, max=3)
 
     @factory.lazy_attribute
     def ueu_id(self):

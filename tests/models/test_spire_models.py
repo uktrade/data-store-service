@@ -141,7 +141,7 @@ def test_footnotes_check_constraint(app_with_migrated_db, status, raise_exceptio
 
 
 @pytest.mark.parametrize(
-    'goods_item_id,country_id,fnr_id,raise_exception',
+    'goods_item_id,country_id,footnote,raise_exception',
     (
         (1, None, None, False),
         (None, None, None, False),
@@ -153,13 +153,19 @@ def test_footnotes_check_constraint(app_with_migrated_db, status, raise_exceptio
     )
 )
 def test_footnote_entries_check_constraint_1(
-    app_with_migrated_db, goods_item_id, country_id, fnr_id, raise_exception
+    app_with_migrated_db, goods_item_id, country_id, footnote, raise_exception
 ):
+    if footnote:
+        footnote = SPIREFootnoteFactory()
+    else:
+        footnote = None
+
     if raise_exception:
         with pytest.raises(IntegrityError):
-            SPIREFootnoteEntryFactory(goods_item_id=goods_item_id, country_id=country_id, fnr_id=fnr_id)
+            SPIREFootnoteEntryFactory(
+                goods_item_id=goods_item_id, country_id=country_id, footnote=footnote)
     else:
-        SPIREFootnoteEntryFactory(goods_item_id=goods_item_id, country_id=country_id, fnr_id=fnr_id)
+        SPIREFootnoteEntryFactory(goods_item_id=goods_item_id, country_id=country_id, footnote=footnote)
 
 
 @pytest.mark.parametrize(
@@ -211,7 +217,8 @@ def test_footnote_entries_check_constraint_3(
     (
         ('HELLO', True),
         ('REFUSAL', False),
-        ('WITHHELD', False),
+        ('WITHHELD', True),
+        ('ISSUE', False),
         ('REVOKE', False),
         ('SURRENDER', False),
     )
@@ -322,10 +329,10 @@ def test_incident_check_constraint_4(
 @pytest.mark.parametrize(
     '_type,licence_id,raise_exception',
     (
-        ('REFUSAL', 1, False),
-        ('REFUSAL', None, True),
+        ('REFUSAL', None, False),
+        ('REFUSAL', 1, True),
         (None, None, True),
-        ('ISSUE', 1, True),
+        ('ISSUE', 1, False),
     ),
 )
 def test_incident_check_constraint_5(
