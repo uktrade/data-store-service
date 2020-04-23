@@ -153,8 +153,7 @@ class SPIREApplicationCountryFactory(BaseFactory):
     start_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     batch = factory.SubFactory(SPIREBatchFactory)
     application = factory.SubFactory(
-        SPIREApplicationFactory,
-        batch=factory.SelfAttribute('..batch')
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
     )
 
     @factory.lazy_attribute
@@ -209,8 +208,7 @@ class SPIREGoodsIncidentFactory(BaseFactory):
     goods_item_id = factory.Faker('random_element', elements=list(range(1, 200)))
     dest_country_id = factory.Faker('random_element', elements=list(range(1, 200)))
     application = factory.SubFactory(
-        SPIREApplicationFactory,
-        batch=factory.SelfAttribute('..batch')
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
     )
     country_group = factory.SubFactory(SPIRECountryGroupFactory)
 
@@ -334,8 +332,7 @@ class SPIREFootnoteEntryFactory(BaseFactory):
     batch = factory.SubFactory(SPIREBatchFactory)
     footnote = factory.SubFactory(SPIREFootnoteFactory)
     application = factory.SubFactory(
-        SPIREApplicationFactory,
-        batch=factory.SelfAttribute('..batch')
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
     )
 
     media_footnote_detail = None
@@ -411,8 +408,7 @@ class SPIREIncidentFactory(BaseFactory):
         elements=['SIEL', 'OGEL', 'OIEL', 'OITCL', 'GPL', 'SITCL', 'TA_OIEL', 'TA_SIEL'],
     )
     application = factory.SubFactory(
-        SPIREApplicationFactory,
-        batch=factory.SelfAttribute('..batch')
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
     )
     report_date = factory.Faker('date_time_between', start_date='-2y', end_date='-1y')
     status_control = factory.Faker('random_element', elements=['A', 'C'])
@@ -514,8 +510,7 @@ class SPIREReturnFactory(BaseFactory):
 
 class SPIREThirdPartyFactory(BaseFactory):
     application = factory.SubFactory(
-        SPIREApplicationFactory,
-        batch=factory.SelfAttribute('..batch')
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
     )
     batch = factory.SubFactory(SPIREBatchFactory)
     country_id = factory.Faker('random_int', min=1, max=200)
@@ -537,8 +532,7 @@ class SPIREThirdPartyFactory(BaseFactory):
 
 class SPIREUltimateEndUserFactory(BaseFactory):
     application = factory.SubFactory(
-        SPIREApplicationFactory,
-        batch=factory.SelfAttribute('..batch')
+        SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
     )
     batch = factory.SubFactory(SPIREBatchFactory)
     country_id = factory.Faker('random_int', min=1, max=200)
