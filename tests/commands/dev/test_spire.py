@@ -1,3 +1,5 @@
+import pytest
+
 from app.commands.dev.spire import populate_spire_schema
 from app.db.models.external import (
     SPIREApplication,
@@ -29,94 +31,51 @@ from app.db.models.external import (
 
 
 class TestPopulateSpireCommand:
-    def test_populate_spire_schema(self, app_with_db):
+    @pytest.mark.parametrize(
+        'batch_size,min_batch_size', ((1, 1), (10, 2)),
+    )
+    def test_populate_spire_schema(self, app_with_db, batch_size, min_batch_size):
         runner = app_with_db.test_cli_runner()
-        args = ['--batch_size', 1, '--min_batch_size', 1]
+        args = ['--batch_size', batch_size, '--min_batch_size', min_batch_size]
         result = runner.invoke(populate_spire_schema, args)
         assert 'Populating schema' in result.output
         assert result.exit_code == 0
         assert result.exception is None
 
-        # Count for some models are not 1 because when using a
+        # Count for some models are not batch_size because when using a
         # sub factory a new related object is created
 
         # Country mapping
-        assert SPIRERefCountryMapping.query.count() == 1
-        assert SPIRECountryGroup.query.count() == 4
-        assert SPIRECountryGroupEntry.query.count() == 1
+        assert SPIRERefCountryMapping.query.count() == batch_size
+        assert SPIRECountryGroup.query.count() == (batch_size * 2) + min_batch_size + 1
+        assert SPIRECountryGroupEntry.query.count() == batch_size
 
         # Application
-        assert SPIREApplication.query.count() == 10
-        assert SPIREApplicationAmendment.query.count() == 1
-        assert SPIREApplicationCountry.query.count() == 1
-        assert SPIREBatch.query.count() == 12
+        assert SPIREApplication.query.count() == (batch_size * 8) + (min_batch_size * 2)
+        assert SPIREApplicationAmendment.query.count() == batch_size
+        assert SPIREApplicationCountry.query.count() == batch_size
+        assert SPIREBatch.query.count() == (batch_size * 9) + (min_batch_size * 2) + 1
 
         # Ars
-        assert SPIREArs.query.count() == 1
-        assert SPIREGoodsIncident.query.count() == 3
-        assert SPIREIncident.query.count() == 1
-        assert SPIRERefArsSubject.query.count() == 1
-        assert SPIREReasonForRefusal.query.count() == 1
-        assert SPIRERefReportRating.query.count() == 1
-        assert SPIREControlEntry.query.count() == 1
+        assert SPIREArs.query.count() == batch_size
+        assert SPIREGoodsIncident.query.count() == (batch_size * 2) + min_batch_size
+        assert SPIREIncident.query.count() == batch_size
+        assert SPIRERefArsSubject.query.count() == batch_size
+        assert SPIREReasonForRefusal.query.count() == batch_size
+        assert SPIRERefReportRating.query.count() == batch_size
+        assert SPIREControlEntry.query.count() == batch_size
 
         # Footnotes
-        assert SPIREFootnote.query.count() == 2
-        assert SPIREFootnoteEntry.query.count() == 1
-        assert SPIREMediaFootnote.query.count() == 2
-        assert SPIREMediaFootnoteCountry.query.count() == 1
-        assert SPIREMediaFootnoteDetail.query.count() == 1
+        assert SPIREFootnote.query.count() == batch_size + min_batch_size
+        assert SPIREFootnoteEntry.query.count() == batch_size
+        assert SPIREMediaFootnote.query.count() == batch_size + min_batch_size
+        assert SPIREMediaFootnoteCountry.query.count() == batch_size
+        assert SPIREMediaFootnoteDetail.query.count() == batch_size
 
         # Misc
-        assert SPIRERefDoNotReportValue.query.count() == 1
-        assert SPIREEndUser.query.count() == 1
-        assert SPIREUltimateEndUser.query.count() == 1
-        assert SPIREReturn.query.count() == 1
-        assert SPIREOglType.query.count() == 1
-        assert SPIREThirdParty.query.count() == 1
-
-    def test_populate_spire_schema_diff_min(self, app_with_db):
-        runner = app_with_db.test_cli_runner()
-        args = ['--batch_size', 10, '--min_batch_size', 1]
-        result = runner.invoke(populate_spire_schema, args)
-        assert 'Populating schema' in result.output
-        assert result.exit_code == 0
-        assert result.exception is None
-
-        # Count for some models are not 1 because when using a
-        # sub factory a new related object is created
-
-        # Country mapping
-        assert SPIRERefCountryMapping.query.count() == 10
-        assert SPIRECountryGroup.query.count() == 22
-        assert SPIRECountryGroupEntry.query.count() == 10
-
-        # Application
-        assert SPIREApplication.query.count() == 82
-        assert SPIREApplicationAmendment.query.count() == 10
-        assert SPIREApplicationCountry.query.count() == 10
-        assert SPIREBatch.query.count() == 93
-
-        # Ars
-        assert SPIREArs.query.count() == 10
-        assert SPIREGoodsIncident.query.count() == 21
-        assert SPIREIncident.query.count() == 10
-        assert SPIRERefArsSubject.query.count() == 10
-        assert SPIREReasonForRefusal.query.count() == 10
-        assert SPIRERefReportRating.query.count() == 10
-        assert SPIREControlEntry.query.count() == 10
-
-        # Footnotes
-        assert SPIREFootnote.query.count() == 11
-        assert SPIREFootnoteEntry.query.count() == 10
-        assert SPIREMediaFootnote.query.count() == 11
-        assert SPIREMediaFootnoteCountry.query.count() == 10
-        assert SPIREMediaFootnoteDetail.query.count() == 10
-
-        # Misc
-        assert SPIRERefDoNotReportValue.query.count() == 10
-        assert SPIREEndUser.query.count() == 10
-        assert SPIREUltimateEndUser.query.count() == 10
-        assert SPIREReturn.query.count() == 10
-        assert SPIREOglType.query.count() == 10
-        assert SPIREThirdParty.query.count() == 10
+        assert SPIRERefDoNotReportValue.query.count() == batch_size
+        assert SPIREEndUser.query.count() == batch_size
+        assert SPIREUltimateEndUser.query.count() == batch_size
+        assert SPIREReturn.query.count() == batch_size
+        assert SPIREOglType.query.count() == batch_size
+        assert SPIREThirdParty.query.count() == batch_size
