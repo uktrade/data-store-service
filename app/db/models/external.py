@@ -1,4 +1,5 @@
 from data_engineering.common.db.models import (
+    _check,
     _col,
     _date,
     _decimal,
@@ -237,7 +238,11 @@ class DITBACIL1(BaseModel):
 
 
 #######################
-# SPIRE
+# SPIRE models
+
+# Check constraints are not picked up by alembic when generating migrations automatically.
+# They therefore have to be generated manually to match the models.
+
 #######################
 
 SPIRE_SCHEMA_NAME = 'spire'
@@ -271,7 +276,6 @@ class SPIRECountryGroupEntry(BaseModel):
 
 class SPIREBatch(BaseModel):
     __tablename__ = 'batches'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
     batch_ref = _col(_text, nullable=False)
@@ -291,10 +295,30 @@ class SPIREBatch(BaseModel):
     third_parties = _relationship('SPIREThirdParty', backref='batch')
     ultimate_end_users = _relationship('SPIREUltimateEndUser', backref='batch')
 
+    __table_args__ = (
+        _check("status IN ('RELEASED','STAGING')"),
+        _check(
+            """
+            (
+                batch_ref LIKE 'C%' AND start_date IS NULL AND end_date IS NULL
+            )
+            OR
+            (
+                batch_ref NOT LIKE 'C%'
+                AND start_date IS NOT NULL
+                AND date_trunc('day', start_date) = start_date
+                AND end_date IS NOT NULL
+                AND date_trunc('day', end_date) = end_date
+                AND start_date <= end_date
+            )
+        """
+        ),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
+
 
 class SPIREApplication(BaseModel):
     __tablename__ = 'applications'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ela_grp_id = _col(_int, primary_key=True, autoincrement=True)
     case_type = _col(_text, nullable=False)
@@ -312,6 +336,31 @@ class SPIREApplication(BaseModel):
     incidents = _relationship('SPIREIncident', backref='application')
     third_parties = _relationship('SPIREThirdParty', backref='application')
     ultimate_end_users = _relationship('SPIREUltimateEndUser', backref='application')
+
+    __table_args__ = (
+        _check(
+            "case_type IN ('SIEL', 'OIEL', 'SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL')"
+        ),
+        _check(
+            """
+            (
+                case_type = 'SIEL' AND case_sub_type IN ('PERMANENT', 'TEMPORARY', 'TRANSHIPMENT')
+            )
+            OR
+            (
+                case_type = 'OIEL'
+                AND case_sub_type IN ('DEALER', 'MEDIA', 'MIL_DUAL', 'UKCONTSHELF','CRYPTO')
+            )
+            OR
+            (
+                case_type IN ('SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL')
+                AND case_sub_type IS NULL
+            )
+        """
+        ),
+        _check("withheld_status IS NULL OR withheld_status IN ('PENDING', 'WITHHELD')"),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
 
 
 class SPIREApplicationAmendment(BaseModel):
@@ -345,7 +394,6 @@ class SPIREApplicationCountry(BaseModel):
 
 class SPIREGoodsIncident(BaseModel):
     __tablename__ = 'goods_incidents'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)
     inc_id = _col(_int, nullable=False)
@@ -365,6 +413,12 @@ class SPIREGoodsIncident(BaseModel):
     ars = _relationship('SPIREArs', backref="goods_incident")
     reasons_for_refusal = _relationship('SPIREReasonForRefusal', backref='goods_incident')
     control_entries = _relationship('SPIREControlEntry', backref='goods_incident')
+
+    __table_args__ = (
+        _check("type IN ('REFUSAL', 'ISSUE', 'REVOKE',  'SURRENDER')"),
+        _check("version_no >= 0"),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
 
 
 class SPIREArs(BaseModel):
@@ -414,17 +468,20 @@ class SPIREEndUser(BaseModel):
 
 class SPIREFootnote(BaseModel):
     __tablename__ = 'footnotes'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
     text = _col(_text)
     status = _col(_text, nullable=False)
     footnote_entries = _relationship('SPIREFootnoteEntry', backref='footnote')
 
+    __table_args__ = (
+        _check("status IN ('CURRENT', 'DELETED', 'ARCHIVED')"),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
+
 
 class SPIREMediaFootnoteDetail(BaseModel):
     __tablename__ = 'media_footnote_details'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
     mf_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.media_footnotes.id'), nullable=False)
@@ -438,10 +495,25 @@ class SPIREMediaFootnoteDetail(BaseModel):
 
     footnote_entries = _relationship('SPIREFootnoteEntry', backref='media_footnote_detail')
 
+    __table_args__ = (
+        _check(
+            """
+            (
+                status_control = 'C' AND end_datetime IS NULL
+            )
+            OR
+            (
+                status_control IS NULL AND end_datetime IS NOT NULL
+            )
+        """
+        ),
+        _check("footnote_type IN ('STANDARD','END_USER')"),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
+
 
 class SPIREFootnoteEntry(BaseModel):
     __tablename__ = 'footnote_entries'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     fne_id = _col(_int, primary_key=True)
     fn_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.footnotes.id'))
@@ -459,10 +531,54 @@ class SPIREFootnoteEntry(BaseModel):
     mf_grp_id = _col(_int)
     mf_free_text = _col(_text)
 
+    __table_args__ = (
+        _check(
+            """
+            (
+                goods_item_id IS NULL AND country_id IS NULL AND fnr_id IS NULL
+            )
+            OR
+            (
+                goods_item_id IS NOT NULL AND country_id IS NULL AND fnr_id IS NULL
+            )
+            OR
+            (
+                goods_item_id IS NULL AND country_id IS NOT NULL AND fnr_id IS NULL
+            )
+            OR
+            (
+                goods_item_id IS NULL AND country_id IS NOT NULL AND fnr_id IS NOT NULL
+            )
+        """
+        ),
+        _check("version_no >= 0"),
+        _check(
+            """
+            (
+                fn_id IS NOT NULL AND mfd_id IS NULL AND mf_free_text IS NULL AND mf_grp_id IS NULL
+            )
+            OR
+            (
+                fn_id IS NULL
+                AND mfd_id IS NOT NULL
+                AND mf_free_text IS NULL
+                AND mf_grp_id IS NOT NULL
+            )
+            OR
+            (
+                fn_id IS NULL
+                AND mfd_id IS NULL
+                AND mf_free_text IS NOT NULL
+                AND mf_grp_id IS NOT NULL
+            )
+        """
+        ),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
+
 
 class SPIREIncident(BaseModel):
     __tablename__ = 'incidents'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     inc_id = _col(_int, primary_key=True)
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
@@ -489,10 +605,86 @@ class SPIREIncident(BaseModel):
     else_id = _col(_int)
     stakeholders_confirmed = _col(_text)
 
+    __table_args__ = (
+        _check("status IN ('READY', 'FOR_ATTENTION')"),
+        _check("version_no >= 0"),
+        _check(
+            """
+            (
+                case_type != 'OGEL' AND ogl_id IS NULL
+            )
+            OR
+            (
+                case_type = 'OGEL' AND ogl_id IS NOT NULL
+            )
+        """
+        ),
+        _check("temporary_licence_flag IN (0, 1)"),
+        _check(
+            """
+            (
+                type != 'REFUSAL' AND licence_id IS NOT NULL
+            )
+            OR
+            (
+                type = 'REFUSAL' AND licence_id IS NULL
+            )
+        """
+        ),
+        _check(
+            """
+            (
+                type = 'SUSPENSION' AND else_id IS NOT NULL
+            )
+            OR
+            (
+                type != 'SUSPENSION' AND else_id IS NULL
+            )
+        """
+        ),
+        _check(
+            """
+            type IN (
+                'REFUSAL', 'ISSUE', 'REDUCTION', 'REVOKE', 'DEREGISTRATION',
+                'SUSPENSION', 'SURRENDER'
+            )
+        """
+        ),
+        _check(
+            """
+            case_type IN (
+                'SIEL', 'OIEL', 'SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL'
+            )
+        """
+        ),
+        _check(
+            """
+            (
+                case_type = 'SIEL' AND case_sub_type IN ('PERMANENT', 'TEMPORARY', 'TRANSHIPMENT')
+            )
+            OR
+            (
+                case_type = 'OIEL'
+                AND case_sub_type IN ('DEALER', 'MEDIA', 'MIL_DUAL', 'UKCONTSHELF','CRYPTO')
+            )
+            OR
+            (
+                case_type IN ('SITCL', 'OITCL', 'OGEL', 'GPL', 'TA_SIEL', 'TA_OIEL')
+                AND case_sub_type IS NULL
+            )
+        """
+        ),
+        _check("licence_conversion_flag IN (0, 1)"),
+        _check("incorporation_flag IN (0, 1)"),
+        _check("mil_flag IN (0, 1)"),
+        _check("other_flag IN (0, 1)"),
+        _check("torture_flag IN (0, 1)"),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
+
 
 class SPIREMediaFootnoteCountry(BaseModel):
     __tablename__ = 'media_footnote_countries'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True)
     ela_grp_id = _col(_int, nullable=False)
@@ -502,6 +694,21 @@ class SPIREMediaFootnoteCountry(BaseModel):
     status_control = _col(_text)
     start_datetime = _col(_dt, nullable=False)
     end_datetime = _col(_dt)
+
+    __table_args__ = (
+        _check(
+            """
+            (
+                status_control = 'C' AND end_datetime IS NULL
+            )
+            OR
+            (
+                status_control IS NULL AND end_datetime IS NOT NULL
+            )
+        """
+        ),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
 
 
 class SPIREMediaFootnote(BaseModel):
@@ -550,7 +757,6 @@ class SPIRERefDoNotReportValue(BaseModel):
 
 class SPIREReturn(BaseModel):
     __tablename__ = 'returns'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     elr_id = _col(_int, primary_key=True)
     elr_version = _col(_int, primary_key=True)
@@ -567,10 +773,28 @@ class SPIREReturn(BaseModel):
     end_user_type = _col(_text)
     eco_comment = _col(_text)
 
+    __table_args__ = (
+        _check("elr_version > 0"),
+        _check("status IN ('WITHDRAWN', 'ACTIVE')"),
+        _check("status_control IN ('A','P','C')"),
+        _check("licence_type IN ('OGEL','OIEL','OITCL')"),
+        _check(
+            """
+            (
+                licence_type = 'OGEL' AND ogl_id IS NOT NULL
+            )
+            OR
+            (
+                licence_type != 'OGEL' AND ogl_id IS NULL
+            )
+        """
+        ),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
+
 
 class SPIREThirdParty(BaseModel):
     __tablename__ = 'third_parties'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     tp_id = _col(_int, primary_key=True)
     ela_grp_id = _col(
@@ -584,10 +808,15 @@ class SPIREThirdParty(BaseModel):
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     status_control = _col(_text, nullable=False)
 
+    __table_args__ = (
+        _check("ultimate_end_user_flag IS NULL OR ultimate_end_user_flag IN (0, 1)"),
+        _check("version_no >= 0"),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
+
 
 class SPIREUltimateEndUser(BaseModel):
     __tablename__ = 'ultimate_end_users'
-    __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     ueu_id = _col(_int, primary_key=True)
     ela_grp_id = _col(
@@ -600,3 +829,9 @@ class SPIREUltimateEndUser(BaseModel):
     batch_id = _col(_int, _foreign_key(f'{SPIRE_SCHEMA_NAME}.batches.id'), nullable=False)
     sh_id = _col(_int)
     ultimate_end_user_flag = _col(_int)
+
+    __table_args__ = (
+        _check("version_no >= 0"),
+        _check("status_control IN ('A', 'P', 'C', 'D')"),
+        {'schema': SPIRE_SCHEMA_NAME},
+    )
