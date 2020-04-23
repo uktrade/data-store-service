@@ -266,7 +266,7 @@ class SPIRERefDoNotReportValueFactory(BaseFactory):
 
 class SPIREReasonForRefusalFactory(BaseFactory):
     goods_incident = factory.SubFactory(SPIREGoodsIncidentFactory)
-    reason_for_refusal = factory.Faker('word')
+    reason_for_refusal = factory.Faker('sentence', nb_words=8, variable_nb_words=False)
 
     class Meta:
         model = SPIREReasonForRefusal

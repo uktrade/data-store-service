@@ -6,7 +6,32 @@ from flask import current_app as app
 from flask.cli import with_appcontext
 
 from app.db.models.external import SPIRE_SCHEMA_NAME
-
+from tests.fixtures.factories import (
+    SPIREApplicationAmendmentFactory,
+    SPIREApplicationCountryFactory,
+    SPIREApplicationFactory,
+    SPIREArsFactory,
+    SPIREBatchFactory,
+    SPIREControlEntryFactory,
+    SPIRECountryGroupEntryFactory,
+    SPIRECountryGroupFactory,
+    SPIREEndUserFactory,
+    SPIREFootnoteEntryFactory,
+    SPIREFootnoteFactory,
+    SPIREGoodsIncidentFactory,
+    SPIREIncidentFactory,
+    SPIREMediaFootnoteCountryFactory,
+    SPIREMediaFootnoteDetailFactory,
+    SPIREMediaFootnoteFactory,
+    SPIREOglTypeFactory,
+    SPIREReasonForRefusalFactory,
+    SPIRERefArsSubjectFactory,
+    SPIRERefCountryMappingFactory,
+    SPIRERefDoNotReportValueFactory,
+    SPIREReturnFactory,
+    SPIREThirdPartyFactory,
+    SPIREUltimateEndUserFactory,
+)
 
 FOLDER = f'{os.getcwd()}/.csv/spire'
 
@@ -48,120 +73,64 @@ def dump_spire_schema():
 @click.option(
     '--batch_size', type=int, help='Batch size', default=10,
 )
-def populate_spire_schema(batch_size):
+@click.option(
+    '--min_batch_size', type=int, help='Batch size', default=10,
+)
+def populate_spire_schema(min_batch_size, batch_size):
 
     """
     Populate spire schema
     """
     click.echo('Populating schema')
-    data_models = {
-        **populate_country_mapping(batch_size),
-        **populate_application(batch_size),
-        **populate_ars(batch_size),
-        **populate_footnotes(batch_size),
-        **populate_misc(batch_size),
-    }
+    min_batch_size = min(batch_size, min_batch_size)
+
+    populate_country_mapping(min_batch_size, batch_size)
+    populate_application(min_batch_size, batch_size)
+    populate_ars(min_batch_size, batch_size)
+    populate_footnotes(min_batch_size, batch_size)
+    populate_misc(min_batch_size, batch_size)
 
 
-
-def populate_country_mapping(batch_size):
+def populate_country_mapping(min_batch_size, batch_size):
     click.echo('- Adding country data')
-    from tests.fixtures.factories import (
-        SPIRECountryGroupFactory,
-        SPIRERefCountryMappingFactory,
-        SPIRECountryGroupEntryFactory,
-    )
-
-    factories = {
-        'country_group_entries': SPIRECountryGroupEntryFactory.create_batch(size=batch_size),
-        'country_groups': SPIRECountryGroupFactory.create_batch(size=batch_size),
-        'country_mappings': SPIRERefCountryMappingFactory.create_batch(size=batch_size),
-    }
-    return factories
+    SPIRECountryGroupEntryFactory.create_batch(size=batch_size)
+    SPIRERefCountryMappingFactory.create_batch(size=batch_size)
 
 
-def populate_application(batch_size):
+def populate_application(min_batch_size, batch_size):
     click.echo('- Adding application data')
-    from tests.fixtures.factories import (
-        SPIREApplicationAmendmentFactory,
-        SPIREApplicationCountryFactory,
-        SPIREApplicationFactory,
-        SPIREBatchFactory,
-    )
-
-    factories = {
-        'batches': SPIREBatchFactory.create_batch(size=batch_size),
-        'application_countries': SPIREApplicationCountryFactory.create_batch(size=batch_size),
-        'applications': SPIREApplicationFactory.create_batch(size=batch_size),
-        'application_amendments': SPIREApplicationAmendmentFactory.create_batch(size=batch_size),
-    }
-    return factories
+    SPIREBatchFactory.create_batch(size=min_batch_size)
+    SPIREApplicationCountryFactory.create_batch(size=batch_size)
+    SPIREApplicationFactory.create_batch(size=min_batch_size)
+    SPIREApplicationAmendmentFactory.create_batch(size=batch_size)
 
 
-def populate_ars(batch_size):
+def populate_ars(min_batch_size, batch_size):
     click.echo('- Adding ars data')
-    from tests.fixtures.factories import (
-        SPIREArsFactory,
-        SPIREBatchFactory,
-        SPIREControlEntryFactory,
-        SPIREGoodsIncidentFactory,
-        SPIREIncidentFactory,
-        SPIREReasonForRefusalFactory,
-        SPIRERefArsSubjectFactory,
-        SPIRERefReportRatingFactory,
-    )
-
     batch = SPIREBatchFactory()
-
-    factories = {
-        'incidents': SPIREIncidentFactory.create_batch(size=batch_size),
-        'goods_incidents': SPIREGoodsIncidentFactory.create_batch(size=batch_size, batch=batch),
-        'ars': SPIREArsFactory.create_batch(size=batch_size),
-        'ars_subjects': SPIRERefArsSubjectFactory.create_batch(size=batch_size),
-        'reasons_for_refusal': SPIREReasonForRefusalFactory.create_batch(size=batch_size),
-        'ref_report_ratings': SPIRERefReportRatingFactory.create_batch(size=batch_size),
-        'control_entries': SPIREControlEntryFactory.create_batch(size=batch_size),
-    }
-    return factories
+    country_group = SPIRECountryGroupFactory()
+    SPIREIncidentFactory.create_batch(size=batch_size)
+    goods_incidents = SPIREGoodsIncidentFactory.create_batch(size=min_batch_size, batch=batch)
+    SPIREArsFactory.create_batch(size=batch_size, goods_incident__country_group=country_group)
+    SPIRERefArsSubjectFactory.create_batch(size=batch_size)
+    SPIREReasonForRefusalFactory.create_batch(size=batch_size, goods_incident=goods_incidents[0])
+    SPIREControlEntryFactory.create_batch(size=batch_size)
 
 
-def populate_footnotes(batch_size):
+def populate_footnotes(min_batch_size, batch_size):
     click.echo('- Adding footnotes data')
-    from tests.fixtures.factories import (
-        SPIREFootnoteEntryFactory,
-        SPIREFootnoteFactory,
-        SPIREMediaFootnoteCountryFactory,
-        SPIREMediaFootnoteDetailFactory,
-        SPIREMediaFootnoteFactory,
-    )
-
-    factories = {
-        'media_footnotes': SPIREMediaFootnoteFactory.create_batch(size=batch_size),
-        'media_footnote_details': SPIREMediaFootnoteDetailFactory.create_batch(size=batch_size),
-        'media_footnote_countries': SPIREMediaFootnoteCountryFactory.create_batch(size=batch_size),
-        'footnotes': SPIREFootnoteFactory.create_batch(size=batch_size),
-        'footnote_entries': SPIREFootnoteEntryFactory.create_batch(size=batch_size),
-    }
-    return factories
+    SPIREMediaFootnoteFactory.create_batch(size=min_batch_size)
+    SPIREMediaFootnoteDetailFactory.create_batch(size=batch_size)
+    SPIREMediaFootnoteCountryFactory.create_batch(size=batch_size)
+    SPIREFootnoteFactory.create_batch(size=min_batch_size)
+    SPIREFootnoteEntryFactory.create_batch(size=batch_size)
 
 
-def populate_misc(batch_size):
+def populate_misc(min_batch_size, batch_size):
     click.echo('- Adding misc data')
-    from tests.fixtures.factories import (
-        SPIREEndUserFactory,
-        SPIREOglTypeFactory,
-        SPIRERefDoNotReportValueFactory,
-        SPIREReturnFactory,
-        SPIREThirdPartyFactory,
-        SPIREUltimateEndUserFactory,
-    )
-
-    factories = {
-        'do_not_report': SPIRERefDoNotReportValueFactory.create_batch(size=batch_size),
-        'end_users': SPIREEndUserFactory.create_batch(size=batch_size),
-        'ultimate_end_users': SPIREUltimateEndUserFactory.create_batch(size=batch_size),
-        'ogl_types': SPIREOglTypeFactory.create_batch(size=batch_size),
-        'returns': SPIREReturnFactory.create_batch(size=batch_size),
-        'third_parties': SPIREThirdPartyFactory.create_batch(size=batch_size),
-    }
-    return factories
+    SPIRERefDoNotReportValueFactory.create_batch(size=batch_size)
+    SPIREEndUserFactory.create_batch(size=batch_size)
+    SPIREUltimateEndUserFactory.create_batch(size=batch_size)
+    SPIREOglTypeFactory.create_batch(size=batch_size)
+    SPIREReturnFactory.create_batch(size=batch_size)
+    SPIREThirdPartyFactory.create_batch(size=batch_size)
