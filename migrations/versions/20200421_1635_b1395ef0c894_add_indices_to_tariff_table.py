@@ -1,7 +1,7 @@
 """add indices to tariff table
 
 Revision ID: b1395ef0c894
-Revises: e61160a7d500
+Revises: 8574fd28d877
 Create Date: 2020-04-21 16:35:11.194269
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.sql.schema import quoted_name  # noqa: F401
 from app.db.models import get_schemas
 
 revision = 'b1395ef0c894'
-down_revision = 'e61160a7d500'
+down_revision = '8574fd28d877'
 
 
 def create_schemas():
