@@ -3,7 +3,7 @@ from app.db.models.external import (
     SPIRECountryGroupEntry,
     SPIRERefCountryMapping
 )
-from app.etl.etl_rebuild_schema import RebuildSchemaPipeline
+from app.etl.rebuild_schema import RebuildSchemaPipeline
 
 
 class SPIRECountryGroupPipeline(RebuildSchemaPipeline):

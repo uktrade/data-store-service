@@ -12,12 +12,12 @@ from data_engineering.common.db.models import (
 )
 from sqlalchemy import Index
 
-from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
-from app.etl.etl_dit_baci import DITBACIPipeline
-from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
-from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
-from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_world_bank_tariff import (
+from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
+from app.etl.organisation.dit import DITBACIPipeline
+from app.etl.organisation.dit import DITEUCountryMembershipPipeline
+from app.etl.organisation.dit import DITReferencePostcodesPipeline
+from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
+from app.etl.organisation.world_bank import (
     WorldBankBoundRatesPipeline,
     WorldBankTariffTransformPipeline,
 )

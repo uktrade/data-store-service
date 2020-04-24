@@ -5,12 +5,12 @@ from multiprocessing.pool import ThreadPool as Pool
 import psycopg2
 from flask import current_app as flask_app
 
-from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
-from app.etl.etl_dit_baci import DITBACIPipeline
-from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
-from app.etl.etl_incremental_data import IncrementalDataPipeline
-from app.etl.etl_snapshot_data import SnapshotDataPipeline
-from app.etl.etl_world_bank_bound_rates import WorldBankBoundRatesPipeline
+from app.etl.organisation.comtrade  import ComtradeCountryCodeAndISOPipeline
+from app.etl.organisation.dit import DITBACIPipeline
+from app.etl.organisation.dit import DITEUCountryMembershipPipeline
+from app.etl.incremental_data import IncrementalDataPipeline
+from app.etl.snapshot_data import SnapshotDataPipeline
+
 
 def timeit(method):
     def timed(*args, **kw):

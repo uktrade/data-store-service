@@ -1,7 +1,7 @@
 from io import BytesIO
 
-from app.etl.etl_incremental_data import IncrementalDataPipeline
-from app.etl.etl_snapshot_data import SnapshotDataPipeline
+from app.etl.incremental_data import IncrementalDataPipeline
+from app.etl.snapshot_data import SnapshotDataPipeline
 
 
 class DITBACIPipeline(IncrementalDataPipeline):

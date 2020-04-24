@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from app.etl.etl_base import LDataPipeline
+from app.etl.base import LDataPipeline
 
 
 class SnapshotDataPipeline(LDataPipeline):

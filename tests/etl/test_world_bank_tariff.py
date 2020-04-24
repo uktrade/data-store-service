@@ -4,7 +4,10 @@ import pytest
 from data_engineering.common.tests.conftest import create_tables
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_world_bank_tariff import WorldBankTariffPipeline, WorldBankTariffTransformPipeline
+from app.etl.organisation.world_bank import (
+    WorldBankTariffPipeline,
+    WorldBankTariffTransformPipeline
+)
 from tests.utils import rows_equal_table
 
 fixture_path = 'tests/fixtures/world_bank'
@@ -663,7 +666,7 @@ class TestWorldBankTariffPipeline:
 
         self.partial_transform_data()
         with mock.patch(
-            'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline._get_products'
+            'app.etl.organisation.world_bank.WorldBankTariffTransformPipeline._get_products'
         ) as mock_get_products:
             mock_get_products.return_value = [['301'], ['401']]
             pipeline = WorldBankTariffTransformPipeline(
@@ -678,11 +681,11 @@ class TestWorldBankTariffPipeline:
         pipeline.process(fi)
 
         with mock.patch(
-            'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline._get_products'
+            'app.etl.organisation.world_bank.WorldBankTariffTransformPipeline._get_products'
         ) as mock_get_products:
             mock_get_products.return_value = [['201']]
             with mock.patch(
-                'app.etl.etl_world_bank_tariff.WorldBankTariffTransformPipeline.finish_processing'
+                'app.etl.organisation.world_bank.WorldBankTariffTransformPipeline.finish_processing'
             ) as mock_finish_processing:
                 mock_finish_processing.return_value = None
 

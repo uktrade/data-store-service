@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from app.etl.etl_rebuild_schema import RebuildSchemaPipeline
+from app.etl.rebuild_schema import RebuildSchemaPipeline
 
 
 def convert_to_csv_bytes(fieldnames, rows):
@@ -21,7 +21,7 @@ def convert_to_csv_bytes(fieldnames, rows):
 
 @pytest.fixture
 def mock_sql_alchemy_model():
-    path = 'app.etl.etl_rebuild_schema.RebuildSchemaPipeline.sql_alchemy_model'
+    path = 'app.etl.rebuild_schema.RebuildSchemaPipeline.sql_alchemy_model'
     with mock.patch(path) as mock_obj:
         yield mock_obj
 
