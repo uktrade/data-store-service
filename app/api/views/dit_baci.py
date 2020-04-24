@@ -1,6 +1,6 @@
 from app.api.views.base import PipelinePaginatedListView
 from app.db.models.external import DITBACIL1
-from app.etl.etl_dit_baci import DITBACIPipeline
+from app.etl.organisation.dit import DITBACIPipeline
 
 
 class BACIListView(PipelinePaginatedListView):

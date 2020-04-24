@@ -1,6 +1,6 @@
 from app.api.views.base import PipelinePaginatedListView
 from app.db.models.external import WorldBankBoundRateL0
-from app.etl.etl_world_bank_tariff import WorldBankBoundRatesPipeline
+from app.etl.organisation.world_bank_tariff import WorldBankBoundRatesPipeline
 
 
 class WorldBankBoundRatesListView(PipelinePaginatedListView):

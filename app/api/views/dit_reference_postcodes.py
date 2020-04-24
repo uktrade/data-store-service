@@ -6,7 +6,7 @@ from flask.views import View
 
 from app.api.views.base import PipelinePaginatedListView
 from app.db.models.external import DITReferencePostcodesL1
-from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
+from app.etl.organisation.dit import DITReferencePostcodesPipeline
 
 
 class DitReferencePostcodeListView(PipelinePaginatedListView):
