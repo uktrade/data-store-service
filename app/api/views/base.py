@@ -3,7 +3,7 @@ from data_engineering.common.views import ac, base, json_error
 
 class PipelinePaginatedListView(base.PaginatedListView):
     pipeline_column_types = None
-    decorators = [json_error, ac.authentication_required, ac.authorization_required]
+    decorators = [ac.authorization_required, ac.authentication_required, json_error]
 
     def get_fields(self):
         if not self.pipeline_column_types:
