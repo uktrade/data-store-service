@@ -45,6 +45,7 @@ class DITBACIPipeline(IncrementalDataPipeline):
         'quantity': 'q',
     }
 
+
 class DITEUCountryMembershipPipeline(SnapshotDataPipeline):
     organisation = 'dit'
     dataset = 'eu_country_membership'

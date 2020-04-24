@@ -6,10 +6,7 @@ from app.etl.organisation.dit import (
     DITReferencePostcodesPipeline,
 )
 from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
-from app.etl.organisation.world_bank import (
-    WorldBankBoundRatesPipeline,
-    WorldBankTariffPipeline
-)
+from app.etl.organisation.world_bank import WorldBankBoundRatesPipeline, WorldBankTariffPipeline
 
 
 def get_schemas():

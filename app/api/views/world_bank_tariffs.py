@@ -2,7 +2,7 @@ from app.api.views.base import PipelinePaginatedListView
 from app.db.models.external import WorldBankTariffL0, WorldBankTariffTransformL1
 from app.etl.organisation.world_bank import (
     WorldBankTariffPipeline,
-    WorldBankTariffTransformPipeline
+    WorldBankTariffTransformPipeline,
 )
 
 

@@ -1,8 +1,4 @@
-from app.db.models.external import (
-    SPIRECountryGroup,
-    SPIRECountryGroupEntry,
-    SPIRERefCountryMapping
-)
+from app.db.models.external import SPIRECountryGroup, SPIRECountryGroupEntry, SPIRERefCountryMapping
 from app.etl.rebuild_schema import RebuildSchemaPipeline
 
 

@@ -5,10 +5,10 @@ from multiprocessing.pool import ThreadPool as Pool
 import psycopg2
 from flask import current_app as flask_app
 
-from app.etl.organisation.comtrade  import ComtradeCountryCodeAndISOPipeline
+from app.etl.incremental_data import IncrementalDataPipeline
+from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
 from app.etl.organisation.dit import DITBACIPipeline
 from app.etl.organisation.dit import DITEUCountryMembershipPipeline
-from app.etl.incremental_data import IncrementalDataPipeline
 from app.etl.snapshot_data import SnapshotDataPipeline
 
 

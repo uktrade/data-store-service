@@ -4,6 +4,7 @@ from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
 
 print('test')
 
+
 class OnsPostcodeListView(PipelinePaginatedListView):
     pipeline_column_types = ONSPostcodeDirectoryPipeline._l1_data_column_types
     model = ONSPostcodeDirectoryL1

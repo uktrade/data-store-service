@@ -6,7 +6,7 @@ from datatools.io.fileinfo import FileInfo
 
 from app.etl.organisation.world_bank import (
     WorldBankTariffPipeline,
-    WorldBankTariffTransformPipeline
+    WorldBankTariffTransformPipeline,
 )
 from tests.utils import rows_equal_table
 
