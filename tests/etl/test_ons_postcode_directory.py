@@ -1,6 +1,6 @@
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
+from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
 from tests.utils import rows_equal_table
 
 snapshot1 = 'tests/fixtures/ons/postcode_directory/ONSPD_MAY_2019_UK.csv'

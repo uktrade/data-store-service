@@ -1,6 +1,6 @@
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_dit_baci import DITBACIPipeline
+from app.etl.organisation.dit import DITBACIPipeline
 from tests.utils import rows_equal_table
 
 

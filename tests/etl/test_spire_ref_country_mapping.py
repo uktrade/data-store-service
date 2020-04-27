@@ -1,8 +1,8 @@
 from unittest import mock
 
 from app.db.models.external import SPIRERefCountryMapping
-from app.etl.etl_spire_ref_country_mapping import SPIRERefCountryMappingPipeline
-from tests.etl.etl_rebuild_schema.test_RebuildSchemaPipeline import convert_to_csv_bytes
+from app.etl.organisation.spire import SPIRERefCountryMappingPipeline
+from tests.etl.rebuild_schema.test_RebuildSchemaPipeline import convert_to_csv_bytes
 
 
 class TestProcess:

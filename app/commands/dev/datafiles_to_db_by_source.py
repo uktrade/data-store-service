@@ -2,19 +2,20 @@ import click
 from flask import current_app as app
 from flask.cli import with_appcontext
 
-from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
-from app.etl.etl_dit_baci import DITBACIPipeline
-from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
-from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
-from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_spire_country_group import SPIRECountryGroupPipeline
-from app.etl.etl_spire_ref_country_mapping import SPIRERefCountryMappingPipeline
-from app.etl.etl_world_bank_bound_rates import WorldBankBoundRatesPipeline
-from app.etl.etl_world_bank_tariff import (
+from app.etl.manager import Manager as PipelineManager
+from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
+from app.etl.organisation.dit import (
+    DITBACIPipeline,
+    DITEUCountryMembershipPipeline,
+    DITReferencePostcodesPipeline,
+)
+from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
+from app.etl.organisation.spire import SPIRECountryGroupPipeline, SPIRERefCountryMappingPipeline
+from app.etl.organisation.world_bank import (
+    WorldBankBoundRatesPipeline,
     WorldBankTariffPipeline,
     WorldBankTariffTransformPipeline,
 )
-from app.etl.manager import Manager as PipelineManager
 
 arg_to_pipeline_config_list = {
     # format:  {'command option': [(pipeline, dataset subdir)]}

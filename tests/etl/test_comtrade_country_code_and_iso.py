@@ -1,6 +1,6 @@
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
+from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
 from tests.utils import rows_equal_table
 
 

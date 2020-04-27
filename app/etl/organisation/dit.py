@@ -1,4 +1,49 @@
-from app.etl.etl_snapshot_data import SnapshotDataPipeline
+from io import BytesIO
+
+from app.etl.pipeline_type.incremental_data import IncrementalDataPipeline
+from app.etl.pipeline_type.snapshot_data import SnapshotDataPipeline
+
+
+class DITBACIPipeline(IncrementalDataPipeline):
+    organisation = 'dit'
+    dataset = 'baci'
+
+    _l0_data_column_types = [
+        ('t', 'integer'),
+        ('hs6', 'integer'),
+        ('i', 'integer'),
+        ('j', 'integer'),
+        ('v', 'decimal'),
+        ('q', 'decimal'),
+    ]
+
+    def _datafile_to_l0_temp(self, file_info):
+        self.dbi.dsv_buffer_to_table(
+            csv_buffer=file_info.data,
+            fq_table_name=self._l0_temp_table,
+            columns=[c for c, _ in self._l0_data_column_types],
+            has_header=True,
+            sep=',',
+            quote='"',
+        )
+
+    _l1_data_column_types = [
+        ('year', 'integer'),
+        ('product_category', 'integer'),
+        ('exporter', 'integer'),
+        ('importer', 'integer'),
+        ('trade_flow_value', 'decimal'),
+        ('quantity', 'decimal'),
+    ]
+
+    _l0_l1_data_transformations = {
+        'year': 't',
+        'product_category': 'hs6',
+        'exporter': 'i',
+        'importer': 'j',
+        'trade_flow_value': 'v',
+        'quantity': 'q',
+    }
 
 
 class DITEUCountryMembershipPipeline(SnapshotDataPipeline):
@@ -108,3 +153,38 @@ class DITEUCountryMembershipPipeline(SnapshotDataPipeline):
             JOIN LATERAL json_each_text(sq.line) ON (key ~ '^[1-2]+');
         """
         self.dbi.execute_statement(stmt)
+
+
+class DITReferencePostcodesPipeline(SnapshotDataPipeline):
+    organisation = 'dit'
+    dataset = 'reference_postcodes'
+
+    _l0_data_column_types = [
+        ("postcode", "text"),
+        ("local_authority_district_code", "text"),
+        ("local_authority_district_name", "text"),
+        ("local_enterprise_partnership_lep1_code", "text"),
+        ("local_enterprise_partnership_lep1_name", "text"),
+        ("local_enterprise_partnership_lep2_code", "text"),
+        ("local_enterprise_partnership_lep2_name", "text"),
+        ("region_code", "text"),
+        ("region_name", "text"),
+        ("national_grid_ref_easting", "text"),
+        ("national_grid_ref_northing", "text"),
+        ("date_of_introduction", "date"),
+        ("date_of_termination", "date"),
+    ]
+
+    def _datafile_to_l0_temp(self, file_info):
+        csv_data_no_empty_quotes = BytesIO(file_info.data.read().replace(b'""', b''))
+        self.dbi.dsv_buffer_to_table(
+            csv_buffer=csv_data_no_empty_quotes,
+            fq_table_name=self._l0_temp_table,
+            columns=None,
+            has_header=True,
+            sep=',',
+            quote='"',
+        )
+
+    _l1_data_column_types = _l0_data_column_types
+    _l0_l1_data_transformations = {}

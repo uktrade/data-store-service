@@ -1,4 +1,4 @@
-from app.etl.etl_base import LDataPipeline
+from app.etl.pipeline_type.base import LDataPipeline
 
 
 class TestClassMembers:

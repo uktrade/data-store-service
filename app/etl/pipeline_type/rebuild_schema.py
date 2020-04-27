@@ -4,7 +4,7 @@ from abc import abstractmethod
 
 from sqlalchemy import DDL
 
-from app.etl.etl_base import classproperty, DataPipeline
+from app.etl.pipeline_type.base import classproperty, DataPipeline
 
 
 class RebuildSchemaPipeline(DataPipeline):
