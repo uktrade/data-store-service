@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from app.etl.base import LDataPipeline
+from app.etl.pipeline_type.base import LDataPipeline
 
 
 class IncrementalDataPipeline(LDataPipeline):
