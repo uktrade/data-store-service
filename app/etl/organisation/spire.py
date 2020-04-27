@@ -1,26 +1,26 @@
-from app.db.models.external import SPIRECountryGroup, SPIRECountryGroupEntry, SPIRERefCountryMapping
+import app.db.models.external as models
 from app.etl.pipeline_type.rebuild_schema import RebuildSchemaPipeline
 
 
-class SPIRECountryGroupPipeline(RebuildSchemaPipeline):
-
-    dataset = 'country_group'
+class SPIREPipeline(RebuildSchemaPipeline):
     organisation = 'spire'
-    schema = SPIRECountryGroup.__table_args__['schema']
-    sql_alchemy_model = SPIRECountryGroup
+    schema = models.SPIRE_SCHEMA_NAME
 
 
-class SPIRECountryGroupEntryPipeline(RebuildSchemaPipeline):
+class SPIRECountryGroupPipeline(SPIREPipeline):
 
-    dataset = 'country_group_entry'
-    organisation = 'spire'
-    schema = SPIRECountryGroupEntry.__table_args__['schema']
-    sql_alchemy_model = SPIRECountryGroupEntry
+    dataset = models.SPIRECountryGroup.__tablename__
+    sql_alchemy_model = models.SPIRECountryGroup
 
 
-class SPIRERefCountryMappingPipeline(RebuildSchemaPipeline):
+class SPIRECountryGroupEntryPipeline(SPIREPipeline):
 
-    dataset = 'country_mapping'
-    organisation = 'spire'
-    schema = SPIRERefCountryMapping.__table_args__['schema']
-    sql_alchemy_model = SPIRERefCountryMapping
+    dataset = models.SPIRECountryGroupEntry.__tablename__
+    sql_alchemy_model = models.SPIRECountryGroupEntry
+
+
+class SPIRERefCountryMappingPipeline(SPIREPipeline):
+
+    dataset = models.SPIRERefCountryMapping.__tablename__
+    sql_alchemy_model = models.SPIRERefCountryMapping
+
