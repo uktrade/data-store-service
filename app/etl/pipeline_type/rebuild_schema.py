@@ -10,6 +10,7 @@ from app.etl.pipeline_type.base import classproperty, DataPipeline
 class RebuildSchemaPipeline(DataPipeline):
 
     csv_to_model_mapping = None
+    null_values = ['null', 'NULL']
 
     def process(self, file_info):
         data = file_info.data.read()
@@ -23,7 +24,9 @@ class RebuildSchemaPipeline(DataPipeline):
         try:
             objects = []
             for row in csv_reader:
-                kwargs = {field: value for field, value in zip(headers, row)}
+                kwargs = {}
+                for field, value in zip(headers, row):
+                    kwargs[field] = None if value in self.null_values else value
                 obj = self.sql_alchemy_model(**kwargs)
                 objects.append(obj)
             session.bulk_save_objects(objects)
