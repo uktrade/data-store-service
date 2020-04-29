@@ -66,7 +66,11 @@ class TestProcess:
 
         dbi = mock.Mock()
         fieldnames = ['a', 'b']
-        rows = [[0, 'null'], [1, 'apple'], [2, 'pineapple'], ]
+        rows = [
+            [0, 'null'],
+            [1, 'apple'],
+            [2, 'pineapple'],
+        ]
         data = convert_to_csv_bytes(fieldnames, rows)
         file_info = mock.Mock()
         file_info.data.read.return_value = data
@@ -76,11 +80,6 @@ class TestProcess:
         pipeline.process(file_info)
 
         calls = mock_sql_alchemy_model.call_args_list
-        expected = [
-            mock.call(a='0', b=None),
-            mock.call(a='1', b='apple'),
-            mock.call(a='2', b=None)
-        ]
+        expected = [mock.call(a='0', b=None), mock.call(a='1', b='apple'), mock.call(a='2', b=None)]
 
         assert calls == expected
-        
