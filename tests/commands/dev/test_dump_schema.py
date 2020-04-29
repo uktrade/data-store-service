@@ -39,7 +39,7 @@ class TestDumpSchemaCommand:
         dump_table('http://db_url', '/test_folder', 'test_schema', 'test_table')
         mock_subproces_run.assert_called_once_with(
             'psql http://db_url -c "\\COPY \\"test_schema\\".\\"test_table\\"'
-            ' to \'/test_folder/TEST_TABLE.csv\' WITH (FORMAT CSV, HEADER)"',
+            ' to \'/test_folder/TEST_TABLE.csv\' WITH (FORMAT CSV, HEADER, NULL \'NULL\')"',
             shell=True,
         )
 

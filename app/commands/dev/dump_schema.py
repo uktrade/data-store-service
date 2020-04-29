@@ -28,7 +28,8 @@ def dump_table(db_uri, folder, schema, table):
         f"""\COPY \\"{schema}\\".\\"{table}\\" to '{folder}/{table.upper()}.csv' """
         f"WITH ("
         f"FORMAT "
-        f"CSV, HEADER)"
+        f"CSV, HEADER, "
+        f"NULL 'NULL')"
     )  # noqa: W605
     cmd = f'psql {db_uri} -c "{dump_sql}"'
     click.echo(f'Creating {table.upper()}.csv')
