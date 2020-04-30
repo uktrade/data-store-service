@@ -62,7 +62,7 @@ arg_to_pipeline_config_list = {
         (WorldBankTariffPipeline, 'world_bank/tariff'),
         (WorldBankTariffTransformPipeline, None),
     ],
-    SPIRECountryGroupPipeline.data_source: [
+    'spire': [
         (SPIREApplicationPipeline, 'spire/application'),
         (SPIREApplicationAmendmentPipeline, 'spire/application_amendment'),
         (SPIREApplicationCountryPipeline, 'spire/application_country'),
