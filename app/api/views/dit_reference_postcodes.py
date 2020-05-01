@@ -3,6 +3,7 @@ from data_engineering.common.views import ac, json_error
 from flask import current_app as flask_app
 from flask import request
 from flask.views import View
+from werkzeug.exceptions import BadRequest
 
 from app.api.views.base import PipelinePaginatedListView
 from app.db.models.external import DITReferencePostcodesL1
@@ -22,8 +23,10 @@ class DitReferencePostcodeView(View):
     model = DITReferencePostcodesL1
 
     def dispatch_request(self):
-        postcode = request.args.get('postcode')
         orientation = request.args.get('orientation', 'tabular')
+        postcode = request.args.get('postcode')
+        if not postcode:
+            raise BadRequest('No postcode specified')
         postcode = postcode.replace(' ', '').lower()
         sql_query = f'''
             select {','.join(

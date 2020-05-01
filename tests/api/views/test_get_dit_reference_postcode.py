@@ -23,6 +23,16 @@ def test_get_dit_reference_postcode_when_no_data(app_with_hawk_user, app_with_mo
     assert response.json['values'] == []
 
 
+def test_get_dit_reference_postcode_when_no_param_specified(
+    app_with_hawk_user, app_with_mock_cache
+):
+    url = '/api/v1/get-dit-reference-postcode/'
+    client = app_with_hawk_user.test_client()
+    response = make_hawk_auth_request(client, url)
+    assert response.status_code == 400
+    assert response.json['error'] == 'No postcode specified'
+
+
 def test_get_dit_reference_postcode(
     add_dit_reference_postcodes, app_with_hawk_user, app_with_mock_cache
 ):
