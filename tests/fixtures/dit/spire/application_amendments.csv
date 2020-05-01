@@ -1,0 +1,6 @@
+"ela_grp_id","ela_id","case_type","case_sub_type","case_processing_time","amendment_closed_date","withheld_status","batch_id"
+"8","1","SITCL","DarkOrange","4320","2003-2-28 00:00:00","WITHHELD","19"
+"9","2","SIEL","DimGray","3060","2019-7-25 00:00:00","WITHHELD","42"
+"10","3","OIEL","PeachPuff","3064","2016-7-18 00:00:00","PENDING","43"
+"11","4","OIEL","LightBlue","1648","2016-5-20 00:00:00","WITHHELD","3"
+"12","5","SITCL","AntiqueWhite","7398","2012-5-31 00:00:00","PENDING","1"

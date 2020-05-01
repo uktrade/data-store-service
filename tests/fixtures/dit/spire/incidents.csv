@@ -1,0 +1,6 @@
+"inc_id","batch_id","status","type","case_type","case_sub_type","ela_grp_id","ela_id","licence_id","report_date","temporary_licence_flag","licence_conversion_flag","incorporation_flag","mil_flag","other_flag","torture_flag","start_date","version_no","ogl_id","status_control","else_id","stakeholders_confirmed"
+"1","16","READY","SURRENDER","OGEL",,"13",,"54207","2018-5-10 23:25:45","1","0","1","0","1","1","2019-8-29 10:05:13","2","25","A",,
+"2","17","READY","REFUSAL","SITCL",,"14",,,"2018-6-8 04:14:24","0","0","1","1","1","0","2018-12-18 07:49:54","2",,"C",,
+"3","18","READY","ISSUE","TA_OIEL",,"15",,"67108","2018-11-24 06:12:02","0","0","1","1","0","1","2019-9-10 23:42:12","0",,"A",,
+"4","19","READY","SUSPENSION","SITCL",,"16",,"92341","2019-2-3 14:16:27","0","1","0","0","1","0","2020-3-25 07:49:31","1",,"C","10",
+"5","20","READY","ISSUE","GPL",,"17",,"44318","2019-4-22 11:29:33","1","0","0","0","1","1","2020-2-27 19:34:04","0",,"A",,
