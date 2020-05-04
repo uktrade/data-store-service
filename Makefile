@@ -5,8 +5,13 @@ BLACK_CONFIG ?= --exclude=venv --skip-string-normalization --line-length 100
 CHECK ?= --check
 
 .PHONY: run_server
-run_server:
+run_server: run_migrations
 	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
+
+
+.PHONY: run_migrations
+run_migrations:
+	python manage.py db upgrade 8574fd28d877
 
 
 .PHONY: run_dev_server
