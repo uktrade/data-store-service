@@ -10,6 +10,6 @@ def register_app_components(flask_app):
 
     @flask_app.teardown_appcontext
     def shutdown_session(exception=None):
-        flask_app.db.remove()
+        flask_app.db.session.remove()
 
     return flask_app
