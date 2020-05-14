@@ -15,7 +15,8 @@ def test_get_table(app_with_hawk_user):
             {'name': 'end_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
             {'name': 'approve_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
             {'name': 'release_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
-            {'name': 'staging_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'}],
+            {'name': 'staging_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
+        ],
     }
 
 

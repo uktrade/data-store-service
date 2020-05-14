@@ -1,11 +1,9 @@
 from flask import current_app as flask_app
-from flask import request
 from flask.views import View
 from sqlalchemy.engine.reflection import Inspector
 
 
 class TableDetailView(View):
-
     def dispatch_request(self, organisation, dataset):
         table_name = dataset
         schema = organisation
