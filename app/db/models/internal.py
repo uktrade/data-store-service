@@ -100,5 +100,12 @@ class Pipeline(BaseModel):
         if not target.slug:
             target.slug = slugify(f'{target.organisation} {target.dataset}')
 
+    @property
+    def pipeline_schema(self):
+        return f'{self.organisation}.{self.dataset}'
+
+    def __str__(self):
+        return self.pipeline_schema
+
 
 event.listen(Pipeline, 'before_insert', Pipeline.generate_slug)

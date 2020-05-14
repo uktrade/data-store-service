@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="post" name="pipeline_form" enctype="multipart/form-data">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ form.csrf_token }}
+            {% include 'form/error_summary.html' %}
+
+            <fieldset class="govuk-fieldset">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+                    <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
+                </legend>
+                {% with field=form.organisation %}
+                    {% include 'form/input_field.html' %}
+                {% endwith %}
+                {% with field=form.dataset %}
+                    {% include 'form/input_field.html' %}
+                {% endwith %}
+                <div class="gov-form-group govuk-!-padding-top-6">
+                    <ul class="govuk-list">
+                        <li>
+                            <input type="submit" value="Create" class="govuk-button govuk-!-margin-bottom-4">
+                        </li>
+                    </ul>
+
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</form>
+{% endblock content %}
