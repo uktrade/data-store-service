@@ -12,9 +12,7 @@
 	      href="{{ url_for('static', filename='assets/images/favicon.ico') }}"
 	      type="image/x-icon">
 	<meta name="twitter:dnt" content="on">
-	<meta name="format-detection" content="telephone=no">
-	
-	<script src="{{ url_for('static', filename='dist/bundle.js') }}"></script>
+	<meta name="format-detection" content="telephone=no">	
     </head>
     
     <body class="govuk-template__body">
@@ -76,7 +74,7 @@
 		<p class="govuk-body">Content goes here</p>
 		{% endblock %}
 	    </main>
-	
+	    
         </div>
 
         <footer class="govuk-footer " role="contentinfo">
@@ -122,11 +120,13 @@
                         </span>
                     </div>
                     <div class="govuk-footer__meta-item">
-                         <a class="govuk-footer__link govuk-footer__copyright-logo" href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">© Crown copyright</a>
+                        <a class="govuk-footer__link govuk-footer__copyright-logo" href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">© Crown copyright</a>
                     </div>
                 </div>
             </div>
-        </footer>	
+        </footer>
+
+	<script src="{{ url_for('static', filename='dist/bundle.js') }}"></script>
 
     </body>
 </html>
