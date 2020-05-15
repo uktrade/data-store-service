@@ -1,0 +1,33 @@
+{
+  "name": "data-store-service",
+  "version": "1.0.0",
+  "description": "The data store service aims to store data from external sources that changes infrequently.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uktrade/data-store-service.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uktrade/data-store-service/issues"
+  },
+  "homepage": "https://github.com/uktrade/data-store-service#readme",
+  "dependencies": {
+    "css-loader": "^3.5.3",
+    "govuk-frontend": "^3.6.0",
+    "node-sass": "^4.14.1",
+    "sass": "^1.26.5",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.2.1",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
