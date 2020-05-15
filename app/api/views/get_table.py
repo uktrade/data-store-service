@@ -9,7 +9,16 @@ class TableDetailView(View):
         schema = organisation
 
         table_exists = flask_app.db.engine.has_table(table_name, schema)
-        if not table_exists:
+        if not table_exists or schema in [
+            'pg_toast',
+            'pg_temp_1',
+            'pg_toast_temp_1',
+            'pg_catalog',
+            'public',
+            'information_schema',
+            'operations',
+            'admin',
+        ]:
             return flask_app.make_response(({}, 404),)
 
         response = {}
