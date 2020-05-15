@@ -32,6 +32,7 @@ from app.db.models.external import (
     SPIREThirdParty,
     SPIREUltimateEndUser,
 )
+from app.db.models.internal import Pipeline
 
 
 def get_session():
@@ -525,3 +526,11 @@ class SPIREUltimateEndUserFactory(BaseFactory):
 
     class Meta:
         model = SPIREUltimateEndUser
+
+
+class PipelineFactory(BaseFactory):
+    organisation = factory.Faker('word')
+    dataset = factory.Faker('word')
+
+    class Meta:
+        model = Pipeline
