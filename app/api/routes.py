@@ -38,5 +38,5 @@ RULES = [
         ),
     ),
     ('/api/v1/get-dit-baci-data/', dit_baci.BACIListView.as_view('list_dit_baci'),),
-    ('/api/v1/table/<organisation>/<dataset>', get_table.TableDetailView.as_view('get_table'),),
+    ('/api/v1/table/<schema>/<table_name>', get_table.TableDetailView.as_view('get_table'),),
 ]

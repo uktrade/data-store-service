@@ -4,9 +4,7 @@ from sqlalchemy.engine.reflection import Inspector
 
 
 class TableDetailView(View):
-    def dispatch_request(self, organisation, dataset):
-        table_name = dataset
-        schema = organisation
+    def dispatch_request(self, schema, table_name):
 
         table_exists = flask_app.db.engine.has_table(table_name, schema)
         if not table_exists or schema in [
