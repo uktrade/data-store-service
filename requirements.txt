@@ -25,11 +25,10 @@ cymem==2.0.3              # via preshed, spacy, thinc
 git+https://github.com/uktrade/data-engineering-common.git  # via -r requirements.in
 decorator==4.4.1          # via ipython, traitlets
 docutils==0.15.2          # via botocore
-entrypoints==0.3          # via flake8
 factory_boy==2.12.0       # via -r requirements.in
 faker==4.0.3              # via factory-boy
 flake8-import-order==0.18.1  # via -r requirements.in, data-engineering-common
-flake8==3.7.9             # via -r requirements.in, data-engineering-common
+flake8==3.8.1             # via -r requirements.in, data-engineering-common
 flask-babelex==0.9.3      # via flask-security
 flask-login==0.4.1        # via flask-security
 flask-mail==0.9.1         # via flask-security
@@ -45,7 +44,7 @@ freezegun==0.3.15         # via -r requirements.in, data-engineering-common
 fuzzywuzzy==0.18.0        # via -r requirements.in
 gunicorn==20.0.4          # via -r requirements.in
 idna==2.8                 # via requests
-importlib-metadata==1.5.0  # via catalogue, pluggy, pytest
+importlib-metadata==1.5.0  # via catalogue, flake8, pluggy, pytest
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.11.1           # via flask-shell-ipython
 itsdangerous==1.1.0       # via flask, flask-security
@@ -77,9 +76,9 @@ prompt-toolkit==3.0.3     # via ipython
 psycopg2==2.8.5           # via -r requirements.in, data-engineering-common
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest
-pycodestyle==2.5.0        # via flake8, flake8-import-order
+pycodestyle==2.6.0        # via flake8, flake8-import-order
 pycountry==19.8.18        # via -r requirements.in
-pyflakes==2.1.1           # via flake8
+pyflakes==2.2.0           # via flake8
 pygments==2.5.2           # via ipython
 pyparsing==2.4.6          # via packaging
 pytest-cov==2.8.1         # via -r requirements.in, data-engineering-common
