@@ -13,40 +13,76 @@ from tests.utils import rows_equal_table
 fixture_path = 'tests/fixtures/world_bank'
 
 file_1 = f'{fixture_path}/tariff.csv'
-eu_country_to_eu_country_file = f'{fixture_path}/eu_country_to_eu_country.csv'
-eu_to_country_file = f'{fixture_path}/eu_to_country.csv'
-country_to_world_file = f'{fixture_path}/country_to_world.csv'
-countries_expanding_file = f'{fixture_path}/countries_expanding.csv'
-country_to_country_two_years = f'{fixture_path}/country_to_country_two_years.csv'
 country_to_country_three_products = f'{fixture_path}/country_to_country_three_products.csv'
-forward_fill = f'{fixture_path}/forward_fill.csv'
 
 
 PRODUCT_201_ROWS = [
-    (201, 'AGO', 'BRA', 2018, 21.0, None, None, None, None, None, None, 21.0),
-    (201, 'AGO', 'ZAF', 2018, 21.0, None, None, None, None, None, None, 21.0),
-    (201, 'AUS', 'BRA', 2018, 21.0, None, None, None, None, None, None, 21.0),
-    (201, 'AUS', 'ZAF', 2018, 21.0, None, None, None, None, None, None, 21.0),
-    (201, 'DZA', 'BRA', 2018, 21.0, 21.0, None, None, None, None, 21.0, 21.0),
-    (201, 'DZA', 'ZAF', 2018, 21.0, None, None, None, None, None, 21.0, 21.0),
+    (201, 12, 24, 2018, None, None, None, None, None, None, None, None),
+    (201, 12, 36, 2018, None, None, None, None, None, None, None, None),
+    (201, 12, 76, 2018, 21, 21, None, None, None, None, None, None),
+    (201, 12, 710, 2018, None, None, None, None, None, None, None, None),
+    (201, 24, 12, 2018, None, None, None, None, None, None, None, None),
+    (201, 24, 36, 2018, None, None, None, None, None, None, None, None),
+    (201, 24, 76, 2018, None, None, None, None, None, None, None, None),
+    (201, 24, 710, 2018, None, None, None, None, None, None, None, None),
+    (201, 36, 12, 2018, None, None, None, None, None, None, None, None),
+    (201, 36, 24, 2018, None, None, None, None, None, None, None, None),
+    (201, 36, 76, 2018, None, None, None, None, None, None, None, None),
+    (201, 36, 710, 2018, None, None, None, None, None, None, None, None),
+    (201, 76, 12, 2018, None, None, None, None, None, None, None, None),
+    (201, 76, 24, 2018, None, None, None, None, None, None, None, None),
+    (201, 76, 36, 2018, None, None, None, None, None, None, None, None),
+    (201, 76, 710, 2018, None, None, None, None, None, None, None, None),
+    (201, 710, 12, 2018, None, None, None, None, None, None, None, None),
+    (201, 710, 24, 2018, None, None, None, None, None, None, None, None),
+    (201, 710, 36, 2018, None, None, None, None, None, None, None, None),
+    (201, 710, 76, 2018, None, None, None, None, None, None, None, None),
 ]
 
 PRODUCT_301_ROWS = [
-    (301, 'AGO', 'BRA', 2018, 10.0, None, None, None, None, None, 10.0, 10.0),
-    (301, 'AGO', 'ZAF', 2018, 10.0, 10.0, None, None, None, None, 10.0, 10.0),
-    (301, 'AUS', 'BRA', 2018, 10.0, None, None, None, None, None, None, 10.0),
-    (301, 'AUS', 'ZAF', 2018, 10.0, None, None, None, None, None, None, 10.0),
-    (301, 'DZA', 'BRA', 2018, 10.0, None, None, None, None, None, None, 10.0),
-    (301, 'DZA', 'ZAF', 2018, 10.0, None, None, None, None, None, None, 10.0),
+    (301, 12, 24, 2018, None, None, None, None, None, None, None, None),
+    (301, 12, 36, 2018, None, None, None, None, None, None, None, None),
+    (301, 12, 76, 2018, None, None, None, None, None, None, None, None),
+    (301, 12, 710, 2018, None, None, None, None, None, None, None, None),
+    (301, 24, 12, 2018, None, None, None, None, None, None, None, None),
+    (301, 24, 36, 2018, None, None, None, None, None, None, None, None),
+    (301, 24, 76, 2018, None, None, None, None, None, None, None, None),
+    (301, 24, 710, 2018, 10, 10, None, None, None, None, None, None),
+    (301, 36, 12, 2018, None, None, None, None, None, None, None, None),
+    (301, 36, 24, 2018, None, None, None, None, None, None, None, None),
+    (301, 36, 76, 2018, None, None, None, None, None, None, None, None),
+    (301, 36, 710, 2018, None, None, None, None, None, None, None, None),
+    (301, 76, 12, 2018, None, None, None, None, None, None, None, None),
+    (301, 76, 24, 2018, None, None, None, None, None, None, None, None),
+    (301, 76, 36, 2018, None, None, None, None, None, None, None, None),
+    (301, 76, 710, 2018, None, None, None, None, None, None, None, None),
+    (301, 710, 12, 2018, None, None, None, None, None, None, None, None),
+    (301, 710, 24, 2018, None, None, None, None, None, None, None, None),
+    (301, 710, 36, 2018, None, None, None, None, None, None, None, None),
+    (301, 710, 76, 2018, None, None, None, None, None, None, None, None),
 ]
 
 PRODUCT_401_ROWS = [
-    (401, 'AGO', 'BRA', 2018, 10.0, None, None, None, None, None, None, 10.0),
-    (401, 'AGO', 'ZAF', 2018, 10.0, None, None, None, None, None, None, 10.0),
-    (401, 'AUS', 'BRA', 2018, 10.0, None, None, None, None, None, 10.0, 10.0),
-    (401, 'AUS', 'ZAF', 2018, 10.0, 10.0, None, None, None, None, 10.0, 10.0),
-    (401, 'DZA', 'BRA', 2018, 10.0, None, None, None, None, None, None, 10.0),
-    (401, 'DZA', 'ZAF', 2018, 10.0, None, None, None, None, None, None, 10.0),
+    (401, 12, 24, 2018, None, None, None, None, None, None, None, None),
+    (401, 12, 36, 2018, None, None, None, None, None, None, None, None),
+    (401, 12, 76, 2018, None, None, None, None, None, None, None, None),
+    (401, 12, 710, 2018, None, None, None, None, None, None, None, None),
+    (401, 24, 12, 2018, None, None, None, None, None, None, None, None),
+    (401, 24, 36, 2018, None, None, None, None, None, None, None, None),
+    (401, 24, 76, 2018, None, None, None, None, None, None, None, None),
+    (401, 24, 710, 2018, None, None, None, None, None, None, None, None),
+    (401, 36, 12, 2018, None, None, None, None, None, None, None, None),
+    (401, 36, 24, 2018, None, None, None, None, None, None, None, None),
+    (401, 36, 76, 2018, None, None, None, None, None, None, None, None),
+    (401, 36, 710, 2018, 10, 10, None, None, None, None, None, None),
+    (401, 76, 12, 2018, None, None, None, None, None, None, None, None),
+    (401, 76, 24, 2018, None, None, None, None, None, None, None, None),
+    (401, 76, 36, 2018, None, None, None, None, None, None, None, None),
+    (401, 76, 710, 2018, None, None, None, None, None, None, None, None),
+    (401, 710, 12, 2018, None, None, None, None, None, None, None, None),
+    (401, 710, 24, 2018, None, None, None, None, None, None, None, None),
+    (401, 710, 36, 2018, None, None, None, None, None, None, None, None),
+    (401, 710, 76, 2018, None, None, None, None, None, None, None, None),
 ]
 
 comtrade_countries = [
@@ -54,11 +90,15 @@ comtrade_countries = [
     {'id': 2, 'cty_code': 48, 'cty_name_english': 'Bahrain', 'iso3_digit_alpha': 'BHR'},
     {'id': 3, 'cty_code': 262, 'cty_name_english': 'Djibouti', 'iso3_digit_alpha': 'DJI'},
     {'id': 4, 'cty_code': 266, 'cty_name_english': 'Gabon', 'iso3_digit_alpha': 'GAB'},
-    {'id': 5, 'cty_code': 381, 'cty_name_english': 'Italy', 'iso3_digit_alpha': 'ITA'},
+    {'id': 5, 'cty_code': 380, 'cty_name_english': 'Italy', 'iso3_digit_alpha': 'ITAF'},
     {'id': 6, 'cty_code': 918, 'cty_name_english': 'European Union', 'iso3_digit_alpha': 'EU'},
     {'id': 7, 'cty_code': 36, 'cty_name_english': 'Australia', 'iso3_digit_alpha': 'AUS'},
     {'id': 8, 'cty_code': 705, 'cty_name_english': 'Slovenia', 'iso3_digit_alpha': 'SVN'},
     {'id': 9, 'cty_code': 724, 'cty_name_english': 'Spain', 'iso3_digit_alpha': 'ESP'},
+    {'id': 10, 'cty_code': 24, 'cty_name_english': 'Angola', 'iso3_digit_alpha': 'AGO'},
+    {'id': 11, 'cty_code': 76, 'cty_name_english': 'Brazil', 'iso3_digit_alpha': 'BRA'},
+    {'id': 12, 'cty_code': 710, 'cty_name_english': 'South Africa', 'iso3_digit_alpha': 'ZAF'},
+    {'id': 13, 'cty_code': 12, 'cty_name_english': 'Algeria', 'iso3_digit_alpha': 'DZA'},
 ]
 
 eu_country_memberships = [
@@ -86,39 +126,19 @@ eu_country_memberships += [
     for i, year in enumerate(range(1958, 2021), len(eu_country_memberships) + 1)
 ]
 
-bound_rates = [{'reporter': 704, 'product': 201, 'bound_rate': 83.03}]
-
 
 class TestWorldBankTariffPipeline:
     @pytest.fixture(autouse=True, scope='function')
     def setup(
-        self,
-        app_with_db,
-        add_comtrade_country_code_and_iso,
-        add_dit_eu_country_membership,
-        add_world_bank_bound_rates,
+        self, app_with_db, add_comtrade_country_code_and_iso, add_dit_eu_country_membership,
     ):
         self.dbi = app_with_db.dbi
         self.dbi.execute_statement('drop table if exists "dit.baci"."L1" cascade;')
         create_tables(app_with_db)
         add_comtrade_country_code_and_iso(comtrade_countries)
         add_dit_eu_country_membership(eu_country_memberships)
-        add_world_bank_bound_rates(bound_rates)
 
-    def test_pipeline(self, add_dit_baci):
-        add_dit_baci(
-            [
-                {
-                    'id': 1,
-                    'year': 2018,
-                    'product_category': 201,
-                    'exporter': 381,
-                    'importer': 705,
-                    'trade_flow_value': 0,
-                    'quantity': 0,
-                }
-            ]
-        )
+    def test_pipeline(self, add_world_bank_raw_tariff):
         pipeline = WorldBankTariffPipeline(self.dbi, force=True)
         fi = FileInfo.from_path(file_1)
         pipeline.process(fi)
@@ -134,360 +154,294 @@ class TestWorldBankTariffPipeline:
         # check L1
         pipeline = WorldBankTariffTransformPipeline(self.dbi, force=True)
         pipeline.process()
-        expected_rows = [(201, 'SVN', 'ITA', 2018, None, None, None, None, None, None, None, None)]
-        assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
+        expected_rows = [
+            (201, 12, 24, 2000, None, None, None, None, None, None, None, None),
+            (201, 12, 24, 2001, None, None, None, None, None, None, None, None),
+        ]
+        assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline, top_rows=2)
 
-        # check second run with different baci updates L1
-        add_dit_baci(
+        # check second run with different raw tariff updates L1
+        add_world_bank_raw_tariff(
             [
                 {
-                    'id': 2,
-                    'year': 2018,
-                    'product_category': 201,
-                    'exporter': 36,
-                    'importer': 705,
-                    'trade_flow_value': 0,
-                    'quantity': 0,
-                }
+                    'reporter': 12,
+                    'year': 2000,
+                    'product': 201,
+                    'partner': 24,
+                    'duty_type': 'AHS',
+                    'simple_average': 10,
+                    'number_of_total_lines': 8,
+                },
             ]
         )
         pipeline.process()
         expected_rows = [
-            (201, 'SVN', 'AUS', 2018, None, None, None, None, None, None, None, None),
-            (201, 'SVN', 'ITA', 2018, None, None, None, None, None, None, None, None),
+            (201, 12, 24, 2000, 10, 10, None, None, None, None, None, None),
+            (201, 12, 24, 2001, 10, None, None, None, None, None, None, None),
         ]
-        assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
+        assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline, top_rows=2)
 
     @pytest.mark.parametrize(
-        'file_name,baci,required_countries,only_products,expected_rows',
+        'raw_tariffs,bound_tariffs,year_range,required_countries,only_products,expected_rows',
         (
+            # country_to_country test
             (
-                eu_country_to_eu_country_file,
+                # raw tariffs
                 [
                     {
-                        'id': 1,
+                        'reporter': 705,
                         'year': 2018,
-                        'product_category': 201,
-                        'exporter': 381,
-                        'importer': 705,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    }
-                ],  # i = partner, j = reporter
-                [('SVN', 705, True), ('ITA', 381, True), ('ITA', 380, True)],
+                        'product': 201,
+                        'partner': 380,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 8,
+                    },
+                ],
+                # bound tariffs
+                [{'reporter': 705, 'product': 201, 'bound_rate': 80}],
+                # year range
+                ('2018', '2018'),
+                # required countries
+                [('SVN', 705, True), ('ITA', 380, True)],
+                # products
                 None,
-                # Result format:
-                # product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
-                # eu_rep_rate, eu_part_rate, country_average, world_average
+                # expected transformed tariffs
+                #   Result format:
+                #     product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
+                #     eu_rep_rate, eu_part_rate, eu_eu_rate, world_average
                 [
-                    (201, 'SVN', 'ITA', 2018, 76.51, 76.51, None, None, None, None, 76.51, 76.51)
-                    # Italy has incorrect id 380 in product file and has to be fixed by the
-                    # cleaning process and updated to 381
+                    (201, 380, 705, 2018, 0, None, None, None, None, None, 0, None),
+                    # EU - EU has zero rate
+                    (201, 705, 380, 2018, 0, 10, None, 80, None, 10, 0, None),
+                    # EU - EU has zero rate with priority on app rate
+                    # Italy has different id 381 in comtrade list and should updated to 380
                 ],
             ),
+            # eu_to_country test
             (
-                eu_to_country_file,
+                # raw tariffs
                 [
                     {
-                        'id': 1,
+                        'reporter': 918,
                         'year': 2017,
-                        'product_category': 201,
-                        'exporter': 36,  # partner: AUS
-                        'importer': 705,  # reporter: SVN
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 36,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 1,
                     },
                     {
-                        'id': 2,
+                        'reporter': 705,
                         'year': 2017,
-                        'product_category': 201,
-                        'exporter': 36,  # partner: AUS
-                        'importer': 724,  # reporter: ESP
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 36,
+                        'duty_type': 'AHS',
+                        'simple_average': 20,
+                        'number_of_total_lines': 1,
                     },
                     {
-                        'id': 3,
+                        'reporter': 36,
                         'year': 2017,
-                        'product_category': 201,
-                        'exporter': 705,  # partner: SVN
-                        'importer': 724,  # reporter: ESP
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 705,
+                        'duty_type': 'AHS',
+                        'simple_average': 30,
+                        'number_of_total_lines': 1,
                     },
                 ],
+                # bound tariffs
+                [{'reporter': 705, 'product': 201, 'bound_rate': 80}],
+                # year range
+                ('2017', '2017'),
+                # required countries
                 [('SVN', 705, True), ('AUS', 36, True), ('ESP', 724, True)],
+                # products
                 None,
+                # expected transformed tariffs
+                #   Result format:
+                #     product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
+                #     eu_rep_rate, eu_part_rate, eu_eu_rate, world_average
+                #
                 #  When the reporter is EU (918) it's reporter_rate needs to be expanded
                 #  to all required eu countries (SVN, ESP)
                 [
-                    (201, 'ESP', 'AUS', 2017, 81.96, None, None, None, 81.96, None, None, 20),
-                    # eu_rep_rate expanded from 918-AUS
-                    # eu_part_rate None because no EU-EU app rates available
-                    # eu_rep_rate has precendence on world_average
-                    # (derived rates are not part of country average)
-                    (201, 'ESP', 'SVN', 2017, 0.0, None, None, None, 0.0, None, None, 20.0),
+                    (201, 36, 705, 2017, 30, 30, None, None, None, 30, None, None),
+                    # use app rate
+                    (201, 36, 724, 2017, 30, None, None, None, None, 30, None, None),
+                    # use average eu partner rate
+                    (201, 705, 36, 2017, 20, 20, None, 80, 10, None, None, None),
+                    # app rate has priority on eu_rep_rate (expansion 918-36 to 705-36)
+                    (201, 705, 724, 2017, 0, None, None, 80, None, None, 0, None),
                     # EU - EU has zero rate
-                    (201, 'SVN', 'AUS', 2017, 20, 20, None, None, 81.96, None, 20, 20),
-                    # app has precedence on eu_rep_rate, eu_part_rate and world_average
-                    # (201, 'SVN', 'ESP', 2017, 0.0, None, None, None, 0.0, None, 20.0, 20.0),
-                    # excluded because not in baci spine
+                    (201, 724, 36, 2017, 10, None, None, None, 10, None, None, None),
+                    # eu_rep_rate expanded from 918-36 (AUS)
+                    (201, 724, 705, 2017, 0, None, None, None, None, None, 0, None)
+                    # EU - EU has zero rate and trumps app rate
                 ],
             ),
+            # country_to_world test
             (
-                country_to_world_file,
+                # raw tariffs
                 [
                     {
-                        'id': 1,
+                        'reporter': 12,
                         'year': 2017,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 0,
+                        'duty_type': 'MFN',
+                        'simple_average': 30,
+                        'number_of_total_lines': 17,
                     },
                     {
-                        'id': 2,
+                        'reporter': 12,
                         'year': 2017,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 24,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 76,
+                        'duty_type': 'AHS',
+                        'simple_average': 21,
+                        'number_of_total_lines': 13,
                     },
                     {
-                        'id': 3,
+                        'reporter': 24,
                         'year': 2017,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 0,
+                        'duty_type': 'MFN',
+                        'simple_average': 5,
+                        'number_of_total_lines': 8,
                     },
                     {
-                        'id': 4,
+                        'reporter': 24,
                         'year': 2017,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 24,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 710,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 2,
                     },
                 ],
+                # bound tariffs
+                [],
+                # year range
+                ('2017', '2017'),
+                # required countries
                 [('BRA', 76, True), ('ZAF', 710, True), ('DZA', 12, True), ('AGO', 24, True)],
+                # products
                 None,
+                # expected transformed tariffs
+                #   Result format:
+                #     product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
+                #     eu_rep_rate, eu_part_rate, eu_eu_rate, world_average
+                #
                 # Angola (24 - AGO) has a tariff specified with World & South Africa (710 - ZAF)
                 # Algeria (12 - DZA) has a tariff specified with World & Brazil (76 - BRA)
                 [
-                    (201, 'AGO', 'BRA', 2017, 5.0, None, 5.0, None, None, None, 10.0, 15.5),
-                    # mfn_rate used from AGO - WLD
-                    # (201, 'AGO', 'DZA', 2017, 5.0, None, 5.0, None, None, None, 10.0, 15.5),
-                    # excluded because not present in baci spine
-                    (201, 'AGO', 'ZAF', 2017, 10.0, 10.0, 5.0, None, None, None, 10.0, 15.5),
-                    # app rate has precedence on mfn_rate
-                    # (201, 'DZA', 'AGO', 2017, 30.0, None, 30.0, None, None, None, 21.0, 15.5),
-                    # excluded because not present in baci spine
-                    (201, 'DZA', 'BRA', 2017, 21.0, 21.0, 30.0, None, None, None, 21.0, 15.5),
-                    # app rate has precedence on mfn_rate
-                    (201, 'DZA', 'ZAF', 2017, 30.0, None, 30.0, None, None, None, 21.0, 15.5),
-                    # expanded to include required country and mfn_rate used from  AGO - WLD
+                    (201, 12, 24, 2017, 30, None, 30, None, None, None, None, 17.5),
+                    # mfn_rate used from 12 (DZA) - 0 (WLD)
+                    (201, 12, 76, 2017, 21, 21.0, 30, None, None, None, None, 17.5),
+                    # ahs_rate from 12 (DZA) - 76 (BRA) priority on MFN from 12 (DZA) - 0 (WLD)
+                    (201, 12, 710, 2017, 30, None, 30, None, None, None, None, 17.5),
+                    # mfn_rate used from 12 (DZA) - 0 (WLD)
+                    (201, 24, 12, 2017, 5, None, 5, None, None, None, None, 17.5),
+                    # mfn_rate used from 24 (AGO) - 0 (WLD)
+                    (201, 24, 76, 2017, 5, None, 5, None, None, None, None, 17.5),
+                    # mfn_rate used from 24 (AGO) - 0 (WLD)
+                    (201, 24, 710, 2017, 10, 10, 5, None, None, None, None, 17.5),
+                    # ahs_rate from 24 (AGO) - 710 (ZAF) priority on MFN from 24 (AGO) - 0 (WLD)
+                    (201, 76, 12, 2017, 17.5, None, None, None, None, None, None, 17.5),
+                    # only world average available
+                    (201, 76, 24, 2017, 17.5, None, None, None, None, None, None, 17.5),
+                    # only world average available
+                    (201, 76, 710, 2017, 17.5, None, None, None, None, None, None, 17.5),
+                    # only world average available
+                    (201, 710, 12, 2017, 17.5, None, None, None, None, None, None, 17.5),
+                    # only world average available
+                    (201, 710, 24, 2017, 17.5, None, None, None, None, None, None, 17.5),
+                    # only world average available
+                    (201, 710, 76, 2017, 17.5, None, None, None, None, None, None, 17.5),
+                    # only world average available
                 ],
             ),
+            # country_to_country_two_years test
             (
-                country_to_country_two_years,
+                # raw tariffs
                 [
                     {
-                        'id': 1,
+                        'reporter': 12,
                         'year': 2017,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 76,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 1,
                     },
                     {
-                        'id': 2,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 24,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 3,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 4,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 24,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 5,
+                        'reporter': 12,
                         'year': 2018,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 6,
-                        'year': 2018,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 24,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 7,
-                        'year': 2018,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 8,
-                        'year': 2018,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 24,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 76,
+                        'duty_type': 'AHS',
+                        'simple_average': 20,
+                        'number_of_total_lines': 1,
                     },
                 ],
-                [('BRA', 76, True), ('ZAF', 710, True), ('DZA', 12, True), ('AGO', 24, True)],
+                # bound tariffs
+                [],
+                # year range
+                ('2017', '2018'),
+                # required countries
+                [('BRA', 76, True), ('DZA', 12, True)],
+                # products
                 None,
+                # expected transformed tariffs
+                #   Result format:
+                #     product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
+                #     eu_rep_rate, eu_part_rate, eu_eu_rate, world_average
                 [
-                    (201, 'AGO', 'BRA', 2017, 10.0, None, None, None, None, None, 10.0, 15.5),
-                    # country average has precedence
-                    (201, 'AGO', 'BRA', 2018, 10.0, None, None, None, None, None, 10.0, 15.5),
-                    (201, 'AGO', 'ZAF', 2017, 10.0, 10.0, None, None, None, None, 10.0, 15.5),
-                    # app rate has precedence
-                    (201, 'AGO', 'ZAF', 2018, 10.0, None, None, None, None, None, 10.0, 15.5),
-                    (201, 'DZA', 'BRA', 2017, 21.0, None, None, None, None, None, 21.0, 15.5),
-                    (201, 'DZA', 'BRA', 2018, 21.0, 21.0, None, None, None, None, 21.0, 15.5),
-                    (201, 'DZA', 'ZAF', 2017, 21.0, None, None, None, None, None, 21.0, 15.5),
-                    (201, 'DZA', 'ZAF', 2018, 21.0, None, None, None, None, None, 21.0, 15.5),
+                    (201, 12, 76, 2017, 10, 10, None, None, None, None, None, None),
+                    (201, 12, 76, 2018, 20, 20, None, None, None, None, None, None),
+                    (201, 76, 12, 2017, None, None, None, None, None, None, None, None),
+                    (201, 76, 12, 2018, None, None, None, None, None, None, None, None),
                 ],
             ),
+            # country_to_country_three_products test
             (
-                countries_expanding_file,
+                # raw tariffs
                 [
                     {
-                        'id': 1,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 2,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 24,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 3,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 4,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 24,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 5,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 36,
-                        'importer': 704,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                ],
-                [
-                    ('BRA', 76, True),
-                    ('ZAF', 710, True),
-                    ('DZA', 12, True),
-                    ('AGO', 24, True),
-                    ('VNM', 704, True),
-                    ('AUS', 36, True),
-                ],
-                None,
-                # Same as country_to_world file with World entries removed and a
-                # tariff between Australia (36) to Vietnam (704) and a BND rate
-                # added for vietnam, different world average
-                [
-                    (201, 'AGO', 'AUS', 2017, 10.0, None, None, None, None, None, 10.0, 16.333),
-                    (201, 'AGO', 'BRA', 2017, 10.0, None, None, None, None, None, 10.0, 16.333),
-                    (201, 'AGO', 'ZAF', 2017, 10.0, 10.0, None, None, None, None, 10.0, 16.333),
-                    (201, 'DZA', 'AUS', 2017, 21.0, None, None, None, None, None, 21.0, 16.333),
-                    (201, 'DZA', 'BRA', 2017, 21.0, 21.0, None, None, None, None, 21.0, 16.333),
-                    (201, 'DZA', 'ZAF', 2017, 21.0, None, None, None, None, None, 21.0, 16.333),
-                    (201, 'VNM', 'AUS', 2017, 18.0, 18.0, None, 83.03, None, None, 18.0, 16.333),
-                    (201, 'VNM', 'BRA', 2017, 18.0, None, None, 83.03, None, None, 18.0, 16.333),
-                    (201, 'VNM', 'ZAF', 2017, 18.0, None, None, 83.03, None, None, 18.0, 16.333),
-                ],
-            ),
-            (
-                country_to_country_three_products,
-                [
-                    {
-                        'id': 1,
+                        'reporter': 12,
                         'year': 2018,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 50,
-                        'quantity': 20,
+                        'product': 201,
+                        'partner': 76,
+                        'duty_type': 'AHS',
+                        'simple_average': 21,
+                        'number_of_total_lines': 13,
                     },
                     {
-                        'id': 2,
+                        'reporter': 24,
                         'year': 2018,
-                        'product_category': 301,
-                        'exporter': 710,
-                        'importer': 24,
-                        'trade_flow_value': 50,
-                        'quantity': 20,
+                        'product': 301,
+                        'partner': 710,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 2,
                     },
                     {
-                        'id': 3,
+                        'reporter': 36,
                         'year': 2018,
-                        'product_category': 401,
-                        'exporter': 710,
-                        'importer': 36,
-                        'trade_flow_value': 50,
-                        'quantity': 20,
+                        'product': 401,
+                        'partner': 710,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 2,
                     },
                 ],
+                # bound tariffs
+                [],
+                # year range
+                ('2018', '2018'),
+                # required countries
                 [
                     ('BRA', 76, True),
                     ('ZAF', 710, True),
@@ -495,40 +449,51 @@ class TestWorldBankTariffPipeline:
                     ('AGO', 24, True),
                     ('AUS', 36, True),
                 ],
+                # products
                 None,
+                # expected transformed tariffs
+                #   Result format:
+                #     product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
+                #     eu_rep_rate, eu_part_rate, eu_eu_rate, world_average
                 PRODUCT_201_ROWS + PRODUCT_301_ROWS + PRODUCT_401_ROWS,
             ),
+            # country_to_country_three_products
             (
-                country_to_country_three_products,
+                # raw tariffs
                 [
                     {
-                        'id': 1,
+                        'reporter': 12,
                         'year': 2018,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 50,
-                        'quantity': 20,
+                        'product': 201,
+                        'partner': 76,
+                        'duty_type': 'AHS',
+                        'simple_average': 21,
+                        'number_of_total_lines': 13,
                     },
                     {
-                        'id': 2,
+                        'reporter': 24,
                         'year': 2018,
-                        'product_category': 301,
-                        'exporter': 710,
-                        'importer': 24,
-                        'trade_flow_value': 50,
-                        'quantity': 20,
+                        'product': 301,
+                        'partner': 710,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 2,
                     },
                     {
-                        'id': 3,
+                        'reporter': 36,
                         'year': 2018,
-                        'product_category': 401,
-                        'exporter': 710,
-                        'importer': 36,
-                        'trade_flow_value': 50,
-                        'quantity': 20,
+                        'product': 401,
+                        'partner': 710,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 2,
                     },
                 ],
+                # bound tariffs
+                [],
+                # year range
+                ('2018', '2018'),
+                # required countries
                 [
                     ('BRA', 76, True),
                     ('ZAF', 710, True),
@@ -536,78 +501,92 @@ class TestWorldBankTariffPipeline:
                     ('AGO', 24, True),
                     ('AUS', 36, True),
                 ],
+                # products
                 '201,401',
+                # expected transformed tariffs
+                #   Result format:
+                #     product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
+                #     eu_rep_rate, eu_part_rate, eu_eu_rate, world_average
                 PRODUCT_201_ROWS + PRODUCT_401_ROWS,
             ),
+            # forward_fill test
             (
-                forward_fill,
+                # raw tariffs
                 [
                     {
-                        'id': 1,
+                        'reporter': 12,
                         'year': 2015,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 76,
+                        'duty_type': 'AHS',
+                        'simple_average': 21,
+                        'number_of_total_lines': 13,
                     },
                     {
-                        'id': 2,
+                        'reporter': 12,
                         'year': 2016,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 3,
-                        'year': 2016,
-                        'product_category': 201,
-                        'exporter': 710,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
-                    },
-                    {
-                        'id': 4,
-                        'year': 2017,
-                        'product_category': 201,
-                        'exporter': 76,
-                        'importer': 12,
-                        'trade_flow_value': 0,
-                        'quantity': 0,
+                        'product': 201,
+                        'partner': 710,
+                        'duty_type': 'AHS',
+                        'simple_average': 10,
+                        'number_of_total_lines': 2,
                     },
                 ],
+                # bound tariffs
+                [],
+                # year range
+                ('2015', '2017'),
+                # required countries
                 [('BRA', 76, True), ('DZA', 12, True), ('ZAF', 710, True)],
+                # products
                 None,
+                # expected transformed tariffs
+                #   Result format:
+                #     product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
+                #     eu_rep_rate, eu_part_rate, eu_eu_rate, world_average
                 [
-                    (201, 'DZA', 'BRA', 2015, 21.0, 21.0, None, None, None, None, 15.5, 15.5),
-                    (201, 'DZA', 'BRA', 2016, 21.0, None, None, None, None, None, 15.5, 15.5),
+                    (201, 12, 76, 2015, 21.0, 21.0, None, None, None, None, None, None),
+                    (201, 12, 76, 2016, 21.0, None, None, None, None, None, None, None),
                     # take previous rate for missing year
-                    (201, 'DZA', 'BRA', 2017, 21.0, None, None, None, None, None, 15.5, 15.5),
-                    (201, 'DZA', 'ZAF', 2015, 15.5, None, None, None, None, None, 15.5, 15.5),
-                    (201, 'DZA', 'ZAF', 2016, 10.0, 10.0, None, None, None, None, 15.5, 15.5),
-                    (201, 'DZA', 'ZAF', 2017, 10.0, None, None, None, None, None, 15.5, 15.5),
+                    (201, 12, 76, 2017, 21.0, None, None, None, None, None, None, None),
+                    # take previous rate for missing year
+                    (201, 12, 710, 2015, None, None, None, None, None, None, None, None),
+                    (201, 12, 710, 2016, 10.0, 10.0, None, None, None, None, None, None),
+                    # take previous rate for missing year
+                    (201, 12, 710, 2017, 10.0, None, None, None, None, None, None, None),
+                    # take previous rate for missing year
+                    (201, 76, 12, 2015, None, None, None, None, None, None, None, None),
+                    (201, 76, 12, 2016, None, None, None, None, None, None, None, None),
+                    (201, 76, 12, 2017, None, None, None, None, None, None, None, None),
+                    (201, 76, 710, 2015, None, None, None, None, None, None, None, None),
+                    (201, 76, 710, 2016, None, None, None, None, None, None, None, None),
+                    (201, 76, 710, 2017, None, None, None, None, None, None, None, None),
+                    (201, 710, 12, 2015, None, None, None, None, None, None, None, None),
+                    (201, 710, 12, 2016, None, None, None, None, None, None, None, None),
+                    (201, 710, 12, 2017, None, None, None, None, None, None, None, None),
+                    (201, 710, 76, 2015, None, None, None, None, None, None, None, None),
+                    (201, 710, 76, 2016, None, None, None, None, None, None, None, None),
+                    (201, 710, 76, 2017, None, None, None, None, None, None, None, None),
                 ],
             ),
         ),
     )
     def test_transform_of_datafile(
         self,
-        file_name,
-        baci,
+        raw_tariffs,
+        bound_tariffs,
+        year_range,
         required_countries,
         only_products,
         expected_rows,
-        add_dit_baci,
+        add_world_bank_raw_tariff,
+        add_world_bank_bound_rates,
         mocker,
     ):
-        add_dit_baci(baci)
+        patch_years(mocker, year_range)
         patch_required_countries(mocker, required_countries)
-        pipeline = WorldBankTariffPipeline(self.dbi, force=True)
-        fi = FileInfo.from_path(file_name)
-        pipeline.process(fi)
+        add_world_bank_raw_tariff(raw_tariffs)
+        add_world_bank_bound_rates(bound_tariffs)
         pipeline = WorldBankTariffTransformPipeline(self.dbi, force=True, products=only_products)
         pipeline.process()
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline)
@@ -622,36 +601,8 @@ class TestWorldBankTariffPipeline:
     def test_transform_of_datafile_continue(
         self, continue_transform, expected_rows, mocker, add_dit_baci
     ):
-        add_dit_baci(
-            [
-                {
-                    'id': 1,
-                    'year': 2018,
-                    'product_category': 201,
-                    'exporter': 76,
-                    'importer': 12,
-                    'trade_flow_value': 50,
-                    'quantity': 20,
-                },
-                {
-                    'id': 2,
-                    'year': 2018,
-                    'product_category': 301,
-                    'exporter': 710,
-                    'importer': 24,
-                    'trade_flow_value': 50,
-                    'quantity': 20,
-                },
-                {
-                    'id': 3,
-                    'year': 2018,
-                    'product_category': 401,
-                    'exporter': 710,
-                    'importer': 36,
-                    'trade_flow_value': 50,
-                    'quantity': 20,
-                },
-            ]
+        patch_years(
+            mocker, ('2018', '2018'),
         )
         patch_required_countries(
             mocker,
@@ -762,4 +713,13 @@ def patch_required_countries(mocker, countries):
         WorldBankTariffTransformPipeline,
         '_create_required_countries_view',
         _create_required_countries_view_patched,
+    )
+
+
+def patch_years(mocker, year_range):
+    mocker.patch.object(
+        WorldBankTariffTransformPipeline, 'cutoff_year', year_range[0],
+    )
+    mocker.patch.object(
+        WorldBankTariffTransformPipeline, 'final_year', year_range[1],
     )

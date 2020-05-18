@@ -55,8 +55,8 @@ arg_to_pipeline_config_list = {
     DITReferencePostcodesPipeline.data_source: [
         (DITReferencePostcodesPipeline, 'dit/reference_postcodes')
     ],
+    DITBACIPipeline.data_source: [(DITBACIPipeline, 'dit/baci')],
     WorldBankTariffPipeline.data_source: [
-        (DITBACIPipeline, 'dit/baci'),
         (DITEUCountryMembershipPipeline, 'dit/eu_country_membership'),
         (ComtradeCountryCodeAndISOPipeline, 'comtrade/country_code_and_iso'),
         (WorldBankBoundRatesPipeline, 'world_bank/bound_rates'),

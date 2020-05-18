@@ -296,13 +296,6 @@ class TestDataFileToDBBySource:
                         'continue_transform': False,
                         'force': False,
                         'products': None,
-                        'sub_directory': 'dit/baci',
-                        'pipeline': DITBACIPipeline,
-                    },
-                    {
-                        'continue_transform': False,
-                        'force': False,
-                        'products': None,
                         'sub_directory': 'dit/eu_country_membership',
                         'pipeline': DITEUCountryMembershipPipeline,
                     },
@@ -339,6 +332,20 @@ class TestDataFileToDBBySource:
                 None,
             ),
             (
+                ['--dit.baci'],
+                [
+                    {
+                        'continue_transform': False,
+                        'force': False,
+                        'products': None,
+                        'sub_directory': 'dit/baci',
+                        'pipeline': DITBACIPipeline,
+                    },
+                ],
+                True,
+                None,
+            ),
+            (
                 ['--ons.postcode_directory', '--force'],
                 [
                     {
@@ -355,13 +362,6 @@ class TestDataFileToDBBySource:
             (
                 ['--world_bank.tariff', '--continue'],
                 [
-                    {
-                        'continue_transform': True,
-                        'force': False,
-                        'products': None,
-                        'sub_directory': 'dit/baci',
-                        'pipeline': DITBACIPipeline,
-                    },
                     {
                         'continue_transform': True,
                         'force': False,
@@ -404,13 +404,6 @@ class TestDataFileToDBBySource:
             (
                 ['--world_bank.tariff', '--products', '1234,5623'],
                 [
-                    {
-                        'continue_transform': False,
-                        'force': False,
-                        'products': '1234,5623',
-                        'sub_directory': 'dit/baci',
-                        'pipeline': DITBACIPipeline,
-                    },
                     {
                         'continue_transform': False,
                         'force': False,

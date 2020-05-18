@@ -27,8 +27,8 @@ def test_get_world_bank_tariffs_single_row(
             {
                 'data_source_row_id': 1,
                 'product': 201,
-                'reporter': 'BGD',
-                'partner': 'BRB',
+                'reporter': 705,
+                'partner': 36,
                 'year': 1990,
                 'assumed_tariff': 10.0,
                 'app_rate': 11.0,
@@ -36,7 +36,7 @@ def test_get_world_bank_tariffs_single_row(
                 'bnd_rate': 14.0,
                 'eu_rep_rate': 10,
                 'eu_part_rate': 10,
-                'country_average': 15.0,
+                'eu_eu_rate': 15.0,
                 'world_average': 16.0,
             }
         ]
@@ -53,15 +53,15 @@ def test_get_world_bank_tariffs_single_row(
                 'appRate': 11.0,
                 'assumedTariff': 10.0,
                 'bndRate': 14.0,
-                'countryAverage': 15.0,
+                'euEuRate': 15.0,
+                'euPartRate': 10.0,
+                'euRepRate': 10.0,
                 'mfnRate': 12.0,
-                'partner': 'BRB',
+                'partner': 36,
                 'product': 201,
-                'reporter': 'BGD',
+                'reporter': 705,
                 'worldAverage': 16.0,
                 'year': 1990,
-                'euRepRate': 10,
-                'euPartRate': 10,
             }
         ],
     }

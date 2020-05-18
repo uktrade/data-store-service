@@ -133,7 +133,7 @@ def add_world_bank_tariff(app):
                 'bnd_rate': record.get('bnd_rate'),
                 'eu_rep_rate': record.get('eu_rep_rate'),
                 'eu_part_rate': record.get('eu_part_rate'),
-                'country_average': record.get('country_average'),
+                'eu_eu_rate': record.get('eu_eu_rate'),
                 'world_average': record.get('world_average'),
             }
             WorldBankTariffTransformL1.get_or_create(
