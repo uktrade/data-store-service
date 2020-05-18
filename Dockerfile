@@ -16,5 +16,4 @@ WORKDIR /app
 
 COPY . /app
 
-RUN scripts/compile_assets.sh
 CMD /app/scripts/entrypoint.sh
