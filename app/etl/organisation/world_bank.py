@@ -158,8 +158,8 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
     def process(self, file_info=None, drop_source=True, **kwargs):
         drop_existing = not self.options.continue_transform
         self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=drop_existing)
-        self._l0_to_l1()
         self.create_indices()
+        self._l0_to_l1()
         self.finish_processing()
 
     def create_indices(self):
