@@ -113,6 +113,7 @@ class DITEUCountryMembershipPipeline(L1SnapshotDataPipeline):
         ('"2015"', 'text'),
         ('"2016"', 'text'),
         ('"2017"', 'text'),
+        ('"2018"', 'text'),
     ]
 
     def _datafile_to_l0_temp(self, file_info):
