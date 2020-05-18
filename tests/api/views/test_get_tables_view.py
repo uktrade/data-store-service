@@ -80,4 +80,4 @@ def test_get_table_data_that_doesnt_exist(app_with_hawk_user, app_with_mock_cach
 def test_get_table_data_that_doesnt_have_id_columns(app_with_hawk_user, app_with_mock_cache):
     client = app_with_hawk_user.test_client()
     response = make_hawk_auth_request(client, '/api/v1/table-data/spire/applications')
-    assert response.status_code == 400
+    assert response.status_code == 422

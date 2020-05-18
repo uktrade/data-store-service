@@ -4,7 +4,7 @@ from data_engineering.common.views import ac, base, json_error
 from flask import current_app as flask_app
 from flask.views import View
 from sqlalchemy.engine.reflection import Inspector
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import NotFound, UnprocessableEntity
 
 
 def _get_columns(schema, table_name):
@@ -62,7 +62,7 @@ class TableDataView(base.PaginatedListView):
         columns = [column['name'] for column in _get_columns(self.schema, self.table_name)]
         # the id column is required for pagination
         if 'id' not in columns:
-            raise BadRequest
+            raise UnprocessableEntity('The table must have an id column')
         return ','.join([c for c in columns if c != 'id'])
 
     def get_from_clause(self):
