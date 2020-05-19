@@ -4,6 +4,7 @@ from multiprocessing.pool import ThreadPool as Pool
 
 import psycopg2
 from flask import current_app as flask_app
+from tqdm import tqdm
 
 from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
 from app.etl.organisation.dit import DITEUCountryMembershipPipeline
@@ -123,6 +124,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
     organisation = WorldBankTariffPipeline.organisation
     dataset = WorldBankTariffPipeline.dataset
     subdataset = 'transformed'
+    pbar = None
 
     _l0_data_column_types = None
 
@@ -158,7 +160,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
     def process(self, file_info=None, drop_source=True, **kwargs):
         drop_existing = not self.options.continue_transform
         self._create_table(self._l1_temp_table, self._l1_column_types, drop_existing=drop_existing)
-        self.create_indices()
+        # self.create_indices()  # slows down data insertion a lot
         self._l0_to_l1()
         self.finish_processing()
 
@@ -220,8 +222,8 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
         products = self._get_products()
         p = Pool(processes=10)
         connection_str = str(flask_app.db.engine.url)
+        self.pbar = tqdm(total=len(products))
         for i, product in enumerate(products):
-            print(f'Processing product: {i + 1}/{len(products)}', end='\t')
             code = str(product[0])
             p.apply_async(
                 self._clean_and_transform_tariffs,
@@ -229,7 +231,6 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             )
         p.close()
         p.join()
-        print('Done!')
 
     def _fq(self, table_name):
         return self.dbi.to_fully_qualified(table_name, self.schema)
@@ -273,7 +274,6 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
         """
         return self.dbi.execute_query(stmt, raise_if_fail=True)
 
-    @timeit
     def _clean_and_transform_tariffs(
         self, product, connection_str, world_bank_bound_rates_l1_table
     ):
@@ -333,33 +333,44 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                     eu_eu_rate,
                     mfn_avg as world_average,
                     coalesce(
-                        eu_eu_rate, -- eu to eu rate trumps all
                         app_rate,
                         eu_rep_rate,
-                        eu_part_rate,
-                        mfn_rate,
-                        mfn_avg
-                    ) as final_tariff
+                        eu_part_rate
+                    ) as ahs_final_tariff
                 from product_tariffs
             ), filled_tariffs as (
                 select
                     *,
-                    first_value(final_tariff)
+                    first_value(ahs_final_tariff)
                         OVER (
                             PARTITION BY reporter, partner,
-                            final_tariff_partition ORDER BY year
+                            ahs_final_tariff_partition ORDER BY year
                         )
-                    as filled_tariff
+                    as ahs_filled_tariff,
+                    first_value(mfn_rate)
+                        OVER (
+                            PARTITION BY reporter, partner,
+                            mfn_final_tariff_partition ORDER BY year
+                        )
+                    as mfn_filled_tariff
                 from (
                     select
                         *,
-                        count(final_tariff)
+                        count(ahs_final_tariff)
                             over (partition by reporter, partner ORDER BY year)
-                        as final_tariff_partition
+                        as ahs_final_tariff_partition,
+                        count(mfn_rate)
+                            over (partition by reporter, partner ORDER BY year)
+                        as mfn_final_tariff_partition
                     from cleaned_tariffs
                 ) sq
             ), assumed_tariffs as (
-                select *, coalesce(filled_tariff, world_average) as assumed_tariff
+                select *, coalesce(
+                    eu_eu_rate,
+                    ahs_filled_tariff,
+                    mfn_filled_tariff,
+                    world_average
+                ) as assumed_tariff
                 from filled_tariffs
             )
             insert into {self._l1_temp_table} (
@@ -402,6 +413,7 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                 curs.close()
             if conn:
                 conn.close()
+            self.pbar.update(1)
 
     @timeit
     def _create_required_countries_view(self):
@@ -862,7 +874,9 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             from all_tariffs t1
             left join {self._fq(self.eu_reporter_rates_vn)} t2
                 using (product, year, reporter, partner)
-        )
+        );
+        CREATE INDEX
+            ON {self._fq(self.tariffs_with_eu_reporter_rates_vn)} (product);
         """
         self.dbi.execute_statement(stmt, raise_if_fail=True)
 
@@ -886,7 +900,9 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
                 where eu_part = 'EUN'
                 group by product, year, reporter, eu_part
             ) sq1 where eu_part_rate is not null
-        )
+        );
+        CREATE INDEX
+            ON {self._fq(self.eu_partner_rates_vn)} (product);
         """
         self.dbi.execute_statement(stmt, raise_if_fail=True)
 
@@ -920,6 +936,8 @@ class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
             from world_reported_tariffs t1
             cross join {self._fq(self.required_countries_vn)} t2
             where t1.reporter != t2.iso_num
-        )
+        );
+        CREATE INDEX
+            ON {self._fq(self.tariffs_with_world_partner_rates_vn)} (product);
         """
         self.dbi.execute_statement(stmt, raise_if_fail=True)

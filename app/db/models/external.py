@@ -144,8 +144,8 @@ class WorldBankBoundRateL1(BaseModel):
 
     id = _col(_int, primary_key=True, autoincrement=True)
     data_source_row_id = _col(_int, unique=True)
-    reporter = _col(_int)
-    product = _col(_int)
+    reporter = _col(_int, index=True)
+    product = _col(_int, index=True)
     bound_rate = _col(_decimal)
 
 

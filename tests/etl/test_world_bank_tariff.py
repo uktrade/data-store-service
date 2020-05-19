@@ -145,9 +145,9 @@ class TestWorldBankTariffPipeline:
 
         # check L0
         expected_rows = [
-            (48, 1999, 201, 0, 'AHS', 5.0, 20),
-            (262, 2005, 201, 380, 'BND', 40.0, 40),
-            (266, 1998, 201, 0, 'AHS', 20.0, 20),
+            (48, 1999, 201, 0, 'AHS', 5, 20),
+            (262, 2005, 201, 380, 'BND', 40, 40),
+            (266, 1998, 201, 0, 'AHS', 20, 20),
         ]
         assert rows_equal_table(self.dbi, expected_rows, pipeline._l0_table, pipeline)
 
@@ -339,7 +339,7 @@ class TestWorldBankTariffPipeline:
                 [
                     (201, 12, 24, 2017, 30, None, 30, None, None, None, None, 17.5),
                     # mfn_rate used from 12 (DZA) - 0 (WLD)
-                    (201, 12, 76, 2017, 21, 21.0, 30, None, None, None, None, 17.5),
+                    (201, 12, 76, 2017, 21, 21, 30, None, None, None, None, 17.5),
                     # ahs_rate from 12 (DZA) - 76 (BRA) priority on MFN from 12 (DZA) - 0 (WLD)
                     (201, 12, 710, 2017, 30, None, 30, None, None, None, None, 17.5),
                     # mfn_rate used from 12 (DZA) - 0 (WLD)
@@ -514,12 +514,12 @@ class TestWorldBankTariffPipeline:
                 # raw tariffs
                 [
                     {
-                        'reporter': 12,
+                        'reporter': 918,
                         'year': 2015,
                         'product': 201,
-                        'partner': 76,
+                        'partner': 724,
                         'duty_type': 'AHS',
-                        'simple_average': 21,
+                        'simple_average': 5,
                         'number_of_total_lines': 13,
                     },
                     {
@@ -531,13 +531,58 @@ class TestWorldBankTariffPipeline:
                         'simple_average': 10,
                         'number_of_total_lines': 2,
                     },
+                    {
+                        'reporter': 12,
+                        'year': 2016,
+                        'product': 201,
+                        'partner': 705,
+                        'duty_type': 'AHS',
+                        'simple_average': 15,
+                        'number_of_total_lines': 2,
+                    },
+                    {
+                        'reporter': 12,
+                        'year': 2015,
+                        'product': 201,
+                        'partner': 0,
+                        'duty_type': 'MFN',
+                        'simple_average': 20,
+                        'number_of_total_lines': 2,
+                    },
+                    {
+                        'reporter': 12,
+                        'year': 2016,
+                        'product': 201,
+                        'partner': 0,
+                        'duty_type': 'MFN',
+                        'simple_average': 30,
+                        'number_of_total_lines': 2,
+                    },
+                    {
+                        'reporter': 705,
+                        'year': 2016,
+                        'product': 201,
+                        'partner': 0,
+                        'duty_type': 'MFN',
+                        'simple_average': 40,
+                        'number_of_total_lines': 2,
+                    },
+                    {
+                        'reporter': 705,
+                        'year': 2016,
+                        'product': 201,
+                        'partner': 724,
+                        'duty_type': 'AHS',
+                        'simple_average': 60,
+                        'number_of_total_lines': 2,
+                    },
                 ],
                 # bound tariffs
                 [],
                 # year range
                 ('2015', '2017'),
                 # required countries
-                [('BRA', 76, True), ('DZA', 12, True), ('ZAF', 710, True)],
+                [('ESP', 724, True), ('DZA', 12, True), ('SVN', 705, True)],
                 # products
                 None,
                 # expected transformed tariffs
@@ -545,28 +590,42 @@ class TestWorldBankTariffPipeline:
                 #     product, reporter, partner, year, assumed_tariff, app_rate, mfn_rate, bnd_rate
                 #     eu_rep_rate, eu_part_rate, eu_eu_rate, world_average
                 [
-                    (201, 12, 76, 2015, 21.0, 21.0, None, None, None, None, None, None),
-                    (201, 12, 76, 2016, 21.0, None, None, None, None, None, None, None),
-                    # take previous rate for missing year
-                    (201, 12, 76, 2017, 21.0, None, None, None, None, None, None, None),
-                    # take previous rate for missing year
-                    (201, 12, 710, 2015, None, None, None, None, None, None, None, None),
-                    (201, 12, 710, 2016, 10.0, 10.0, None, None, None, None, None, None),
-                    # take previous rate for missing year
-                    (201, 12, 710, 2017, 10.0, None, None, None, None, None, None, None),
-                    # take previous rate for missing year
-                    (201, 76, 12, 2015, None, None, None, None, None, None, None, None),
-                    (201, 76, 12, 2016, None, None, None, None, None, None, None, None),
-                    (201, 76, 12, 2017, None, None, None, None, None, None, None, None),
-                    (201, 76, 710, 2015, None, None, None, None, None, None, None, None),
-                    (201, 76, 710, 2016, None, None, None, None, None, None, None, None),
-                    (201, 76, 710, 2017, None, None, None, None, None, None, None, None),
-                    (201, 710, 12, 2015, None, None, None, None, None, None, None, None),
-                    (201, 710, 12, 2016, None, None, None, None, None, None, None, None),
-                    (201, 710, 12, 2017, None, None, None, None, None, None, None, None),
-                    (201, 710, 76, 2015, None, None, None, None, None, None, None, None),
-                    (201, 710, 76, 2016, None, None, None, None, None, None, None, None),
-                    (201, 710, 76, 2017, None, None, None, None, None, None, None, None),
+                    (201, 12, 705, 2015, 20, None, 20, None, None, None, None, 20),
+                    # mfn rate from 12-0 expanded
+                    (201, 12, 705, 2016, 15, 15, 30, None, None, 15, None, 35),
+                    # ahs 12-705
+                    (201, 12, 705, 2017, 15, None, None, None, None, None, None, None),
+                    # ahs previous year
+                    (201, 12, 724, 2015, 20, None, 20, None, None, None, None, 20),
+                    # mfn rate 12-0 expanded
+                    (201, 12, 724, 2016, 15, None, 30, None, None, 15, None, 35),
+                    # eu_part_rate as avg from 12-705 ahs
+                    (201, 12, 724, 2017, 15, None, None, None, None, None, None, None),
+                    # eu_part_rate from previous year
+                    (201, 705, 12, 2015, 20, None, None, None, None, None, None, 20),
+                    # world avg from 2015 mfn: 12-0
+                    (201, 705, 12, 2016, 40, None, 40, None, None, None, None, 35),
+                    # mfn rate: 705-0
+                    (201, 705, 12, 2017, 40, None, None, None, None, None, None, None),
+                    # mfn rate from previous year
+                    (201, 705, 724, 2015, 0, None, None, None, 5, None, 0, 20),
+                    # eu-eu trumps all
+                    (201, 705, 724, 2016, 0, 60, 40, None, None, 60, 0, 35),
+                    # eu-eu trumps all
+                    (201, 705, 724, 2017, 0, None, None, None, None, None, 0, None),
+                    # eu-eu trumps all
+                    (201, 724, 12, 2015, 20, None, None, None, None, None, None, 20),
+                    # world avg from 2015 mfn: 12-0
+                    (201, 724, 12, 2016, 35, None, None, None, None, None, None, 35),
+                    # world avg from 2016 mfn: 12-0, 705-0
+                    (201, 724, 12, 2017, None, None, None, None, None, None, None, None),
+                    # nothing available
+                    (201, 724, 705, 2015, 0, None, None, None, None, None, 0, 20),
+                    # eu-eu trumps all
+                    (201, 724, 705, 2016, 0, None, None, None, None, None, 0, 35),
+                    # eu-eu trumps all
+                    (201, 724, 705, 2017, 0, None, None, None, None, None, 0, None)
+                    # eu-eu trumps all
                 ],
             ),
         ),
