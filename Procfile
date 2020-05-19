@@ -1,1 +1,1 @@
-web: make run_server
+web: npm run build; make run_server
