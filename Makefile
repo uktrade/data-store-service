@@ -23,7 +23,7 @@ run_tests_local:
 
 check: flake8 black
 
-compile_assets:
+compile_assets: install_node
 	./scripts/compile_assets.sh
 
 format: CHECK=
@@ -34,3 +34,6 @@ black:
 
 flake8:
 	flake8 .
+
+install_node:
+	./scripts/install_node.sh
