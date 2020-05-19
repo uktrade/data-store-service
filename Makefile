@@ -5,7 +5,7 @@ BLACK_CONFIG ?= --exclude=venv --skip-string-normalization --line-length 100
 CHECK ?= --check
 
 .PHONY: run_server
-run_server: compile_assets
+run_server:
 	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
 
 
@@ -23,9 +23,6 @@ run_tests_local:
 
 check: flake8 black
 
-compile_assets: install_node
-	./scripts/compile_assets.sh
-
 format: CHECK=
 format: black
 
@@ -34,6 +31,3 @@ black:
 
 flake8:
 	flake8 .
-
-install_node:
-	./scripts/install_node.sh
