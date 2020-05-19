@@ -8,9 +8,11 @@ from data_engineering.common.db.models import (
     _int,
     _sa,
     _text,
+    _unique,
     BaseModel,
 )
-from sqlalchemy import or_
+from slugify import slugify
+from sqlalchemy import event, or_
 
 from app import constants
 from app.constants import DatafileState
@@ -79,3 +81,24 @@ class DatafileRegistryModel(BaseModel):
         for row in query:
             processed_dfs_per_pipeline[row[0]].append(row[1])
         return processed_dfs_per_pipeline
+
+
+class Pipeline(BaseModel):
+    __tablename__ = 'pipeline'
+    __table_args__ = (
+        _unique('organisation', 'dataset', name='organisation_dataset_unique_together'),
+        {'schema': 'public'},
+    )
+
+    id = _col('id', _int, primary_key=True, autoincrement=True)
+    organisation = _col(_text, nullable=False)
+    dataset = _col(_text, nullable=False)
+    slug = _col(_text, nullable=False)
+
+    @staticmethod
+    def generate_slug(mapper, connection, target):
+        if not target.slug:
+            target.slug = slugify(f'{target.organisation} {target.dataset}')
+
+
+event.listen(Pipeline, 'before_insert', Pipeline.generate_slug)
