@@ -5,7 +5,12 @@ from flask.blueprints import Blueprint
 
 from app.db.models.internal import Pipeline, PipelineDataFile
 from app.uploader.forms import DataFileForm, PipelineForm, PipelineSelectForm, VerifyDataFileForm
-from app.uploader.utils import get_s3_file_sample, process_pipeline_data_file, upload_file
+from app.uploader.utils import (
+    get_s3_file_sample,
+    process_pipeline_data_file,
+    save_column_types,
+    upload_file,
+)
 
 templates_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 
@@ -81,11 +86,11 @@ def pipeline_data_verify(slug, file_id):
     pipeline_data_file = get_object_or_404(
         PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False
     )
+    file_contents = get_s3_file_sample(
+        pipeline_data_file.data_file_url, pipeline.delimiter, pipeline.quote
+    )
     form = VerifyDataFileForm()
     if not form.validate_on_submit():
-        file_contents = get_s3_file_sample(
-            pipeline_data_file.data_file_url, pipeline.delimiter, pipeline.quote
-        )
         dict_file_contents = file_contents.to_dict()
         return render_template(
             'pipeline_data_verify.html',
@@ -95,6 +100,7 @@ def pipeline_data_verify(slug, file_id):
             form=form,
         )
     if form.proceed.data == 'yes':
+        save_column_types(pipeline, file_contents)
         process_pipeline_data_file(pipeline_data_file)
         return redirect(
             url_for(

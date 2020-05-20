@@ -27,9 +27,7 @@ class DatafileRegistryModel(BaseModel):
     __tablename__ = 'datafile_registry'
     __table_args__ = {'schema': 'operations'}
 
-    processing_state = _enum(
-        *DatafileState.values(), name='processing_state', inherit_schema=True
-    )
+    processing_state = _enum(*DatafileState.values(), name='processing_state', inherit_schema=True)
 
     id = _col('id', _int, primary_key=True, autoincrement=True)
     source = _col(_text, nullable=False)

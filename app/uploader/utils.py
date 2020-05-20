@@ -38,3 +38,10 @@ def process_pipeline_data_file(pipeline_data_file):
 
 def move_file_in_s3(pipeline_data_file):
     pass
+
+
+def save_column_types(pipeline, file_contents):
+    columns = file_contents.columns.to_list()
+    mapped_column_types = list(zip(columns, ['text'] * len(columns)))
+    pipeline.column_types = mapped_column_types
+    pipeline.save()

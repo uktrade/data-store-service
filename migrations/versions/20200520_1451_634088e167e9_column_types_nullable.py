@@ -7,8 +7,8 @@ Create Date: 2020-05-20 14:51:54.657792
 """
 import sqlalchemy as sa
 from alembic import context, op
-from sqlalchemy.sql.schema import quoted_name  # noqa: F401
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.sql.schema import quoted_name  # noqa: F401
 
 from app.db.models import get_schemas
 
