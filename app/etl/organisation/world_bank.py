@@ -9,7 +9,7 @@ from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
 from app.etl.organisation.dit import DITBACIPipeline
 from app.etl.organisation.dit import DITEUCountryMembershipPipeline
 from app.etl.pipeline_type.incremental_data import IncrementalDataPipeline
-from app.etl.pipeline_type.snapshot_data import SnapshotDataPipeline
+from app.etl.pipeline_type.snapshot_data import L1SnapshotDataPipeline
 
 
 def timeit(method):
@@ -23,7 +23,7 @@ def timeit(method):
     return timed
 
 
-class WorldBankBoundRatesPipeline(SnapshotDataPipeline):
+class WorldBankBoundRatesPipeline(L1SnapshotDataPipeline):
     organisation = 'world_bank'
     dataset = 'bound_rates'
 

@@ -2,6 +2,7 @@ import datetime
 from collections import defaultdict
 
 from data_engineering.common.db.models import (
+    _array,
     _col,
     _dt,
     _enum,
@@ -94,6 +95,9 @@ class Pipeline(BaseModel):
     organisation = _col(_text, nullable=False)
     dataset = _col(_text, nullable=False)
     slug = _col(_text, nullable=False)
+    column_types = _col(_array(_text), nullable=False)
+    delimiter = _col(_text, nullable=False, server_default=',')
+    quote = _col(_text, server_default='"')
 
     @staticmethod
     def generate_slug(mapper, connection, target):

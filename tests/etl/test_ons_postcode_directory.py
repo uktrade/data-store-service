@@ -458,11 +458,11 @@ class TestONSPostcodeDirectoryPipeline:
         assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l1_table, pipeline)
 
     def test_new_data(self, app_with_db):
-        pipeline = ONSPostcodeDirectoryPipeline(app_with_db.dbi, force=False)
+        pipeline = ONSPostcodeDirectoryPipeline(app_with_db.dbi, force=False, delete_previous=True)
         fi = FileInfo.from_path(snapshot1)
-        pipeline.process(fi, delete_previous=True)
+        pipeline.process(fi)
         fi2 = FileInfo.from_path(snapshot2)
-        pipeline.process(fi2, delete_previous=True)
+        pipeline.process(fi2)
 
         # check L0
         expected_rows = [
