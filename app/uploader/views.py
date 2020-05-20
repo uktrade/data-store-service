@@ -17,6 +17,11 @@ uploader_views = Blueprint(
 )
 
 
+def render_uploader_template(*args, **kwargs):
+    kwargs['active_menu'] = 'upload'
+    return render_template(*args, **kwargs)
+
+
 def get_object_or_404(model, **kwargs):
     obj = model.query.filter_by(**kwargs).first()
     if not obj:
@@ -35,7 +40,7 @@ def pipeline_select():
         return redirect(
             url_for('uploader_views.pipeline_data_upload', slug=form.pipeline.data.slug)
         )
-    return render_template('pipeline_select.html', form=form, show_form=show_form)
+    return render_uploader_template('pipeline_select.html', form=form, show_form=show_form)
 
 
 @uploader_views.route('/create/', methods=('GET', 'POST'))
@@ -45,13 +50,13 @@ def pipeline_create():
         pipeline = Pipeline(dataset=form.dataset.data, organisation=form.organisation.data)
         pipeline.save()
         return redirect(url_for('uploader_views.pipeline_created', slug=pipeline.slug))
-    return render_template('pipeline_create.html', heading='Create dataset', form=form)
+    return render_uploader_template('pipeline_create.html', heading='Create dataset', form=form)
 
 
 @uploader_views.route('/created/<slug>/')
 def pipeline_created(slug):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    return render_template('pipeline_created.html', pipeline=pipeline)
+    return render_uploader_template('pipeline_created.html', pipeline=pipeline)
 
 
 @uploader_views.route('/data/<slug>/', methods=('GET', 'POST'))
@@ -61,7 +66,7 @@ def pipeline_data_upload(slug):
     if form.validate_on_submit():
         upload_file(form.csv_file.data, form.csv_file.data.filename, pipeline)
         return redirect(url_for('uploader_views.pipeline_data_uploaded', slug=pipeline.slug))
-    return render_template(
+    return render_uploader_template(
         'pipeline_data_upload.html', pipeline=pipeline, form=form, heading='Upload data'
     )
 
@@ -69,4 +74,4 @@ def pipeline_data_upload(slug):
 @uploader_views.route('/data/<slug>/uploaded/')
 def pipeline_data_uploaded(slug):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    return render_template('pipeline_data_uploaded.html', pipeline=pipeline)
+    return render_uploader_template('pipeline_data_uploaded.html', pipeline=pipeline)
