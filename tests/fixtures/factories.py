@@ -531,6 +531,20 @@ class SPIREUltimateEndUserFactory(BaseFactory):
 class PipelineFactory(BaseFactory):
     organisation = factory.Faker('word')
     dataset = factory.Faker('word')
+    delimiter = factory.Faker('random_element', elements=[',', '\t', ';'])
+    quote = factory.Faker('random_element', elements=['"', None])
+
+    @factory.lazy_attribute
+    def column_types(self):
+        _types = []
+        for i in range(0, random.randint(1, 10)):
+            _types.append(
+                [
+                    factory.Faker('word').generate(),
+                    random.choice(['text', 'int', 'boolean', 'decimal']),
+                ]
+            )
+        return _types
 
     class Meta:
         model = Pipeline

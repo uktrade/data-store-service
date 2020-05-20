@@ -1,7 +1,7 @@
 from io import BytesIO
 
 from app.etl.pipeline_type.incremental_data import IncrementalDataPipeline
-from app.etl.pipeline_type.snapshot_data import SnapshotDataPipeline
+from app.etl.pipeline_type.snapshot_data import L1SnapshotDataPipeline
 
 
 class DITBACIPipeline(IncrementalDataPipeline):
@@ -46,7 +46,7 @@ class DITBACIPipeline(IncrementalDataPipeline):
     }
 
 
-class DITEUCountryMembershipPipeline(SnapshotDataPipeline):
+class DITEUCountryMembershipPipeline(L1SnapshotDataPipeline):
     organisation = 'dit'
     dataset = 'eu_country_membership'
 
@@ -155,7 +155,7 @@ class DITEUCountryMembershipPipeline(SnapshotDataPipeline):
         self.dbi.execute_statement(stmt)
 
 
-class DITReferencePostcodesPipeline(SnapshotDataPipeline):
+class DITReferencePostcodesPipeline(L1SnapshotDataPipeline):
     organisation = 'dit'
     dataset = 'reference_postcodes'
 

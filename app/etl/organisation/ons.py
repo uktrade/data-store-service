@@ -1,9 +1,9 @@
 from io import BytesIO
 
-from app.etl.pipeline_type.snapshot_data import SnapshotDataPipeline
+from app.etl.pipeline_type.snapshot_data import L1SnapshotDataPipeline
 
 
-class ONSPostcodeDirectoryPipeline(SnapshotDataPipeline):
+class ONSPostcodeDirectoryPipeline(L1SnapshotDataPipeline):
     organisation = 'ons'
     dataset = 'postcode_directory'
 

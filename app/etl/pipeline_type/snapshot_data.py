@@ -3,22 +3,20 @@ from abc import abstractmethod
 from app.etl.pipeline_type.base import LDataPipeline
 
 
-class SnapshotDataPipeline(LDataPipeline):
+class L0SnapshotDataPipeline(LDataPipeline):
     """ Abstract class for standard pipelines that ingest data snapshots
 
     This class implements the abstract process method of a CleanDataPipeline as:
         1) parse file_info object into L0.temp (_datafile_to_l0_temp)
         2) update L0 data with L0.temp snapshot data (_l0_temp_to_l0)
-        3) standardise L0 data and copy into L1 (_l0_to_l1)
-        4) clean up L0.temp
+        3) clean up L0.temp
 
     Snapshot data is stored as follows:
-        - new data records are appended to existing L0, L1 records
+        - new data records are appended to existing L0 records
         - L0 includes a datafile_created column to identify the file
             from which the record was originally created
         - L0 includes a datafile_updated column to track the latest
             snapshot file in which the record was present
-        - L1 records are linked to L0 records by the data_source_row_id column
     """
 
     @property
@@ -51,36 +49,27 @@ class SnapshotDataPipeline(LDataPipeline):
     def _l0_column_types(self):
         return self.l0_helper_columns + self._l0_data_column_types
 
-    @property
-    @abstractmethod
-    def _l1_data_column_types(self):
-        """ returns list of tuples containing l1 column names and
-            their sql type [(l1_column_1_name, sql_type), ...]
-        """
-        ...
-
-    @property
-    def _l1_column_types(self):
-        return self.l1_helper_columns + self._l1_data_column_types
-
-    def process(self, file_info, delete_previous=False, **kwargs):
+    def l0_process(self, file_info):
         datafile_name = file_info.name.split('/')[-1]
 
         self._create_table(self._l0_temp_table, self._l0_data_column_types, drop_existing=True)
-        self._create_table(self._l0_table, self._l0_column_types, unique_column_names=['data_hash'])
         self._create_table(
-            self._l1_table, self._l1_column_types, unique_column_names=['data_source_row_id']
+            self._l0_table,
+            self._l0_column_types,
+            unique_column_names=['data_hash'],
+            drop_existing=self.options.force,
         )
 
         self._datafile_to_l0_temp(file_info)
         self._l0_temp_to_l0(datafile_name)
-        self._l0_to_l1(datafile_name)
 
         self.dbi.drop_table(self._l0_temp_table)
 
-        if delete_previous:
-            self._delete_from_l1(datafile_name)
-            self._delete_from_l0(datafile_name)
+    def process(self, file_info, **kwargs):
+        self.l0_process(file_info)
+
+        if not self.options.force and self.options.delete_previous:
+            self._delete_from_l0(file_info.name.split('/')[-1])
 
     def _create_table(
         self, table_name, column_types, unique_column_names=None, drop_existing=False
@@ -137,6 +126,69 @@ class SnapshotDataPipeline(LDataPipeline):
         """
         self.dbi.execute_statement(stmt)
 
+    def _delete_from_l0(self, file_name):
+        delete = f"""
+                    with delete_from_l0 as (
+                       select id, datafile_updated
+                       from {self._l0_table}
+                       where datafile_updated != '{file_name}'
+                    )
+                    delete from {self._l0_table} l0
+                    where exists (
+                        select 1
+                        from delete_from_l0 dl0
+                        where dl0.id = l0.id
+                    )
+                """
+        self.dbi.execute_statement(delete)
+
+
+class L1SnapshotDataPipeline(L0SnapshotDataPipeline):
+    """ Abstract class for standard pipelines that ingest data snapshots
+
+    This class implements the abstract process method of a CleanDataPipeline as:
+        1) parse file_info object into L0.temp (_datafile_to_l0_temp)
+        2) update L0 data with L0.temp snapshot data (_l0_temp_to_l0)
+        3) standardise L0 data and copy into L1 (_l0_to_l1)
+        4) clean up L0.temp
+
+    Snapshot data is stored as follows:
+        - new data records are appended to existing L0, L1 records
+        - L0 includes a datafile_created column to identify the file
+            from which the record was originally created
+        - L0 includes a datafile_updated column to track the latest
+            snapshot file in which the record was present
+        - L1 records are linked to L0 records by the data_source_row_id column
+    """
+
+    @property
+    @abstractmethod
+    def _l1_data_column_types(self):
+        """ returns list of tuples containing l1 column names and
+            their sql type [(l1_column_1_name, sql_type), ...]
+        """
+        ...
+
+    @property
+    def _l1_column_types(self):
+        return self.l1_helper_columns + self._l1_data_column_types
+
+    def process(self, file_info, **kwargs):
+        super().l0_process(file_info)
+
+        datafile_name = file_info.name.split('/')[-1]
+        self._create_table(
+            self._l1_table,
+            self._l1_column_types,
+            unique_column_names=['data_source_row_id'],
+            drop_existing=self.options.force,
+        )
+        self._l0_to_l1(datafile_name)
+
+        if not self.options.force and self.options.delete_previous:
+            self._delete_from_l1(datafile_name)
+            self._delete_from_l0(datafile_name)
+
     # LO TO L1
     @property
     @abstractmethod
@@ -175,41 +227,24 @@ class SnapshotDataPipeline(LDataPipeline):
 
     def _delete_from_l1(self, file_name):
         delete = f"""
-                    with delete_from_l0 as (
-                       select id, datafile_updated
-                       from {self._l0_table}
-                       where datafile_updated != '{file_name}'
-                    )
-                    , delete_from_l1 as (
-                       select
-                         l1.id as l1_id,
-                         l1.data_source_row_id as l0_id,
-                         l0.datafile_updated
-                       from delete_from_l0 l0
-                        left join {self._l1_table} l1
-                         on l0.id = l1.data_source_row_id
-                    )
-                    delete from {self._l1_table} l1
-                    where exists (
-                        select 1
-                        from delete_from_l1 dl1
-                        where dl1.l1_id = l1.id
-                    )
-                """
-        self.dbi.execute_statement(delete)
-
-    def _delete_from_l0(self, file_name):
-        delete = f"""
-                    with delete_from_l0 as (
-                       select id, datafile_updated
-                       from {self._l0_table}
-                       where datafile_updated != '{file_name}'
-                    )
-                    delete from {self._l0_table} l0
-                    where exists (
-                        select 1
-                        from delete_from_l0 dl0
-                        where dl0.id = l0.id
-                    )
-                """
+            with delete_from_l0 as (
+               select id, datafile_updated
+               from {self._l0_table}
+               where datafile_updated != '{file_name}'
+            ), delete_from_l1 as (
+               select
+                 l1.id as l1_id,
+                 l1.data_source_row_id as l0_id,
+                 l0.datafile_updated
+               from delete_from_l0 l0
+                left join {self._l1_table} l1
+                 on l0.id = l1.data_source_row_id
+            )
+            delete from {self._l1_table} l1
+            where exists (
+                select 1
+                from delete_from_l1 dl1
+                where dl1.l1_id = l1.id
+            )
+        """
         self.dbi.execute_statement(delete)

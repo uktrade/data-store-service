@@ -37,6 +37,7 @@ class DataPipeline(metaclass=ABCMeta):
 
     def set_option_defaults(self, options):
         options.setdefault('force', False)
+        options.setdefault('delete_previous', False)
         return options
 
     def get_options(self, options):
@@ -115,7 +116,6 @@ class LDataPipeline(DataPipeline, metaclass=ABCMeta):
 
     L0_TABLE = 'L0'
     L1_TABLE = 'L1'
-    L2_TABLE = 'L2'
 
     @property
     def l1_helper_columns(self):

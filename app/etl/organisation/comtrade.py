@@ -1,7 +1,7 @@
-from app.etl.pipeline_type.snapshot_data import SnapshotDataPipeline
+from app.etl.pipeline_type.snapshot_data import L1SnapshotDataPipeline
 
 
-class ComtradeCountryCodeAndISOPipeline(SnapshotDataPipeline):
+class ComtradeCountryCodeAndISOPipeline(L1SnapshotDataPipeline):
     organisation = 'comtrade'
     dataset = 'country_code_and_iso'
 
