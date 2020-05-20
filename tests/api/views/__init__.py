@@ -16,3 +16,8 @@ def make_hawk_auth_request(client, url):
     sender = get_mohawk_sender('http://localhost:80' + url)
     response = client.get(url, headers={'Authorization': sender.request_header})
     return response
+
+
+def make_sso_request(client, url):
+    response = client.get(url)
+    return response

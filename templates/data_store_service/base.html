@@ -43,13 +43,13 @@
 			class="govuk-header__navigation"
 			aria-label="Top Level Navigation">
                         <li class="{% if active_menu == 'home' %} govuk-header__navigation-item govuk-header__navigation-item--active {% else %} govuk-header__navigation-item {% endif %}">
-                            <a class="govuk-header__link" href="/">
+                            <a class="govuk-header__link" href="{{ url_for('index') }}">
 				Home
 			    </a>
                         </li>
-                        <li class="{% if active_menu == 'not_active' %} govuk-header__navigation-item--active-2 {% else %} govuk-header__navigation-item {% endif %}">
-                            <a class="govuk-header__link" href="not-active">
-				Not active
+                        <li class="{% if active_menu == 'upload' %} govuk-header__navigation-item govuk-header__navigation-item--active {% else %} govuk-header__navigation-item {% endif %}">
+                            <a class="govuk-header__link" href="{{ url_for('uploader_views.pipeline_select') }}">
+				Manage datasets
 			    </a>
                         </li>
 		    </ul>
@@ -70,9 +70,7 @@
             </div>
 	    
 	    <main id="main-content" class="govuk-main-wrapper">
-		{% block content %}
-		<p class="govuk-body">Content goes here</p>
-		{% endblock %}
+		{% block content %}{% endblock %}
 	    </main>
 	    
         </div>
