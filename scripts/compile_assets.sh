@@ -3,4 +3,4 @@
 source ./scripts/functions.sh
 
 run "npm install"
-run "npm run build"
+run "npm run-script build"
