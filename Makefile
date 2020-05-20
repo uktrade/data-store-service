@@ -1,7 +1,7 @@
 PORT ?= 5050
 TEST ?=.
 COV ?= --cov
-BLACK_CONFIG ?= --exclude=venv --skip-string-normalization --line-length 100
+BLACK_CONFIG ?= --exclude=venv --exclude=node_modules --skip-string-normalization --line-length 100
 CHECK ?= --check
 
 compile_assets:

@@ -5,9 +5,10 @@ import pytest
 from flask import template_rendered, url_for
 from slugify import slugify
 
+from app.constants import DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR, NO, YES
 from app.db.models.internal import Pipeline
 from tests.api.views import make_sso_request
-from tests.fixtures.factories import PipelineFactory
+from tests.fixtures.factories import PipelineDataFileFactory, PipelineFactory
 
 
 def get_client(app):
@@ -50,7 +51,7 @@ def test_get_select_pipeline_view_with_no_pipelines(app_with_db, captured_templa
     html = response.get_data(as_text=True)
     assert 'Add new dataset' in html
     assert template_context['show_form'] is False
-    assert 'Update dataset' not in html
+    assert 'Continue to upload data' not in html
 
 
 def test_get_select_pipeline_view_with_pipelines(app_with_db, captured_templates):
@@ -63,7 +64,7 @@ def test_get_select_pipeline_view_with_pipelines(app_with_db, captured_templates
     html = response.get_data(as_text=True)
     assert 'Add new dataset' in html
     assert template_context['show_form'] is True
-    assert 'Update dataset' in html
+    assert 'Continue to upload data' in html
 
 
 def test_submit_form_select_pipeline_view(app_with_db, captured_templates):
@@ -88,7 +89,7 @@ def test_get_pipeline_create_view(app_with_db, captured_templates):
         client, url, 'pipeline_create.html', captured_templates,
     )
     html = response.get_data(as_text=True)
-    assert 'Create dataset' in html
+    assert 'Create pipeline' in html
     assert 'Add new dataset' not in html
 
 
@@ -158,14 +159,16 @@ def test_get_pipeline_created_view_404_unknown_pipeline(app_with_db, captured_te
 
 
 def test_get_data_uploaded_view(app_with_db, captured_templates):
-    pipeline = PipelineFactory()
+    data_file = PipelineDataFileFactory()
     client = get_client(app_with_db)
-    url = url_for('uploader_views.pipeline_data_uploaded', slug=pipeline.slug)
+    url = url_for(
+        'uploader_views.pipeline_data_uploaded', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
     response, template_context = _test_view(
         client, url, 'pipeline_data_uploaded.html', captured_templates,
     )
     html = response.get_data(as_text=True)
-    assert 'Data successfully uploaded' in html
+    assert 'Data now being processed' in html
 
 
 def test_get_data_upload_view(app_with_db, captured_templates):
@@ -179,17 +182,110 @@ def test_get_data_upload_view(app_with_db, captured_templates):
     assert 'Upload data' in html
 
 
+@mock.patch('app.uploader.utils.open')
+def test_get_data_verify_view(mock_smart_open, app_with_db, captured_templates):
+    csv_string = 'hello,goodbye\n1,2\n3,4'
+    mock_smart_open.return_value = io.StringIO(csv_string)
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    response, template_context = _test_view(
+        client, url, 'pipeline_data_verify.html', captured_templates,
+    )
+    html = response.get_data(as_text=True)
+    assert 'Data successfully uploaded' in html
+
+
+@mock.patch('app.uploader.utils.open')
+def test_get_data_verify_error_view(mock_smart_open, app_with_db, captured_templates):
+    mock_smart_open.side_effect = UnicodeDecodeError('Error', b'', 1, 2, '')
+
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    response, template_context = _test_view(
+        client, url, 'pipeline_data_verify.html', captured_templates,
+    )
+    html = response.get_data(as_text=True)
+    assert 'Try again' in html
+
+    form = template_context['form']
+    assert form.errors == {
+        'non_field_errors': [
+            'Unable to process file - please check your file is a valid CSV and try again'
+        ]
+    }
+
+
+def test_submit_data_verify_proceed_no(app_with_db, captured_templates):
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    form_data = {'proceed': NO}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    html = response.get_data(as_text=True)
+    assert 'Continue to upload data' in html
+    template, template_context = captured_templates.pop()
+    assert template.name == 'pipeline_select.html'
+    assert template_context['request'].path == url_for('uploader_views.pipeline_select')
+    assert data_file.deleted is True
+
+
+@mock.patch('app.uploader.views.process_pipeline_data_file')
+@mock.patch('app.uploader.utils.open')
+def test_submit_data_verify_proceed_yes(
+    mock_smart_open, mock_process_pipeline_data_file, app_with_db, captured_templates
+):
+    mock_process_pipeline_data_file.return_value = None
+    csv_string = 'hello,goodbye\n1,2\n3,4'
+    mock_smart_open.return_value = io.StringIO(csv_string)
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    form_data = {'proceed': YES}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    html = response.get_data(as_text=True)
+    assert 'Data now being processed' in html
+    template, template_context = captured_templates.pop()
+    assert template.name == 'pipeline_data_uploaded.html'
+    assert template_context['request'].path == url_for(
+        'uploader_views.pipeline_data_uploaded', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    assert data_file.deleted is False
+    assert mock_process_pipeline_data_file.called is True
+
+
+@mock.patch('app.uploader.utils.open')
 @mock.patch('app.uploader.views.upload_file')
-def test_submit_data_upload_view(mock_upload_file, app_with_db, captured_templates):
-    mock_upload_file.return_value = None
-    pipeline = PipelineFactory()
+def test_submit_data_upload_view(
+    mock_upload_file, mock_smart_open, app_with_db, captured_templates
+):
+    csv_string = 'hello,goodbye\n1,2\n3,4'
+    mock_smart_open.return_value = io.StringIO(csv_string)
+    mock_upload_file.return_value = 'fakefile.csv'
+    pipeline = PipelineFactory(delimiter=DEFAULT_CSV_DELIMITER, quote=DEFAULT_CSV_QUOTECHAR)
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
-
-    form_data = {'csv_file': (io.BytesIO(b"abcdef"), 'test.csv')}
+    form_data = {'csv_file': (io.BytesIO(b"hello,goodbye\n1,2\n3,4"), 'test.csv')}
     response = client.post(
         url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
     )
     assert mock_upload_file.called is True
     html = response.get_data(as_text=True)
     assert 'Data successfully uploaded' in html
+
+    template, template_context = captured_templates.pop()
+    file_contents = template_context['file_contents']
+    assert file_contents == {'goodbye': {0: '2', 1: '4'}, 'hello': {0: '1', 1: '3'}}

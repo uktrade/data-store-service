@@ -13,7 +13,8 @@ backcall==0.1.0           # via ipython
 black==19.10b0            # via -r requirements.in, data-engineering-common
 blinker==1.4              # via flask-mail, flask-principal
 blis==0.4.1               # via spacy, thinc
-boto3==1.11.10            # via uktrade-data-tools
+boto3==1.11.10            # via smart-open, uktrade-data-tools
+boto==2.49.0              # via smart-open
 botocore==1.14.10         # via boto3, s3transfer
 catalogue==1.0.0          # via spacy, thinc
 certifi==2019.11.28       # via data-engineering-common, requests
@@ -94,9 +95,10 @@ pyyaml==5.3.1             # via -r requirements.in, data-engineering-common
 redis==3.5.1              # via -r requirements.in, data-engineering-common
 regex==2020.1.8           # via black
 requests-oauthlib==1.1.0  # via -r requirements.in, flask-oauthlib
-requests==2.22.0          # via codecov, data-engineering-common, requests-oauthlib, spacy
+requests==2.22.0          # via codecov, data-engineering-common, requests-oauthlib, smart-open, spacy
 s3transfer==0.3.2         # via boto3
 six==1.14.0               # via apscheduler, freezegun, mohawk, packaging, pip-tools, python-dateutil, sqlalchemy-utils, traitlets
+smart_open==2.0.0         # via -r requirements.in
 spacy==2.2.4              # via -r requirements.in
 speaklater==1.3           # via flask-babelex
 sqlalchemy-utils==0.36.5  # via -r requirements.in, data-engineering-common
