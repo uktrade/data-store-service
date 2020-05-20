@@ -3,4 +3,5 @@
 applications:
 -
   buildpack:
+    - nodejs_buildpack
     - python_buildpack

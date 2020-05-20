@@ -2,12 +2,14 @@ from app.api.views import (
     dit_baci,
     dit_reference_postcodes,
     get_table,
+    index,
     ons_postcodes,
     world_bank_bound_rates,
     world_bank_tariffs,
 )
 
 RULES = [
+    ('/', index.index),
     (
         '/api/v1/get-dit-reference-postcodes/',
         dit_reference_postcodes.DitReferencePostcodeListView.as_view(
