@@ -144,8 +144,8 @@ class WorldBankBoundRateL1(BaseModel):
 
     id = _col(_int, primary_key=True, autoincrement=True)
     data_source_row_id = _col(_int, unique=True)
-    reporter = _col(_int)
-    product = _col(_int)
+    reporter = _col(_int, index=True)
+    product = _col(_int, index=True)
     bound_rate = _col(_decimal)
 
 
@@ -179,8 +179,8 @@ class WorldBankTariffTransformL1(BaseModel):
     id = _col(_int, primary_key=True, autoincrement=True)
     data_source_row_id = _col(_int, unique=True)
     product = _col(_int)
-    reporter = _col(_text)
-    partner = _col(_text)
+    reporter = _col(_int)
+    partner = _col(_int)
     year = _col(_int)
     assumed_tariff = _col(_decimal)
     app_rate = _col(_decimal)
@@ -188,7 +188,7 @@ class WorldBankTariffTransformL1(BaseModel):
     bnd_rate = _col(_decimal)
     eu_rep_rate = _col(_decimal)
     eu_part_rate = _col(_decimal)
-    country_average = _col(_decimal)
+    eu_eu_rate = _col(_decimal)
     world_average = _col(_decimal)
 
     Index(f"{__tablename__}_product_idx", product, postgresql_using='hash')

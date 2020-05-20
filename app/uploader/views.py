@@ -47,7 +47,11 @@ def pipeline_select():
 def pipeline_create():
     form = PipelineForm()
     if form.validate_on_submit():
-        pipeline = Pipeline(dataset=form.dataset.data, organisation=form.organisation.data)
+        pipeline = Pipeline(
+            dataset=form.dataset.data,
+            organisation=form.organisation.data,
+            column_types=[['temp', 'text']],  # temporary placeholder
+        )
         pipeline.save()
         return redirect(url_for('uploader_views.pipeline_created', slug=pipeline.slug))
     return render_uploader_template('pipeline_create.html', heading='Create dataset', form=form)
