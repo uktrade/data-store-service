@@ -83,7 +83,9 @@ def pipeline_data_verify(slug, file_id):
     )
     form = VerifyDataFileForm()
     if not form.validate_on_submit():
-        file_contents = get_s3_file_sample(pipeline_data_file.data_file_url)
+        file_contents = get_s3_file_sample(
+            pipeline_data_file.data_file_url, pipeline.delimiter, pipeline.quote
+        )
         dict_file_contents = file_contents.to_dict()
         return render_template(
             'pipeline_data_verify.html',

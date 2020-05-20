@@ -20,8 +20,7 @@ from data_engineering.common.db.models import (
 from slugify import slugify
 from sqlalchemy import event, or_
 
-from app import constants
-from app.constants import DatafileState
+from app.constants import DatafileState, DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR
 
 
 class DatafileRegistryModel(BaseModel):
@@ -29,7 +28,7 @@ class DatafileRegistryModel(BaseModel):
     __table_args__ = {'schema': 'operations'}
 
     processing_state = _enum(
-        *constants.DatafileState.values(), name='processing_state', inherit_schema=True
+        *DatafileState.values(), name='processing_state', inherit_schema=True
     )
 
     id = _col('id', _int, primary_key=True, autoincrement=True)
@@ -100,9 +99,9 @@ class Pipeline(BaseModel):
     organisation = _col(_text, nullable=False)
     dataset = _col(_text, nullable=False)
     slug = _col(_text, nullable=False)
-    column_types = _col(_array(_text), nullable=False)
-    delimiter = _col(_text, nullable=False, server_default=',')
-    quote = _col(_text, server_default='"')
+    column_types = _col(_array(_text))
+    delimiter = _col(_text, nullable=False, server_default=DEFAULT_CSV_DELIMITER)
+    quote = _col(_text, server_default=DEFAULT_CSV_QUOTECHAR)
     data_files = _relationship('PipelineDataFile', backref='pipeline')
 
     @staticmethod
