@@ -32,7 +32,7 @@ from app.db.models.external import (
     SPIREThirdParty,
     SPIREUltimateEndUser,
 )
-from app.db.models.internal import Pipeline
+from app.db.models.internal import Pipeline, PipelineDataFile
 
 
 def get_session():
@@ -548,3 +548,11 @@ class PipelineFactory(BaseFactory):
 
     class Meta:
         model = Pipeline
+
+
+class PipelineDataFileFactory(BaseFactory):
+    pipeline = factory.SubFactory(PipelineFactory)
+    data_file_url = factory.Faker('word')
+
+    class Meta:
+        model = PipelineDataFile

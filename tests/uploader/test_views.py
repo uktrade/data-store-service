@@ -7,7 +7,7 @@ from slugify import slugify
 
 from app.db.models.internal import Pipeline
 from tests.api.views import make_sso_request
-from tests.fixtures.factories import PipelineFactory
+from tests.fixtures.factories import PipelineDataFileFactory, PipelineFactory
 
 
 def get_client(app):
@@ -158,9 +158,11 @@ def test_get_pipeline_created_view_404_unknown_pipeline(app_with_db, captured_te
 
 
 def test_get_data_uploaded_view(app_with_db, captured_templates):
-    pipeline = PipelineFactory()
+    data_file = PipelineDataFileFactory()
     client = get_client(app_with_db)
-    url = url_for('uploader_views.pipeline_data_uploaded', slug=pipeline.slug)
+    url = url_for(
+        'uploader_views.pipeline_data_uploaded', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
     response, template_context = _test_view(
         client, url, 'pipeline_data_uploaded.html', captured_templates,
     )
@@ -179,17 +181,25 @@ def test_get_data_upload_view(app_with_db, captured_templates):
     assert 'Upload data' in html
 
 
+@mock.patch('app.uploader.utils.open')
 @mock.patch('app.uploader.views.upload_file')
-def test_submit_data_upload_view(mock_upload_file, app_with_db, captured_templates):
-    mock_upload_file.return_value = None
+def test_submit_data_upload_view(
+    mock_upload_file, mock_smart_open, app_with_db, captured_templates
+):
+    csv_string = 'hello,goodbye\n1,2\n3,4'
+    mock_smart_open.return_value = io.StringIO(csv_string)
+    mock_upload_file.return_value = 'fakefile.csv'
     pipeline = PipelineFactory()
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
-
-    form_data = {'csv_file': (io.BytesIO(b"abcdef"), 'test.csv')}
+    form_data = {'csv_file': (io.BytesIO(b"hello,goodbye\n1,2\n3,4"), 'test.csv')}
     response = client.post(
         url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
     )
     assert mock_upload_file.called is True
     html = response.get_data(as_text=True)
     assert 'Data successfully uploaded' in html
+
+    template, template_context = captured_templates.pop()
+    file_contents = template_context['file_contents']
+    assert file_contents == {'goodbye': {0: '2', 1: '4'}, 'hello': {0: '1', 1: '3'}}

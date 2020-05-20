@@ -1,15 +1,20 @@
 import datetime
+import uuid
 from collections import defaultdict
 
 from data_engineering.common.db.models import (
     _array,
+    _bool,
     _col,
     _dt,
     _enum,
+    _foreign_key,
     _int,
+    _relationship,
     _sa,
     _text,
     _unique,
+    _uuid,
     BaseModel,
 )
 from slugify import slugify
@@ -98,6 +103,7 @@ class Pipeline(BaseModel):
     column_types = _col(_array(_text), nullable=False)
     delimiter = _col(_text, nullable=False, server_default=',')
     quote = _col(_text, server_default='"')
+    data_files = _relationship('PipelineDataFile', backref='pipeline')
 
     @staticmethod
     def generate_slug(mapper, connection, target):
@@ -113,3 +119,14 @@ class Pipeline(BaseModel):
 
 
 event.listen(Pipeline, 'before_insert', Pipeline.generate_slug)
+
+
+class PipelineDataFile(BaseModel):
+    __tablename__ = 'pipeline_data_file'
+
+    id = _col(_uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    data_file_url = _col(_text, nullable=False)
+    pipeline_id = _col(_int, _foreign_key('public.pipeline.id'), nullable=False)
+    deleted = _col(_bool, default=False)
+    uploaded_at = _col(_dt, default=lambda: datetime.datetime.utcnow())
+    processed_at = _col(_dt)

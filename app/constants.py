@@ -1,5 +1,8 @@
 from enum import Enum
 
+DEFAULT_CSV_DELIMITER = ','
+DEFAULT_CSV_QUOTECHAR = '"'
+
 
 class BaseEnum(Enum):
     @classmethod

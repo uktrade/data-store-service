@@ -3,9 +3,9 @@ import os
 from flask import abort, redirect, render_template, url_for
 from flask.blueprints import Blueprint
 
-from app.db.models.internal import Pipeline
-from app.uploader.forms import DataFileForm, PipelineForm, PipelineSelectForm
-from app.uploader.utils import upload_file
+from app.db.models.internal import Pipeline, PipelineDataFile
+from app.uploader.forms import DataFileForm, PipelineForm, PipelineSelectForm, VerifyDataFileForm
+from app.uploader.utils import get_s3_file_sample, process_pipeline_data_file, upload_file
 
 templates_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 
@@ -64,14 +64,55 @@ def pipeline_data_upload(slug):
     pipeline = get_object_or_404(Pipeline, slug=slug)
     form = DataFileForm()
     if form.validate_on_submit():
-        upload_file(form.csv_file.data, form.csv_file.data.filename, pipeline)
-        return redirect(url_for('uploader_views.pipeline_data_uploaded', slug=pipeline.slug))
-    return render_uploader_template(
+        data_file_url = upload_file(form.csv_file.data, form.csv_file.data.filename, pipeline)
+        data_file = PipelineDataFile(data_file_url=data_file_url, pipeline=pipeline)
+        data_file.save()
+        return redirect(
+            url_for('uploader_views.pipeline_data_verify', slug=pipeline.slug, file_id=data_file.id)
+        )
+    return render_template(
         'pipeline_data_upload.html', pipeline=pipeline, form=form, heading='Upload data'
     )
 
 
-@uploader_views.route('/data/<slug>/uploaded/')
-def pipeline_data_uploaded(slug):
+@uploader_views.route('/data/<slug>/verify/<file_id>/', methods=('GET', 'POST'))
+def pipeline_data_verify(slug, file_id):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    return render_uploader_template('pipeline_data_uploaded.html', pipeline=pipeline)
+    pipeline_data_file = get_object_or_404(
+        PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False
+    )
+    form = VerifyDataFileForm()
+    if not form.validate_on_submit():
+        file_contents = get_s3_file_sample(pipeline_data_file.data_file_url)
+        dict_file_contents = file_contents.to_dict()
+        return render_template(
+            'pipeline_data_verify.html',
+            pipeline=pipeline,
+            file_contents=dict_file_contents,
+            format_row_data=format_row_data,
+            form=form,
+        )
+    if form.proceed.data == 'yes':
+        process_pipeline_data_file(pipeline_data_file)
+        return redirect(
+            url_for(
+                'uploader_views.pipeline_data_uploaded',
+                slug=pipeline.slug,
+                file_id=pipeline_data_file.id,
+            )
+        )
+    else:
+        pipeline_data_file.deleted = True
+        pipeline_data_file.save()
+        return redirect(url_for('uploader_views.pipeline_select'))
+
+
+def format_row_data(row):
+    return ", ".join(row.values())
+
+
+@uploader_views.route('/data/<slug>/uploaded/<file_id>/')
+def pipeline_data_uploaded(slug, file_id):
+    pipeline = get_object_or_404(Pipeline, slug=slug)
+    get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False)
+    return render_uploader_template('pipeline_data_uploaded.html', pipeline=pipeline,)

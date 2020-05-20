@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import FileField, StringField
+from wtforms import FileField, SelectField, StringField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired
 
@@ -39,4 +39,10 @@ class PipelineSelectForm(FlaskForm):
 class DataFileForm(FlaskForm):
     csv_file = FileField(
         'CSV File', validators=[DataRequired()], render_kw={'class': 'govuk-input'}
+    )
+
+
+class VerifyDataFileForm(FlaskForm):
+    proceed = SelectField(
+        choices=[('yes', 'Yes'), ('no', 'No')], label='Does the contents of the file look correct?'
     )

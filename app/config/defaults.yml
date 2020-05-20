@@ -29,3 +29,4 @@ session:
   secret_key: $ENV{DSS_SESSION_SECRET_KEY, _dss_authbroker_token}
 inputs:
   source-folder: $ENV{INPUTS_SOURCE_FOLDER, inputs/source/}
+  upload-folder: $ENV{UPLOAD_FOLDER, /upload/}
