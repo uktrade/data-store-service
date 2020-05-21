@@ -48,8 +48,10 @@ class DataFileForm(FlaskForm):
 
 class VerifyDataFileForm(FlaskForm):
     proceed = SelectField(
-        choices=[(YES, 'Yes and start processing'),
-                 (NO, 'No and return back to the beginning to try again')],
+        choices=[
+            (YES, 'Yes and start processing'),
+            (NO, 'No and return back to the beginning to try again'),
+        ],
         label='Does the contents of the file look correct?',
         validators=[DataRequired()],
     )
