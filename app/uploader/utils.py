@@ -20,16 +20,19 @@ def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
     full_url = f'{FOLDER}/{url}'
     contents = []
     i = 0
-    with open(full_url, encoding='utf-8-sig') as csv_file:
-        reader = csv.DictReader(csv_file, delimiter=delimiter, quotechar=quotechar, strict=True)
-        for row in reader:
-            contents.append(row)
-            i += 1
-            if i == number_of_lines:
-                break
+    try:
+        with open(full_url, encoding='utf-8-sig') as csv_file:
+            reader = csv.DictReader(csv_file, delimiter=delimiter, quotechar=quotechar, strict=True)
+            for row in reader:
+                contents.append(row)
+                i += 1
+                if i == number_of_lines:
+                    break
 
-    df = pandas.DataFrame(data=contents)
-    return df
+        df = pandas.DataFrame(data=contents)
+        return df
+    except UnicodeDecodeError or csv.Error:
+        return pandas.DataFrame()
 
 
 def process_pipeline_data_file(pipeline_data_file):

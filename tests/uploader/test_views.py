@@ -5,6 +5,7 @@ import pytest
 from flask import template_rendered, url_for
 from slugify import slugify
 
+from app.constants import DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR
 from app.db.models.internal import Pipeline
 from tests.api.views import make_sso_request
 from tests.fixtures.factories import PipelineDataFileFactory, PipelineFactory
@@ -189,7 +190,10 @@ def test_submit_data_upload_view(
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)
     mock_upload_file.return_value = 'fakefile.csv'
-    pipeline = PipelineFactory()
+    pipeline = PipelineFactory(
+        delimiter=DEFAULT_CSV_DELIMITER,
+        quote=DEFAULT_CSV_QUOTECHAR,
+    )
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
     form_data = {'csv_file': (io.BytesIO(b"hello,goodbye\n1,2\n3,4"), 'test.csv')}
