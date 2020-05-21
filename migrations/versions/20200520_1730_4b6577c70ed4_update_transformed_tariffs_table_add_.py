@@ -65,6 +65,7 @@ def schema_upgrades():
         type_=sa.Integer(),
         existing_nullable=True,
         schema=quoted_name('world_bank.tariff', quote=True),
+        postgresql_using='partner::integer',
     )
     op.alter_column(
         'L1',
@@ -73,6 +74,7 @@ def schema_upgrades():
         type_=sa.Integer(),
         existing_nullable=True,
         schema=quoted_name('world_bank.tariff', quote=True),
+        postgresql_using='reporter::integer',
     )
     op.drop_column('L1', 'country_average', schema=quoted_name('world_bank.tariff', quote=True))
     # ### end Alembic commands ###
@@ -93,6 +95,7 @@ def schema_downgrades():
         type_=sa.TEXT(),
         existing_nullable=True,
         schema=quoted_name('world_bank.tariff', quote=True),
+        postgresql_using='reporter::text',
     )
     op.alter_column(
         'L1',
@@ -101,6 +104,7 @@ def schema_downgrades():
         type_=sa.TEXT(),
         existing_nullable=True,
         schema=quoted_name('world_bank.tariff', quote=True),
+        postgresql_using='partner::text',
     )
     op.drop_column('L1', 'eu_eu_rate', schema=quoted_name('world_bank.tariff', quote=True))
     op.drop_index(
