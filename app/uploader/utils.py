@@ -13,8 +13,12 @@ def upload_file(stream, file_name, pipeline):
     file_name = f'{upload_folder}/{pipeline.organisation}/{pipeline.dataset}/{file_name}'
     abs_fn = storage._abs_file_name(file_name)
     s3 = storage._get_bucket()
-    s3.upload_fileobj(stream, abs_fn)
+    _upload_file_stream(s3, stream, abs_fn)
     return file_name
+
+
+def _upload_file_stream(s3, stream, abs_fn):
+    s3.upload_fileobj(stream, abs_fn)
 
 
 def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
