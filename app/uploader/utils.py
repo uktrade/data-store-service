@@ -32,8 +32,11 @@ def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
                     break
 
         df = pandas.DataFrame(data=contents)
+        empty_column = None in df.columns.to_list()
+        if empty_column:
+            raise csv.Error('Invalid CSV')
         return df
-    except UnicodeDecodeError or csv.Error:
+    except (UnicodeDecodeError, csv.Error):
         return pandas.DataFrame()
 
 

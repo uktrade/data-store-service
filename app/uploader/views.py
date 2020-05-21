@@ -108,6 +108,7 @@ def pipeline_data_verify(slug, file_id):
                 file_id=pipeline_data_file.id,
             )
         )
+
     if not file_contents.empty:
         file_contents = file_contents.to_dict()
     else:
