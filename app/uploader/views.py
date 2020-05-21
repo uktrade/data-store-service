@@ -56,7 +56,7 @@ def pipeline_create():
         pipeline = Pipeline(dataset=form.dataset.data, organisation=form.organisation.data)
         pipeline.save()
         return redirect(url_for('uploader_views.pipeline_created', slug=pipeline.slug))
-    return render_uploader_template('pipeline_create.html', heading='Create dataset', form=form)
+    return render_uploader_template('pipeline_create.html', heading='Create pipeline', form=form)
 
 
 @uploader_views.route('/created/<slug>/')

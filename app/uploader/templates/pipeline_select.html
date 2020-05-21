@@ -8,13 +8,13 @@
             {% include 'form/error_summary.html' %}
             {% if show_form %}
                 <fieldset class="govuk-fieldset">
-                    {% with field=form.pipeline, label='Select Dataset' %}
+                    {% with field=form.pipeline, label='Select Pipeline' %}
                         {% include 'form/input_radio_field.html' %}
                     {%  endwith %}
                         <div class="gov-form-group govuk-!-padding-top-4">
                         <ul class="govuk-list">
                             <li>
-                                <input type="submit" value="Continue" class="govuk-button govuk-!-margin-bottom-0">
+                                <input type="submit" value="Continue to upload data" class="govuk-button govuk-!-margin-bottom-0">
                             </li>
                             <li class="govuk-!-padding-top-0"><h2>Or</h2></li>
                             <li>
