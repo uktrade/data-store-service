@@ -51,7 +51,7 @@ def test_get_select_pipeline_view_with_no_pipelines(app_with_db, captured_templa
     html = response.get_data(as_text=True)
     assert 'Add new dataset' in html
     assert template_context['show_form'] is False
-    assert 'Update dataset' not in html
+    assert 'Continue to upload data' not in html
 
 
 def test_get_select_pipeline_view_with_pipelines(app_with_db, captured_templates):
@@ -64,7 +64,7 @@ def test_get_select_pipeline_view_with_pipelines(app_with_db, captured_templates
     html = response.get_data(as_text=True)
     assert 'Add new dataset' in html
     assert template_context['show_form'] is True
-    assert 'Update dataset' in html
+    assert 'Continue to upload data' in html
 
 
 def test_submit_form_select_pipeline_view(app_with_db, captured_templates):
@@ -89,7 +89,7 @@ def test_get_pipeline_create_view(app_with_db, captured_templates):
         client, url, 'pipeline_create.html', captured_templates,
     )
     html = response.get_data(as_text=True)
-    assert 'Create dataset' in html
+    assert 'Create pipeline' in html
     assert 'Add new dataset' not in html
 
 
@@ -168,7 +168,7 @@ def test_get_data_uploaded_view(app_with_db, captured_templates):
         client, url, 'pipeline_data_uploaded.html', captured_templates,
     )
     html = response.get_data(as_text=True)
-    assert 'Data successfully uploaded' in html
+    assert 'Data now being processed' in html
 
 
 def test_get_data_upload_view(app_with_db, captured_templates):
