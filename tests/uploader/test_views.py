@@ -5,7 +5,7 @@ import pytest
 from flask import template_rendered, url_for
 from slugify import slugify
 
-from app.constants import DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR
+from app.constants import DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR, NO, YES
 from app.db.models.internal import Pipeline
 from tests.api.views import make_sso_request
 from tests.fixtures.factories import PipelineDataFileFactory, PipelineFactory
@@ -180,6 +180,91 @@ def test_get_data_upload_view(app_with_db, captured_templates):
     )
     html = response.get_data(as_text=True)
     assert 'Upload data' in html
+
+
+@mock.patch('app.uploader.utils.open')
+def test_get_data_verify_view(mock_smart_open, app_with_db, captured_templates):
+    csv_string = 'hello,goodbye\n1,2\n3,4'
+    mock_smart_open.return_value = io.StringIO(csv_string)
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    response, template_context = _test_view(
+        client, url, 'pipeline_data_verify.html', captured_templates,
+    )
+    html = response.get_data(as_text=True)
+    assert 'Data successfully uploaded' in html
+
+
+@mock.patch('app.uploader.utils.open')
+def test_get_data_verify_error_view(mock_smart_open, app_with_db, captured_templates):
+    mock_smart_open.side_effect = UnicodeDecodeError('Error', b'', 1, 2, '')
+
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    response, template_context = _test_view(
+        client, url, 'pipeline_data_verify.html', captured_templates,
+    )
+    html = response.get_data(as_text=True)
+    assert 'Try again' in html
+
+    form = template_context['form']
+    assert form.errors == {
+        'non_field_errors': [
+            'Unable to process file - please check your file is a valid CSV and try again'
+        ]
+    }
+
+
+def test_submit_data_verify_proceed_no(app_with_db, captured_templates):
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    form_data = {'proceed': NO}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    html = response.get_data(as_text=True)
+    assert 'Continue to upload data' in html
+    template, template_context = captured_templates.pop()
+    assert template.name == 'pipeline_select.html'
+    assert template_context['request'].path == url_for('uploader_views.pipeline_select')
+    assert data_file.deleted is True
+
+
+@mock.patch('app.uploader.views.process_pipeline_data_file')
+@mock.patch('app.uploader.utils.open')
+def test_submit_data_verify_proceed_yes(
+    mock_smart_open, mock_process_pipeline_data_file, app_with_db, captured_templates
+):
+    mock_process_pipeline_data_file.return_value = None
+    csv_string = 'hello,goodbye\n1,2\n3,4'
+    mock_smart_open.return_value = io.StringIO(csv_string)
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    form_data = {'proceed': YES}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    html = response.get_data(as_text=True)
+    assert 'Data now being processed' in html
+    template, template_context = captured_templates.pop()
+    assert template.name == 'pipeline_data_uploaded.html'
+    assert template_context['request'].path == url_for(
+        'uploader_views.pipeline_data_uploaded', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    assert data_file.deleted is False
+    assert mock_process_pipeline_data_file.called is True
 
 
 @mock.patch('app.uploader.utils.open')
