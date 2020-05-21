@@ -1,3 +1,5 @@
+import os.path
+
 import click
 from flask import current_app as app
 from flask.cli import with_appcontext
@@ -115,7 +117,7 @@ def datafiles_to_db_by_source(**kwargs):
         ctx = click.get_current_context()
         click.echo(ctx.get_help())
     else:
-        manager = PipelineManager(storage=app.config['inputs']['source-folder'], dbi=app.dbi)
+        manager = PipelineManager(storage=get_source_folder(), dbi=app.dbi)
         for _arg, pipeline_info_list in arg_to_pipeline_config_list.items():
             arg = _arg.replace(".", "__")
             if (kwargs['all'] and _arg) or kwargs[arg]:
@@ -141,3 +143,8 @@ def _pipeline_option(option_name):
 
 for k in arg_to_pipeline_config_list.keys():
     datafiles_to_db_by_source = _pipeline_option(k)(datafiles_to_db_by_source)
+
+
+def get_source_folder():
+    bucket = app.config['s3']['bucket_url']
+    return os.path.join(bucket, app.config['s3']['datasets_folder'])

@@ -1,3 +1,4 @@
+import os.path
 from datetime import datetime
 from unittest import mock
 
@@ -87,9 +88,10 @@ class TestETLManager:
 
         mock_get_file_names.return_value = ['fake_file.txt']
         mock_read_files.side_effect = read_files
-        manager = Manager(
-            storage=app_with_db.config['inputs']['source-folder'], dbi=app_with_db.dbi
-        )
+
+        bucket = app_with_db.config['s3']['bucket_url']
+        source_folder = os.path.join(bucket, app_with_db.config['s3']['datasets_folder'])
+        manager = Manager(storage=source_folder, dbi=app_with_db.dbi)
         manager._pipelines['fake_pipeline'] = PipelineConfig(
             pipeline=FakePipeline(1234, raise_processing_exception=raise_exception),
             sub_directory='/tmp/fake_pipeline',

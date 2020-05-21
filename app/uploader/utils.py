@@ -1,4 +1,5 @@
 import csv
+import os.path
 
 import pandas
 from datatools.io.storage import StorageFactory
@@ -7,8 +8,9 @@ from smart_open import open
 
 
 def upload_file(stream, file_name, pipeline):
-    storage = StorageFactory.create(app.config['inputs']['upload-folder'])
-    file_name = f'{pipeline.organisation}/{pipeline.dataset}/{file_name}'
+    storage = StorageFactory.create(app.config['s3']['bucket_url'])
+    upload_folder = app.config['s3']['upload_folder']
+    file_name = f'{upload_folder}/{pipeline.organisation}/{pipeline.dataset}/{file_name}'
     abs_fn = storage._abs_file_name(file_name)
     s3 = storage._get_bucket()
     s3.upload_fileobj(stream, abs_fn)
@@ -16,8 +18,8 @@ def upload_file(stream, file_name, pipeline):
 
 
 def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
-    FOLDER = app.config['inputs']['upload-folder']
-    full_url = f'{FOLDER}/{url}'
+    bucket = app.config['s3']['bucket_url']
+    full_url = os.path.join(bucket, url)
     contents = []
     i = 0
     try:

@@ -190,10 +190,7 @@ def test_submit_data_upload_view(
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)
     mock_upload_file.return_value = 'fakefile.csv'
-    pipeline = PipelineFactory(
-        delimiter=DEFAULT_CSV_DELIMITER,
-        quote=DEFAULT_CSV_QUOTECHAR,
-    )
+    pipeline = PipelineFactory(delimiter=DEFAULT_CSV_DELIMITER, quote=DEFAULT_CSV_QUOTECHAR)
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
     form_data = {'csv_file': (io.BytesIO(b"hello,goodbye\n1,2\n3,4"), 'test.csv')}
