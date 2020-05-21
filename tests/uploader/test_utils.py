@@ -20,11 +20,18 @@ def test_save_column_types(data, expected_column_types, app_with_db):
     assert pipeline.column_types == expected_column_types
 
 
+@pytest.mark.parametrize(
+    'csv_string,delimiter,quotechar',
+    (
+        ('hello,goodbye\n"1,1,1",2\n3,4\n5,6', DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR),
+        ('hello~goodbye\n1~2\n3~4\n5~6', '~', DEFAULT_CSV_QUOTECHAR),
+        ('hello,goodbye\n$1,1,1$,2\n3,4\n5,6', DEFAULT_CSV_DELIMITER, '$'),
+    ),
+)
 @mock.patch('app.uploader.utils.open')
-def test_get_s3_file_sample(mock_smart_open, app_with_db):
-    csv_string = 'hello,goodbye\n1,2\n3,4\n5,6'
+def test_get_s3_file_sample(mock_smart_open, csv_string, delimiter, quotechar, app_with_db):
     mock_smart_open.return_value = io.StringIO(csv_string)
-    result = get_s3_file_sample('', DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR, number_of_lines=2)
+    result = get_s3_file_sample('', delimiter, quotechar, number_of_lines=2)
     assert result.empty is False
     assert result.columns.to_list() == ['hello', 'goodbye']
     assert len(result.index) == 2
