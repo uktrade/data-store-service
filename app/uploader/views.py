@@ -1,5 +1,6 @@
 import os
 
+from data_engineering.common.sso.token import login_required
 from flask import abort, redirect, render_template, url_for
 from flask.blueprints import Blueprint
 
@@ -36,6 +37,7 @@ def get_object_or_404(model, **kwargs):
 
 
 @uploader_views.route('/', methods=('GET', 'POST'))
+@login_required
 def pipeline_select():
     show_form = False
     first_pipeline = Pipeline.query.first()
@@ -50,6 +52,7 @@ def pipeline_select():
 
 
 @uploader_views.route('/create/', methods=('GET', 'POST'))
+@login_required
 def pipeline_create():
     form = PipelineForm()
     if form.validate_on_submit():
@@ -60,12 +63,14 @@ def pipeline_create():
 
 
 @uploader_views.route('/created/<slug>/')
+@login_required
 def pipeline_created(slug):
     pipeline = get_object_or_404(Pipeline, slug=slug)
     return render_uploader_template('pipeline_created.html', pipeline=pipeline)
 
 
 @uploader_views.route('/data/<slug>/', methods=('GET', 'POST'))
+@login_required
 def pipeline_data_upload(slug):
     pipeline = get_object_or_404(Pipeline, slug=slug)
     form = DataFileForm()
@@ -82,6 +87,7 @@ def pipeline_data_upload(slug):
 
 
 @uploader_views.route('/data/<slug>/verify/<file_id>/', methods=('GET', 'POST'))
+@login_required
 def pipeline_data_verify(slug, file_id):
     pipeline = get_object_or_404(Pipeline, slug=slug)
     pipeline_data_file = get_object_or_404(
@@ -129,6 +135,7 @@ def format_row_data(row):
 
 
 @uploader_views.route('/data/<slug>/uploaded/<file_id>/')
+@login_required
 def pipeline_data_uploaded(slug, file_id):
     pipeline = get_object_or_404(Pipeline, slug=slug)
     get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False)

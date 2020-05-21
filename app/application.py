@@ -1,5 +1,6 @@
 import os
 
+from data_engineering.common.sso.register import register_sso_component
 from flask_migrate import Migrate
 
 config_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__), 'config'))
@@ -11,6 +12,8 @@ def register_app_components(flask_app):
     from app.uploader.views import uploader_views
 
     flask_app.register_blueprint(uploader_views)
+
+    register_sso_component(flask_app, role_based=False)
 
     if os.environ.get('NO_BROWSER_CACHE'):
         no_browser_cache(flask_app)
