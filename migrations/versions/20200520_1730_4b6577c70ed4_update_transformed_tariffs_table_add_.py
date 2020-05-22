@@ -1,7 +1,7 @@
 """update transformed tariffs table & add indices to bounds rate
 
 Revision ID: 4b6577c70ed4
-Revises: dfdba022eb89
+Revises: 634088e167e9
 Create Date: 2020-05-20 17:30:59.376612
 
 """
@@ -13,7 +13,7 @@ from sqlalchemy.sql.schema import quoted_name  # noqa: F401
 from app.db.models import get_schemas
 
 revision = '4b6577c70ed4'
-down_revision = 'dfdba022eb89'
+down_revision = '634088e167e9'
 
 
 def create_schemas():
