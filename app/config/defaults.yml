@@ -27,5 +27,7 @@ cache:
   ssl: $ENV{CACHE_SSL, True}
 session:
   secret_key: $ENV{DSS_SESSION_SECRET_KEY, _dss_authbroker_token}
-inputs:
-  source-folder: $ENV{INPUTS_SOURCE_FOLDER, inputs/source/}
+s3:
+  bucket_url: $ENV{S3_BUCKET_URL, inputs}
+  datasets_folder: $ENV{DATASETS_FOLDER, datasets}
+  upload_folder: $ENV{UPLOAD_FOLDER, uploads}

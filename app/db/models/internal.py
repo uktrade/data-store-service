@@ -1,31 +1,33 @@
 import datetime
+import uuid
 from collections import defaultdict
 
 from data_engineering.common.db.models import (
     _array,
+    _bool,
     _col,
     _dt,
     _enum,
+    _foreign_key,
     _int,
+    _relationship,
     _sa,
     _text,
     _unique,
+    _uuid,
     BaseModel,
 )
 from slugify import slugify
 from sqlalchemy import event, or_
 
-from app import constants
-from app.constants import DatafileState
+from app.constants import DatafileState, DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR
 
 
 class DatafileRegistryModel(BaseModel):
     __tablename__ = 'datafile_registry'
     __table_args__ = {'schema': 'operations'}
 
-    processing_state = _enum(
-        *constants.DatafileState.values(), name='processing_state', inherit_schema=True
-    )
+    processing_state = _enum(*DatafileState.values(), name='processing_state', inherit_schema=True)
 
     id = _col('id', _int, primary_key=True, autoincrement=True)
     source = _col(_text, nullable=False)
@@ -95,9 +97,10 @@ class Pipeline(BaseModel):
     organisation = _col(_text, nullable=False)
     dataset = _col(_text, nullable=False)
     slug = _col(_text, nullable=False)
-    column_types = _col(_array(_text), nullable=False)
-    delimiter = _col(_text, nullable=False, server_default=',')
-    quote = _col(_text, server_default='"')
+    column_types = _col(_array(_text))
+    delimiter = _col(_text, nullable=False, server_default=DEFAULT_CSV_DELIMITER)
+    quote = _col(_text, server_default=DEFAULT_CSV_QUOTECHAR)
+    data_files = _relationship('PipelineDataFile', backref='pipeline')
 
     @staticmethod
     def generate_slug(mapper, connection, target):
@@ -113,3 +116,14 @@ class Pipeline(BaseModel):
 
 
 event.listen(Pipeline, 'before_insert', Pipeline.generate_slug)
+
+
+class PipelineDataFile(BaseModel):
+    __tablename__ = 'pipeline_data_file'
+
+    id = _col(_uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    data_file_url = _col(_text, nullable=False)
+    pipeline_id = _col(_int, _foreign_key('public.pipeline.id'), nullable=False)
+    deleted = _col(_bool, default=False)
+    uploaded_at = _col(_dt, default=lambda: datetime.datetime.utcnow())
+    processed_at = _col(_dt)
