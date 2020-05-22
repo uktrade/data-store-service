@@ -42,7 +42,10 @@ def _test_view(client, url, expected_template_name, _templates, expected_status=
     return response, template_context
 
 
-def test_get_select_pipeline_view_with_no_pipelines(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_get_select_pipeline_view_with_no_pipelines(
+    is_authenticated, app_with_db, captured_templates
+):
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_select')
     response, template_context = _test_view(
@@ -54,7 +57,8 @@ def test_get_select_pipeline_view_with_no_pipelines(app_with_db, captured_templa
     assert 'Continue to upload data' not in html
 
 
-def test_get_select_pipeline_view_with_pipelines(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_get_select_pipeline_view_with_pipelines(is_authenticated, app_with_db, captured_templates):
     PipelineFactory()
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_select')
@@ -67,7 +71,8 @@ def test_get_select_pipeline_view_with_pipelines(app_with_db, captured_templates
     assert 'Continue to upload data' in html
 
 
-def test_submit_form_select_pipeline_view(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_submit_form_select_pipeline_view(is_authenticated, app_with_db, captured_templates):
     pipeline = PipelineFactory()
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_select')
@@ -82,7 +87,8 @@ def test_submit_form_select_pipeline_view(app_with_db, captured_templates):
     assert 'Upload data' in html
 
 
-def test_get_pipeline_create_view(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_get_pipeline_create_view(is_authenticated, app_with_db, captured_templates):
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_create')
     response, template_context = _test_view(
@@ -93,7 +99,8 @@ def test_get_pipeline_create_view(app_with_db, captured_templates):
     assert 'Add new dataset' not in html
 
 
-def test_submit_form_pipeline_create_view(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_submit_form_pipeline_create_view(is_authenticated, app_with_db, captured_templates):
     form_data = {'organisation': 'test_org', 'dataset': 'test_dataset'}
     slug = slugify(f'{form_data["organisation"]} {form_data["dataset"]}')
     assert Pipeline.query.filter_by(slug=slug).first() is None
@@ -126,8 +133,9 @@ def test_submit_form_pipeline_create_view(app_with_db, captured_templates):
         ),
     ),
 )
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 def test_submit_form_pipeline_create_view_errors(
-    form_data, expected_error, app_with_db, captured_templates
+    is_authenticated, form_data, expected_error, app_with_db, captured_templates
 ):
     PipelineFactory(dataset='test_dataset', organisation='test_organisation')
     client = get_client(app_with_db)
@@ -140,7 +148,8 @@ def test_submit_form_pipeline_create_view_errors(
     assert form.errors == expected_error
 
 
-def test_get_pipeline_created_view(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_get_pipeline_created_view(is_authenticated, app_with_db, captured_templates):
     pipeline = PipelineFactory()
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_created', slug=pipeline.slug)
@@ -151,14 +160,18 @@ def test_get_pipeline_created_view(app_with_db, captured_templates):
     assert 'Dataset pipeline created' in html
 
 
-def test_get_pipeline_created_view_404_unknown_pipeline(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_get_pipeline_created_view_404_unknown_pipeline(
+    is_authenticated, app_with_db, captured_templates
+):
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_created', slug='i-made-this-up')
     response = make_sso_request(client, url)
     assert response.status_code == 404
 
 
-def test_get_data_uploaded_view(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_get_data_uploaded_view(is_authenticated, app_with_db, captured_templates):
     data_file = PipelineDataFileFactory()
     client = get_client(app_with_db)
     url = url_for(
@@ -171,7 +184,8 @@ def test_get_data_uploaded_view(app_with_db, captured_templates):
     assert 'Data now being processed' in html
 
 
-def test_get_data_upload_view(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_get_data_upload_view(is_authenticated, app_with_db, captured_templates):
     pipeline = PipelineFactory()
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
@@ -182,8 +196,9 @@ def test_get_data_upload_view(app_with_db, captured_templates):
     assert 'Upload data' in html
 
 
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.utils.open')
-def test_get_data_verify_view(mock_smart_open, app_with_db, captured_templates):
+def test_get_data_verify_view(mock_smart_open, is_authenticated, app_with_db, captured_templates):
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)
     data_file = PipelineDataFileFactory()
@@ -198,8 +213,11 @@ def test_get_data_verify_view(mock_smart_open, app_with_db, captured_templates):
     assert 'Data successfully uploaded' in html
 
 
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.utils.open')
-def test_get_data_verify_error_view(mock_smart_open, app_with_db, captured_templates):
+def test_get_data_verify_error_view(
+    mock_smart_open, is_authenticated, app_with_db, captured_templates
+):
     mock_smart_open.side_effect = UnicodeDecodeError('Error', b'', 1, 2, '')
 
     data_file = PipelineDataFileFactory()
@@ -221,7 +239,8 @@ def test_get_data_verify_error_view(mock_smart_open, app_with_db, captured_templ
     }
 
 
-def test_submit_data_verify_proceed_no(app_with_db, captured_templates):
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_submit_data_verify_proceed_no(is_authenticated, app_with_db, captured_templates):
     data_file = PipelineDataFileFactory()
     client = get_client(app_with_db)
     url = url_for(
@@ -239,10 +258,15 @@ def test_submit_data_verify_proceed_no(app_with_db, captured_templates):
     assert data_file.deleted is True
 
 
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.views.process_pipeline_data_file')
 @mock.patch('app.uploader.utils.open')
 def test_submit_data_verify_proceed_yes(
-    mock_smart_open, mock_process_pipeline_data_file, app_with_db, captured_templates
+    mock_smart_open,
+    mock_process_pipeline_data_file,
+    is_authenticated,
+    app_with_db,
+    captured_templates,
 ):
     mock_process_pipeline_data_file.return_value = None
     csv_string = 'hello,goodbye\n1,2\n3,4'
@@ -267,10 +291,11 @@ def test_submit_data_verify_proceed_yes(
     assert mock_process_pipeline_data_file.called is True
 
 
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.utils.open')
 @mock.patch('app.uploader.views.upload_file')
 def test_submit_data_upload_view(
-    mock_upload_file, mock_smart_open, app_with_db, captured_templates
+    mock_upload_file, mock_smart_open, is_authenticated, app_with_db, captured_templates
 ):
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)

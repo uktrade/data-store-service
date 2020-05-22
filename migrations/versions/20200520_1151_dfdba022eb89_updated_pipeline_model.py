@@ -1,7 +1,7 @@
 """updated Pipeline model
 
 Revision ID: dfdba022eb89
-Revises: edb4f0469686
+Revises: e5f27a1a8f53
 Create Date: 2020-05-20 11:51:38.877228
 
 """

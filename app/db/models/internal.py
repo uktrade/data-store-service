@@ -90,7 +90,6 @@ class Pipeline(BaseModel):
     __tablename__ = 'pipeline'
     __table_args__ = (
         _unique('organisation', 'dataset', name='organisation_dataset_unique_together'),
-        {'schema': 'public'},
     )
 
     id = _col('id', _int, primary_key=True, autoincrement=True)
@@ -123,7 +122,7 @@ class PipelineDataFile(BaseModel):
 
     id = _col(_uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     data_file_url = _col(_text, nullable=False)
-    pipeline_id = _col(_int, _foreign_key('public.pipeline.id'), nullable=False)
+    pipeline_id = _col(_int, _foreign_key('pipeline.id'), nullable=False)
     deleted = _col(_bool, default=False)
     uploaded_at = _col(_dt, default=lambda: datetime.datetime.utcnow())
     processed_at = _col(_dt)
