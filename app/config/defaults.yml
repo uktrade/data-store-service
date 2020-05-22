@@ -5,13 +5,13 @@ app:
   database_url: $ENV{DSS_DATABASE_URL, postgresql://postgres@dss_postgres/postgres}
   pagination_size: $ENV{DSS_PAGINATION_SIZE, 1000}
 sso:
-  base_url: $ENV{SSO_URL, https://sso.trade.gov.uk}
+  base_url: $ENV{AUTHBROKER_URL, https://sso.trade.gov.uk}
   profile_path: $ENV{ACCESS_TOKEN_PATH, /api/v1/user/me/}
   authorize_path: $ENV{AUTHORIZE_PATH, /o/authorize/}
-  access_token_path: $ENV{DSS_SSO_PATH_USER, /o/token/}
-  logout_path: $ENV{DSS_SSO_PATH_LOGOUT, /logout/}
-  client_id: $ENV{DSS_ABC_CLIENT_ID, sso_client_id}
-  client_secret: $ENV{DSS_ABC_CLIENT_SECRET, sso_client_secret}
+  access_token_path: $ENV{SSO_PATH_USER, /o/token/}
+  logout_path: $ENV{SSO_PATH_LOGOUT, /logout/}
+  client_id: $ENV{AUTHBROKER_CLIENT_ID, sso_client_id}
+  client_secret: $ENV{AUTHBROKER_CLIENT_SECRET, sso_client_secret}
 access_control:
   hawk_enabled: $ENV{DSS_HAWK_ENABLED, True}
   hawk_nonce_enabled: $ENV{DSS_HAWK_NONCE_ENABLED, True}
