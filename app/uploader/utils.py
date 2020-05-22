@@ -1,4 +1,5 @@
 import csv
+import datetime
 import os.path
 
 import pandas
@@ -7,21 +8,41 @@ from flask import current_app as app
 from smart_open import open
 
 
-def upload_file(stream, file_name, pipeline):
+def upload_file(stream, pipeline):
     storage = StorageFactory.create(app.config['s3']['bucket_url'])
     upload_folder = app.config['s3']['upload_folder']
-    file_name = f'{upload_folder}/{pipeline.organisation}/{pipeline.dataset}/{file_name}'
-    storage.write_file(file_name, stream)
-    return file_name
+    file_name = f'{upload_folder}/{pipeline.file_name}'
+    obj = storage.write_file(file_name, stream)
+    # return file_name, obj.version_id
+    import random
+    return file_name, random.randint(0, 1000)
 
 
-def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
+def delete_file(pipeline):
+    storage = StorageFactory.create(app.config['s3']['bucket_url'])
+    upload_folder = app.config['s3']['upload_folder']
+    file_name = f'{upload_folder}/{pipeline.file_name}'
+    storage.delete_file(file_name)
+
+
+def get_versions(pipeline_data_file):
+    return [
+        {"number": 1, "uploaded_at": datetime.datetime.now(), "latest": True},
+        {"number": 2, "uploaded_at": datetime.datetime.now(), "latest": False},
+        {"number": 3, "uploaded_at": datetime.datetime.now(), "latest": False},
+    ]
+
+
+def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4, version=None):
     bucket = app.config['s3']['bucket_url']
     full_url = os.path.join(bucket, url)
     contents = []
     i = 0
+    transport_params = {}
+    # if version:
+    #     transport_params = {'version_id': 'version'}
     try:
-        with open(full_url, encoding='utf-8-sig') as csv_file:
+        with open(full_url, encoding='utf-8-sig', transport_params=transport_params) as csv_file:
             reader = csv.DictReader(csv_file, delimiter=delimiter, quotechar=quotechar, strict=True)
             for row in reader:
                 contents.append(row)

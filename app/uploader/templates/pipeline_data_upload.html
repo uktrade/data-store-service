@@ -2,6 +2,28 @@
 
 {% block content %}
 
+{% if versions %}
+<table class="govuk-table">
+    <caption class="govuk-table__caption">Existing versions</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Version name</th>
+            <th scope="col" class="govuk-table__header">Date uploaded</th>
+            <th scope="col" class="govuk-table__header"></th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    {% for version in versions %}
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">{{ version.number }}</th>
+            <td class="govuk-table__cell">{{ version.uploaded_at }}</td>
+            <td class="govuk-table__cell">{% if version.latest %}Latest{% else %}<a href="{{ url_for('uploader_views.pipeline_restore_version', slug=pipeline.slug, version=version.number)}}">Restore</a>{% endif %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
 <form method="post" name="pipeline_form" enctype="multipart/form-data">
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
@@ -13,7 +35,7 @@
                     <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
                 </legend>
 
-                {% with field=form.csv_file %}
+                {% with field=form.csv_file, type=file %}
                     {% include 'form/input_field.html' %}
                 {% endwith %}
                 <div class="gov-form-group govuk-!-padding-top-6">

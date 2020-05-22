@@ -1,0 +1,66 @@
+{% extends 'data_store_service/base.html' %}
+
+{% block content %}
+
+<form method="post" name="verify_form" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    {% include 'form/error_summary.html' %}
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
+        </legend>
+        {% with field=form.proceed %}
+            {% include 'form/input_radio_field.html' %}
+        {% endwith %}
+        <div class="gov-form-group govuk-!-padding-top-6">
+            <ul class="govuk-list">
+                <li>
+                    <input type="submit" value="Proceed" class="govuk-button govuk-!-margin-bottom-4">
+                </li>
+            </ul>
+        </div>
+    </fieldset>
+</form>
+
+<table class="govuk-table">
+    <caption class="govuk-table__caption">Current version ({{ current_version }})</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Column</th>
+            <th scope="col" class="govuk-table__header">Data type</th>
+            <th scope="col" class="govuk-table__header">Sample data taken from the first few rows</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    {% for column, data in file_contents_current.items() %}
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">{{ column }}</th>
+            <td class="govuk-table__cell">text</td>
+            <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<table class="govuk-table">
+    <caption class="govuk-table__caption">Version to restore ({{ version_to_restore }})</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Column</th>
+            <th scope="col" class="govuk-table__header">Data type</th>
+            <th scope="col" class="govuk-table__header">Sample data taken from the first few rows</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+    {% for column, data in file_contents_to_restore.items() %}
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">{{ column }}</th>
+            <td class="govuk-table__cell">text</td>
+            <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+{% endblock content %}

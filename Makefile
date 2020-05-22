@@ -14,7 +14,7 @@ run_server: compile_assets
 
 .PHONY: run_dev_server
 run_dev_server:
-	FLASK_DEBUG=1 FLASK_APP='data_engineering.common.application:get_or_create()' flask run --host 0.0.0.0 --port ${PORT}
+	USE_DOTENV=1 FLASK_DEBUG=1 FLASK_APP='data_engineering.common.application:get_or_create()' flask run --host 0.0.0.0 --port ${PORT}
 
 .PHONY: run_tests
 run_tests:

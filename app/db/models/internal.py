@@ -110,6 +110,10 @@ class Pipeline(BaseModel):
     def pipeline_schema(self):
         return f'{self.organisation}.{self.dataset}'
 
+    @property
+    def file_name(self):
+        return f'{self.organisation}/{self.dataset}/data.csv'
+
     def __str__(self):
         return self.pipeline_schema
 
@@ -123,6 +127,6 @@ class PipelineDataFile(BaseModel):
     id = _col(_uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     data_file_url = _col(_text, nullable=False)
     pipeline_id = _col(_int, _foreign_key('pipeline.id'), nullable=False)
-    deleted = _col(_bool, default=False)
+    version = _col(_text)
     uploaded_at = _col(_dt, default=lambda: datetime.datetime.utcnow())
     processed_at = _col(_dt)
