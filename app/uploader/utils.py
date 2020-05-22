@@ -6,12 +6,66 @@ from datatools.io.storage import StorageFactory
 from flask import current_app as app
 from smart_open import open
 
+import boto3
+
+from boto3.s3.transfer import TransferConfig
+
+MB = 100
+
+config = TransferConfig (**{
+    'multipart_threshold': 1024 * MB,
+    'max_concurrency': 5,
+    'multipart_chunksize': 1024 * MB,
+    'use_threads': True
+})
+
+
+class UploadFile:
+
+    def __init__(self):
+        self.total = 0
+        self.uploaded = 0
+        self.s3 = boto3.client('s3')
+
+    def upload_callback(self, size):
+        if self.total == 0:
+            return
+        self.uploaded += size
+        percentage = int(self.uploaded / self.total * 100)
+        print(f'{percentage} % - ({size}) - Total {self.total} - Uploaded {self.uploaded}')
+
+    def upload(self, stream, file_name, pipeline):
+        self.total = get_size(stream)
+        bucket = app.config['s3']['bucket_url']
+        bucket = bucket.replace('s3://', '')
+        upload_folder = app.config['s3']['upload_folder']
+        file_name = f'{upload_folder}/{pipeline.organisation}/{pipeline.dataset}/{file_name}'
+        self.s3.upload_fileobj(
+            stream, bucket, file_name, Config=config, Callback=self.upload_callback
+        )
+        return file_name
+
+
+def get_size(fobj):
+    if fobj.content_length:
+        return fobj.content_length
+
+    try:
+        pos = fobj.tell()
+        fobj.seek(0, 2)  #seek to end
+        size = fobj.tell()
+        fobj.seek(pos)  # back to original position
+        return size
+    except (AttributeError, IOError):
+        pass
+
+    # in-memory file object that doesn't support seeking or tell
+    return 0  #assume small enough
+
 
 def upload_file(stream, file_name, pipeline):
-    storage = StorageFactory.create(app.config['s3']['bucket_url'])
-    upload_folder = app.config['s3']['upload_folder']
-    file_name = f'{upload_folder}/{pipeline.organisation}/{pipeline.dataset}/{file_name}'
-    storage.write_file(file_name, stream)
+    u = UploadFile()
+    file_name = u.upload(stream, file_name, pipeline)
     return file_name
 
 
