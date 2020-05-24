@@ -6,7 +6,6 @@
 #
 alembic==1.4.2            # via flask-migrate
 appdirs==1.4.3            # via black
-appnope==0.1.0            # via ipython
 apscheduler==3.6.3        # via -r requirements.in
 attrs==19.3.0             # via black, pytest
 babel==2.8.0              # via flask-babelex
@@ -43,7 +42,7 @@ flask-principal==0.4.0    # via flask-security
 flask-security==3.0.0     # via -r requirements.in, data-engineering-common
 flask-shell-ipython==0.4.1  # via -r requirements.in
 flask-sqlalchemy==2.4.1   # via -r requirements.in, data-engineering-common, flask-migrate
-flask-wtf==0.14.2         # via -r requirements.in, flask-security
+flask-wtf==0.14.3         # via -r requirements.in, flask-security
 flask==1.1.1              # via -r requirements.in, data-engineering-common, flask-babelex, flask-login, flask-mail, flask-migrate, flask-oauthlib, flask-principal, flask-security, flask-shell-ipython, flask-sqlalchemy, flask-wtf
 freezegun==0.3.15         # via -r requirements.in, data-engineering-common
 fuzzywuzzy==0.18.0        # via -r requirements.in
@@ -52,7 +51,7 @@ idna==2.8                 # via email-validator, requests
 importlib-metadata==1.5.0  # via catalogue, pluggy, pytest
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.11.1           # via flask-shell-ipython
-itsdangerous==1.1.0       # via flask, flask-security
+itsdangerous==1.1.0       # via flask, flask-security, flask-wtf
 jedi==0.16.0              # via ipython
 jinja2==2.11.0            # via flask, flask-babelex
 jmespath==0.9.4           # via boto3, botocore
