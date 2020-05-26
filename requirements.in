@@ -23,7 +23,7 @@ pandas==1.0.3
 pip-tools==5.1.2
 psycopg2==2.8.5
 pycountry==19.8.18
-pytest-cov==2.8.1
+pytest-cov==2.9.0
 pytest-mock==3.1.0
 pytest==5.4.2
 python-slugify==4.0.0
