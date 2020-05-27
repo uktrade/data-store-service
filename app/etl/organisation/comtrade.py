@@ -25,7 +25,7 @@ class ComtradeCountryCodeAndISOPipeline(L1SnapshotDataPipeline):
             has_header=True,
             sep=',',
             quote='"',
-            encoding='WIN1258',
+            encoding='WIN1252',
         )
 
     _l1_data_column_types = _l0_data_column_types

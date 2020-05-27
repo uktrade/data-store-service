@@ -110,7 +110,6 @@ def pipeline_data_verify(slug, file_id):
     )
     if is_form_valid:
         save_column_types(pipeline, file_contents)
-        process_pipeline_data_file(pipeline_data_file)
         return redirect(
             url_for(
                 'uploader_views.pipeline_data_uploaded',
@@ -142,5 +141,19 @@ def format_row_data(row):
 @login_required
 def pipeline_data_uploaded(slug, file_id):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False)
-    return render_uploader_template('pipeline_data_uploaded.html', pipeline=pipeline,)
+    pipeline_data_file = get_object_or_404(
+        PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False
+    )
+    thread = process_pipeline_data_file(pipeline_data_file)
+    file_id = pipeline_data_file.id
+    thread.start()
+    return render_uploader_template(
+        'pipeline_data_uploaded.html', pipeline=pipeline, file_id=file_id
+    )
+
+
+@uploader_views.route('/progress/<file_id>/')
+@login_required
+def progress(file_id):
+    file = get_object_or_404(PipelineDataFile, id=file_id)
+    return '100' if file.processed_at else '0'

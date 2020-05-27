@@ -1,4 +1,5 @@
 import io
+from threading import Thread
 from unittest import mock
 
 import pytest
@@ -171,7 +172,10 @@ def test_get_pipeline_created_view_404_unknown_pipeline(
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-def test_get_data_uploaded_view(is_authenticated, app_with_db, captured_templates):
+@mock.patch('app.uploader.views.process_pipeline_data_file')
+def test_get_data_uploaded_view(
+    is_authenticated, process_pipeline_data_file, app_with_db, captured_templates
+):
     data_file = PipelineDataFileFactory()
     client = get_client(app_with_db)
     url = url_for(
@@ -268,7 +272,7 @@ def test_submit_data_verify_proceed_yes(
     app_with_db,
     captured_templates,
 ):
-    mock_process_pipeline_data_file.return_value = None
+    mock_process_pipeline_data_file.return_value = Thread()
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)
     data_file = PipelineDataFileFactory()
