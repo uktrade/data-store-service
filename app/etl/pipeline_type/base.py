@@ -10,6 +10,8 @@ class classproperty(object):
         self.f = f
 
     def __get__(self, obj, owner):
+        if obj:
+            return self.f(obj)
         return self.f(owner)
 
 
@@ -56,7 +58,8 @@ class DataPipeline(metaclass=ABCMeta):
             self.dbi.execute_statement(
                 "SET statement_timeout TO '20h' "
             )  # If a query takes longer over 20hours, stop it!
-            self._create_schema_if_not_exists(self.schema)
+            if self.organisation and self.dataset:
+                self._create_schema_if_not_exists(self.schema)
 
     def __str__(self):
         return f'<{self.__class__.__name__}>'
