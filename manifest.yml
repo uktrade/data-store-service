@@ -2,6 +2,6 @@
 ---
 applications:
 -
-  buildpack:
+  buildpacks:
     - nodejs_buildpack
     - python_buildpack
