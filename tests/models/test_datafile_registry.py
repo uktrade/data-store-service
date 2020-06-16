@@ -1,8 +1,8 @@
 import pandas as pd
+from data_engineering.common.tests.utils import assert_dfs_equal_ignore_dtype
 
 from app.constants import DatafileState
 from app.db.models.internal import DatafileRegistryModel
-from tests.utils import assert_dfs_equal_ignore_dtype
 
 entry1 = {
     'source': 'source1',

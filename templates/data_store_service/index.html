@@ -1,0 +1,14 @@
+{% extends 'data_store_service/base.html' %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+          <p class="govuk-heading-m govuk-!-margin-bottom-2">Main menu</p>
+          <ul class="govuk-list">
+              <li>
+                  <a class="govuk-link" href="{{ url_for('uploader_views.pipeline_select') }}">Manage datasets</a>
+              </li>
+          </ul>
+      </div>
+  </div>
+{% endblock %}

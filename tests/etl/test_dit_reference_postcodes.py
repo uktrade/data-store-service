@@ -1,6 +1,6 @@
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
+from app.etl.organisation.dit import DITReferencePostcodesPipeline
 from tests.utils import rows_equal_table
 
 snapshot1 = 'tests/fixtures/dit/reference_postcodes/snapshot1.csv'

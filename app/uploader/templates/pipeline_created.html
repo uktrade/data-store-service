@@ -1,0 +1,14 @@
+{% extends 'data_store_service/base.html' %}
+
+{% block content %}
+<div class="govuk-panel govuk-panel--confirmation">
+    <h1 class="govuk-panel__title">Dataset pipeline created</h1>
+    <div class="govuk-panel__body"><strong>{{ pipeline }}</strong></div>
+</div>
+<a href="{{ url_for('uploader_views.pipeline_data_upload',  slug=pipeline.slug) }}" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
+    Continue to upload data
+    <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
+    </svg>
+</a>
+{% endblock content %}

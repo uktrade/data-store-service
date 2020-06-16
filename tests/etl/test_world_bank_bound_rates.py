@@ -1,6 +1,6 @@
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_world_bank_bound_rates import WorldBankBoundRatesPipeline
+from app.etl.organisation.world_bank import WorldBankBoundRatesPipeline
 from tests.utils import rows_equal_table
 
 

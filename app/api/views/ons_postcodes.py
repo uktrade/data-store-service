@@ -1,6 +1,6 @@
 from app.api.views.base import PipelinePaginatedListView
 from app.db.models.external import ONSPostcodeDirectoryL1
-from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
+from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
 
 
 class OnsPostcodeListView(PipelinePaginatedListView):

@@ -1,12 +1,15 @@
 PORT ?= 5050
 TEST ?=.
 COV ?= --cov
-BLACK_CONFIG ?= --exclude=venv --skip-string-normalization --line-length 100
+BLACK_CONFIG ?= --exclude=venv --exclude=node_modules --skip-string-normalization --line-length 100
 CHECK ?= --check
 
+compile_assets:
+	./scripts/compile_assets.sh
+
 .PHONY: run_server
-run_server:
-	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
+run_server: compile_assets
+	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn_config.py'
 
 
 .PHONY: run_dev_server

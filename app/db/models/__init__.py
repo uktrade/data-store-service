@@ -1,12 +1,17 @@
-from app.etl.etl_comtrade_country_code_and_iso import ComtradeCountryCodeAndISOPipeline
-from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
-from app.etl.etl_dit_reference_postcodes import DITReferencePostcodesPipeline
-from app.etl.etl_ons_postcode_directory import ONSPostcodeDirectoryPipeline
-from app.etl.etl_world_bank_tariff import WorldBankBoundRatesPipeline, WorldBankTariffPipeline
+from app.db.models.external import SPIRE_SCHEMA_NAME
+from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
+from app.etl.organisation.dit import (
+    DITBACIPipeline,
+    DITEUCountryMembershipPipeline,
+    DITReferencePostcodesPipeline,
+)
+from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
+from app.etl.organisation.world_bank import WorldBankBoundRatesPipeline, WorldBankTariffPipeline
 
 
 def get_schemas():
     return [
+        'public',
         'operations',
         'admin',
         ONSPostcodeDirectoryPipeline.schema,
@@ -15,4 +20,6 @@ def get_schemas():
         WorldBankTariffPipeline.schema,
         ComtradeCountryCodeAndISOPipeline.schema,
         DITEUCountryMembershipPipeline.schema,
+        DITBACIPipeline.schema,
+        SPIRE_SCHEMA_NAME,
     ]

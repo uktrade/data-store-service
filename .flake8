@@ -4,6 +4,8 @@ application-package-names=authbroker_client
 exclude =
     venv,
     .venv
+    node_modules
+    temp
 import_order_style = smarkets
 max-line-length = 100
 extend-ignore = E203

@@ -1,6 +1,6 @@
 from datatools.io.fileinfo import FileInfo
 
-from app.etl.etl_dit_eu_country_membership import DITEUCountryMembershipPipeline
+from app.etl.organisation.dit import DITEUCountryMembershipPipeline
 from tests.utils import rows_equal_table
 
 
@@ -75,10 +75,12 @@ class TestDITEUCountryMembershipPipeline:
                 'EUN',
                 'EUN',
                 'EUN',
+                'EUN',
             ),
             (
                 'Belgium',
                 'BEL',
+                'EUN',
                 'EUN',
                 'EUN',
                 'EUN',
@@ -192,6 +194,7 @@ class TestDITEUCountryMembershipPipeline:
                 None,
                 None,
                 None,
+                'EUN',
                 'EUN',
                 'EUN',
                 'EUN',

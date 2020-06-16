@@ -2,6 +2,7 @@ import pytest
 
 from app.db.models.external import (
     ComtradeCountryCodeAndISOL1,
+    DITBACIL1,
     DITEUCountryMembershipL1,
     DITReferencePostcodesL1,
     ONSPostcodeDirectoryL1,
@@ -130,7 +131,9 @@ def add_world_bank_tariff(app):
                 'app_rate': record.get('app_rate'),
                 'mfn_rate': record.get('mfn_rate'),
                 'bnd_rate': record.get('bnd_rate'),
-                'country_average': record.get('country_average'),
+                'eu_rep_rate': record.get('eu_rep_rate'),
+                'eu_part_rate': record.get('eu_part_rate'),
+                'eu_eu_rate': record.get('eu_eu_rate'),
                 'world_average': record.get('world_average'),
             }
             WorldBankTariffTransformL1.get_or_create(
@@ -154,6 +157,25 @@ def add_world_bank_raw_tariff(app):
                 'number_of_total_lines': record.get('number_of_total_lines'),
             }
             WorldBankTariffL0.get_or_create(
+                id=record.get('id', None), defaults=defaults,
+            )
+
+    return _method
+
+
+@pytest.fixture(scope='module')
+def add_dit_baci(app):
+    def _method(records):
+        for record in records:
+            defaults = {
+                'year': record.get('year'),
+                'product_category': record.get('product_category'),
+                'exporter': record.get('exporter'),
+                'importer': record.get('importer'),
+                'trade_flow_value': record.get('trade_flow_value'),
+                'quantity': record.get('quantity'),
+            }
+            DITBACIL1.get_or_create(
                 id=record.get('id', None), defaults=defaults,
             )
 
