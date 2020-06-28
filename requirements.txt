@@ -117,7 +117,7 @@ tzlocal==2.0.0            # via apscheduler
 git+https://github.com/uktrade/dt08-data-tools.git  # via -r requirements.in
 urllib3==1.25.8           # via botocore, requests
 wasabi==0.6.0             # via spacy, thinc
-watchdog==0.10.2          # via -r requirements.in
+watchdog==0.10.3          # via -r requirements.in
 wcwidth==0.1.8            # via prompt-toolkit, pytest
 werkzeug==0.16.1          # via -r requirements.in, data-engineering-common, flask
 wtforms==2.2.1            # via flask-wtf
