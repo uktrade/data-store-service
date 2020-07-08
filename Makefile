@@ -9,7 +9,7 @@ compile_assets:
 
 .PHONY: run_server
 run_server: compile_assets
-	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn.conf'
+	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn_config.py'
 
 
 .PHONY: run_dev_server

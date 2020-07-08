@@ -99,7 +99,6 @@ class Pipeline(BaseModel):
     column_types = _col(_array(_text))
     delimiter = _col(_text, nullable=False, server_default=DEFAULT_CSV_DELIMITER)
     quote = _col(_text, server_default=DEFAULT_CSV_QUOTECHAR)
-    data_files = _relationship('PipelineDataFile', backref='pipeline')
 
     @staticmethod
     def generate_slug(mapper, connection, target):
@@ -130,3 +129,5 @@ class PipelineDataFile(BaseModel):
     version = _col(_text)
     uploaded_at = _col(_dt, default=lambda: datetime.datetime.utcnow())
     processed_at = _col(_dt)
+
+    pipeline = _relationship('Pipeline', backref='data_files')

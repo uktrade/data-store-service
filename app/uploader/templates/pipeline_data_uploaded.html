@@ -4,6 +4,35 @@
 <div class="govuk-panel govuk-panel--confirmation">
     <h1 class="govuk-panel__title">Data now being processed</h1>
     <div class="govuk-panel__body">by&nbsp;<strong>{{ pipeline }}</strong>&nbsp;pipeline</div>
-    <div class="govuk-panel__body">Please wait</div>
+    <div id="pipeline_progress_label" class="govuk-panel__body">Please wait</div>
+    <progress id="pipeline_progress" value="0" max="100"/>
 </div>
+<script type="text/javascript">
+function loadXMLDoc(file_id, interval) {
+    var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+           if (xmlhttp.status == 200) {
+               document.getElementById("pipeline_progress").value = xmlhttp.responseText;
+               if (xmlhttp.responseText == 100) {
+                    clearInterval(interval);
+                    document.getElementById("pipeline_progress_label").innerHTML = 'Completed';
+               }
+           }
+           else {
+               document.getElementById("pipeline_progress").value = 0;
+               clearInterval(interval);
+           }
+        }
+    };
+    xmlhttp.open("GET", "/upload/progress/" + file_id + '/', true);
+    xmlhttp.send();
+}
+
+const interval = setInterval(function() {
+   loadXMLDoc('{{ file_id }}', interval);
+ }, 2000);
+
+</script>
 {% endblock content %}
