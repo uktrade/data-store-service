@@ -23,7 +23,7 @@
 </form>
 
 <table class="govuk-table">
-    <caption class="govuk-table__caption">Current version ({{ current_version }})</caption>
+    <caption class="govuk-table__caption">Current version</caption>
     <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Column</th>
@@ -32,7 +32,7 @@
         </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for column, data in file_contents_current.items() %}
+    {% for column, data in file_contents_latest.items() %}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">{{ column }}</th>
             <td class="govuk-table__cell">text</td>
@@ -43,7 +43,7 @@
 </table>
 
 <table class="govuk-table">
-    <caption class="govuk-table__caption">Version to restore ({{ version_to_restore }})</caption>
+    <caption class="govuk-table__caption">Version to restore</caption>
     <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Column</th>

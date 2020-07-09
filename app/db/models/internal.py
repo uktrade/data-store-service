@@ -100,6 +100,8 @@ class Pipeline(BaseModel):
     delimiter = _col(_text, nullable=False, server_default=DEFAULT_CSV_DELIMITER)
     quote = _col(_text, server_default=DEFAULT_CSV_QUOTECHAR)
 
+    data_files = _relationship('PipelineDataFile', order_by='desc(PipelineDataFile.processed_at)')
+
     @staticmethod
     def generate_slug(mapper, connection, target):
         if not target.slug:
@@ -108,10 +110,6 @@ class Pipeline(BaseModel):
     @property
     def pipeline_schema(self):
         return f'{self.organisation}.{self.dataset}'
-
-    @property
-    def file_name(self):
-        return f'{self.organisation}/{self.dataset}/data.csv'
 
     def __str__(self):
         return self.pipeline_schema
@@ -126,8 +124,8 @@ class PipelineDataFile(BaseModel):
     id = _col(_uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     data_file_url = _col(_text, nullable=False)
     pipeline_id = _col(_int, _foreign_key('pipeline.id'), nullable=False)
-    version = _col(_text)
+    latest_version = _col(_bool)
     uploaded_at = _col(_dt, default=lambda: datetime.datetime.utcnow())
     processed_at = _col(_dt)
 
-    pipeline = _relationship('Pipeline', backref='data_files')
+    pipeline = _relationship('Pipeline')

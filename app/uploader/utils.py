@@ -1,5 +1,4 @@
 import csv
-import datetime
 import os.path
 from io import BytesIO
 from threading import Thread
@@ -14,41 +13,26 @@ from sqlalchemy.sql.functions import now
 from app.etl.pipeline_type.dsv_to_table import DSVToTablePipeline
 
 
-def upload_file(stream, pipeline):
+def upload_file(stream, pipeline, version_number):
     storage = StorageFactory.create(app.config['s3']['bucket_url'])
     upload_folder = app.config['s3']['upload_folder']
-    file_name = f'{upload_folder}/{pipeline.file_name}'
-    obj = storage.write_file(file_name, stream)
-    # return file_name, obj.version_id
-    import random
-    return file_name, random.randint(0, 1000)
+    file_name = f'{upload_folder}/{pipeline.organisation}/{pipeline.dataset}/{version_number}'
+    storage.write_file(file_name, stream)
+    return file_name
 
 
-def delete_file(pipeline):
+def delete_file(pipeline_data_file):
     storage = StorageFactory.create(app.config['s3']['bucket_url'])
-    upload_folder = app.config['s3']['upload_folder']
-    file_name = f'{upload_folder}/{pipeline.file_name}'
-    storage.delete_file(file_name)
+    storage.delete_file(pipeline_data_file.data_file_url)
 
 
-def get_versions(pipeline_data_file):
-    return [
-        {"number": 1, "uploaded_at": datetime.datetime.now(), "latest": True},
-        {"number": 2, "uploaded_at": datetime.datetime.now(), "latest": False},
-        {"number": 3, "uploaded_at": datetime.datetime.now(), "latest": False},
-    ]
-
-
-def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4, version=None):
+def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
     bucket = app.config['s3']['bucket_url']
     full_url = os.path.join(bucket, url)
     contents = []
     i = 0
-    transport_params = {}
-    # if version:
-    #     transport_params = {'version_id': 'version'}
     try:
-        with open(full_url, encoding='utf-8-sig', transport_params=transport_params) as csv_file:
+        with open(full_url, encoding='utf-8-sig') as csv_file:
             reader = csv.DictReader(csv_file, delimiter=delimiter, quotechar=quotechar, strict=True)
             for row in reader:
                 contents.append(row)
@@ -113,6 +97,7 @@ def process_pipeline_data_file(pipeline_data_file):
     def ctx_bridge(pipeline, pipeline_data_file, file_info):
         pipeline.process(file_info)
         pipeline_data_file.processed_at = now()
+        pipeline_data_file.latest_version = True
         pipeline_data_file.save()
 
     thread = PipelineThread(
@@ -124,8 +109,7 @@ def process_pipeline_data_file(pipeline_data_file):
     return thread
 
 
-def save_column_types(pipeline, file_contents):
+def get_column_types(file_contents):
     columns = file_contents.columns.to_list()
     mapped_column_types = list(zip(columns, ['text'] * len(columns)))
-    pipeline.column_types = mapped_column_types
-    pipeline.save()
+    return mapped_column_types

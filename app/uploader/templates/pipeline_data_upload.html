@@ -2,22 +2,22 @@
 
 {% block content %}
 
-{% if versions %}
+{% if pipeline.data_files|length > 0 %}
 <table class="govuk-table">
     <caption class="govuk-table__caption">Existing versions</caption>
     <thead class="govuk-table__head">
         <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Version name</th>
             <th scope="col" class="govuk-table__header">Date uploaded</th>
+            <th scope="col" class="govuk-table__header">Date processed</th>
             <th scope="col" class="govuk-table__header"></th>
         </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for version in versions %}
+    {% for data_file in pipeline.data_files %}
         <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">{{ version.number }}</th>
-            <td class="govuk-table__cell">{{ version.uploaded_at }}</td>
-            <td class="govuk-table__cell">{% if version.latest %}Latest{% else %}<a href="{{ url_for('uploader_views.pipeline_restore_version', slug=pipeline.slug, version=version.number)}}">Restore</a>{% endif %}</td>
+            <td class="govuk-table__cell">{{ data_file.uploaded_at }}</td>
+            <td class="govuk-table__cell">{% if data_file.processed_at %} {{ data_file.processed_at }} {% else %}<a href="{{ url_for('uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id)}}">Process</a>{% endif %}</td>
+            <td class="govuk-table__cell">{% if data_file.processed_at %} {% if data_file.latest_version %}Latest{% else %}<a href="{{ url_for('uploader_views.pipeline_restore_version', slug=data_file.pipeline.slug, file_id=data_file.id)}}">Restore</a>{% endif %}{% endif %}</td>
         </tr>
     {% endfor %}
     </tbody>
@@ -35,7 +35,7 @@
                     <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
                 </legend>
 
-                {% with field=form.csv_file, type=file %}
+                {% with field=form.csv_file %}
                     {% include 'form/input_field.html' %}
                 {% endwith %}
                 <div class="gov-form-group govuk-!-padding-top-6">
