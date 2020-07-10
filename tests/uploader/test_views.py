@@ -7,7 +7,7 @@ from flask import template_rendered, url_for
 from slugify import slugify
 
 from app.constants import DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR, NO, YES
-from app.db.models.internal import Pipeline
+from app.db.models.internal import Pipeline, PipelineDataFile
 from tests.api.views import make_sso_request
 from tests.fixtures.factories import PipelineDataFileFactory, PipelineFactory
 
@@ -259,7 +259,7 @@ def test_submit_data_verify_proceed_no(is_authenticated, app_with_db, captured_t
     template, template_context = captured_templates.pop()
     assert template.name == 'pipeline_select.html'
     assert template_context['request'].path == url_for('uploader_views.pipeline_select')
-    assert data_file.deleted is True
+    assert not PipelineDataFile.query.get(data_file.id)
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
@@ -291,7 +291,7 @@ def test_submit_data_verify_proceed_yes(
     assert template_context['request'].path == url_for(
         'uploader_views.pipeline_data_uploaded', slug=data_file.pipeline.slug, file_id=data_file.id
     )
-    assert data_file.deleted is False
+    assert PipelineDataFile.query.get(data_file.id)
     assert mock_process_pipeline_data_file.called is True
 
 
