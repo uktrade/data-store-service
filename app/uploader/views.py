@@ -3,6 +3,7 @@ import os
 from data_engineering.common.sso.token import login_required
 from flask import abort, redirect, render_template, url_for
 from flask.blueprints import Blueprint
+from werkzeug.exceptions import BadRequest
 
 from app.constants import YES
 from app.db.models.internal import Pipeline, PipelineDataFile
@@ -57,8 +58,8 @@ def pipeline_create():
     form = PipelineForm()
     if form.validate_on_submit():
         pipeline = Pipeline(
-            dataset=form.dataset.data,
-            organisation=form.organisation.data,
+            dataset=form.format(form.dataset.data),
+            organisation=form.format(form.organisation.data),
             column_types=[['temp', 'text']],  # temporary placeholder
         )
         pipeline.save()
@@ -86,7 +87,7 @@ def pipeline_data_upload(slug):
             url_for('uploader_views.pipeline_data_verify', slug=pipeline.slug, file_id=data_file.id)
         )
     return render_uploader_template(
-        'pipeline_data_upload.html', pipeline=pipeline, form=form, heading='Upload data'
+        'pipeline_data_upload.html', pipeline=pipeline, form=form, heading='Upload data',
     )
 
 
@@ -144,11 +145,20 @@ def pipeline_data_uploaded(slug, file_id):
     pipeline_data_file = get_object_or_404(
         PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False
     )
+    schema_parts = pipeline.pipeline_schema.split('.')
+    if len(schema_parts) != 2:
+        raise BadRequest("Invalid schema for this pipeline.")
+    data_workspace_schema_name = schema_parts[0]
+    data_workspace_table_name = schema_parts[1]
     thread = process_pipeline_data_file(pipeline_data_file)
     file_id = pipeline_data_file.id
     thread.start()
     return render_uploader_template(
-        'pipeline_data_uploaded.html', pipeline=pipeline, file_id=file_id
+        'pipeline_data_uploaded.html',
+        pipeline=pipeline,
+        file_id=file_id,
+        data_workspace_schema_name=data_workspace_schema_name,
+        data_workspace_table_name=data_workspace_table_name,
     )
 
 
