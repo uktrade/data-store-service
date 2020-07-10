@@ -39,7 +39,10 @@ def test_get_table_data(app_with_hawk_user, app_with_mock_cache):
         client, '/api/v1/table-data/spire/footnotes?orientation=records'
     )
     assert response.status_code == 200
-    assert response.json == {'results': [{'text': 'foo bar', 'status': 'CURRENT'}], 'next': None}
+    assert response.json == {
+        'results': [{'id': 1, 'text': 'foo bar', 'status': 'CURRENT'}],
+        'next': None,
+    }
 
 
 def test_get_table_data_paginated(app_with_hawk_user, app_with_mock_cache):
@@ -58,7 +61,7 @@ def test_get_table_data_paginated(app_with_hawk_user, app_with_mock_cache):
 
     assert response.status_code == 200
     assert response.json == {
-        'results': [{'text': 'foo bar', 'status': 'CURRENT'} for i in range(10)],
+        'results': [{'id': i, 'text': 'foo bar', 'status': 'CURRENT'} for i in range(1, 11)],
         'next': expected_next_url,
     }
 
@@ -66,7 +69,7 @@ def test_get_table_data_paginated(app_with_hawk_user, app_with_mock_cache):
     response = make_hawk_auth_request(client, response.json['next'].replace('http://localhost', ''))
     assert response.status_code == 200
     assert response.json == {
-        'results': [{'text': 'foo bar', 'status': 'CURRENT'} for i in range(10, 15)],
+        'results': [{'id': i, 'text': 'foo bar', 'status': 'CURRENT'} for i in range(11, 16)],
         'next': None,
     }
 
