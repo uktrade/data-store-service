@@ -16,13 +16,16 @@ class PipelineForm(FlaskForm):
         'Dataset', validators=[DataRequired()], render_kw={'class': 'govuk-input'}
     )
 
+    def format(self, field):
+        return field.lower().replace('.', '_')
+
     def validate(self):
         rv = FlaskForm.validate(self)
         if not rv:
             return False
 
         pipeline = Pipeline.query.filter_by(
-            organisation=self.organisation.data, dataset=self.dataset.data
+            organisation=self.format(self.organisation.data), dataset=self.format(self.dataset.data)
         ).first()
         if pipeline is not None:
             self.errors['non_field_errors'] = [
