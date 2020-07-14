@@ -100,6 +100,12 @@ def process_pipeline_data_file(pipeline_data_file):
         pipeline_data_file.latest_version = True
         pipeline_data_file.save()
 
+        # Set existing latest_version to False
+        for data_file in pipeline_data_file.pipeline.data_files:
+            if data_file.latest_version and data_file.id != pipeline_data_file.id:
+                data_file.latest_version = False
+                data_file.save()
+
     thread = PipelineThread(
         pipeline=dsv_pipeline,
         pipeline_data_file=pipeline_data_file,
@@ -111,5 +117,4 @@ def process_pipeline_data_file(pipeline_data_file):
 
 def get_column_types(file_contents):
     columns = file_contents.columns.to_list()
-    mapped_column_types = list(zip(columns, ['text'] * len(columns)))
-    return mapped_column_types
+    return list(zip(columns, ['text'] * len(columns)))

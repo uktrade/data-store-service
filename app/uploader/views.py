@@ -215,11 +215,4 @@ def pipeline_data_uploaded(slug, file_id):
 @login_required
 def progress(file_id):
     file = get_object_or_404(PipelineDataFile, id=file_id)
-    if file.processed_at:
-        # Set existing latest_version to False
-        for data_file in file.pipeline.data_files:
-            if data_file.latest_version and data_file.id != file.id:
-                data_file.latest_version = False
-                data_file.save()
-        return '100'
-    return '0'
+    return '100' if file.processed_at else '0'
