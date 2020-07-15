@@ -22,3 +22,13 @@ class DatafileState(BaseEnum):
     FAILED = 'failed'
     PROCESSED = 'processed'
     IGNORED = 'ignored'
+
+
+class DataUploaderFileState(BaseEnum):
+    UPLOADING = 'uploading'
+    UPLOADED = 'uploaded'
+    VERIFIED = 'verified'
+    PROCESSING_DSS = 'processing_dss'
+    PROCESSING_DATAFLOW = 'processing_dataflow'
+    COMPLETED = 'completed'
+    FAILED = 'failed'

@@ -50,11 +50,9 @@ def test_get_s3_file_sample_when_invalid_csv(mock_smart_open, app_with_db):
 
 @mock.patch('app.uploader.utils.StorageFactory.create')
 def test_upload_file(mock_create_storage, app_with_db):
-    pipeline = PipelineFactory(organisation='org', dataset='set')
     file_name = 'test.csv'
     with mock.patch.object(S3Storage, 'write_file', return_value=None) as mock_write_file:
         mock_create_storage.return_value = S3Storage('s3://bucket')
-        actual_file_name = upload_file('', file_name, pipeline)
+        upload_file('', file_name)
     assert mock_create_storage.called is True
     assert mock_write_file.called is True
-    assert actual_file_name == 'uploads/org/set/test.csv'
