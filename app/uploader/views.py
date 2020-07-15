@@ -2,10 +2,11 @@ import os
 
 from data_engineering.common.sso.token import login_required
 from flask import abort, redirect, render_template, url_for
+from flask import current_app as app
 from flask.blueprints import Blueprint
 from werkzeug.exceptions import BadRequest
 
-from app.constants import YES
+from app.constants import DataUploaderFileState, YES
 from app.db.models.internal import Pipeline, PipelineDataFile
 from app.uploader.forms import DataFileForm, PipelineForm, PipelineSelectForm, VerifyDataFileForm
 from app.uploader.utils import (
@@ -80,9 +81,25 @@ def pipeline_data_upload(slug):
     pipeline = get_object_or_404(Pipeline, slug=slug)
     form = DataFileForm()
     if form.validate_on_submit():
-        data_file_url = upload_file(form.csv_file.data, form.csv_file.data.filename, pipeline)
-        data_file = PipelineDataFile(data_file_url=data_file_url, pipeline=pipeline)
-        data_file.save()
+        upload_folder = app.config['s3']['upload_folder']
+        data_file_url = (
+            f'{upload_folder}/{pipeline.organisation}/'
+            f'{pipeline.dataset}/{form.csv_file.data.filename}'
+        )
+        data_file = PipelineDataFile(
+            data_file_url=data_file_url,
+            pipeline=pipeline,
+            state=DataUploaderFileState.UPLOADING.value,
+        )
+        try:
+            upload_file(form.csv_file.data, data_file_url)
+            data_file.state = DataUploaderFileState.UPLOADED.value
+            data_file.save()
+        except Exception as e:
+            data_file.state = DataUploaderFileState.FAILED.value
+            data_file.error_message = str(e)
+            data_file.save()
+            raise
         return redirect(
             url_for('uploader_views.pipeline_data_verify', slug=pipeline.slug, file_id=data_file.id)
         )
@@ -111,6 +128,8 @@ def pipeline_data_verify(slug, file_id):
     )
     if is_form_valid:
         save_column_types(pipeline, file_contents)
+        pipeline_data_file.state = DataUploaderFileState.VERIFIED.value
+        pipeline_data_file.save()
         return redirect(
             url_for(
                 'uploader_views.pipeline_data_uploaded',
@@ -166,4 +185,30 @@ def pipeline_data_uploaded(slug, file_id):
 @login_required
 def progress(file_id):
     file = get_object_or_404(PipelineDataFile, id=file_id)
-    return '100' if file.processed_at else '0'
+    state = file.state
+    response = {'state': state}
+    if not state:
+        response['progress'] = '0'
+        response['info'] = 'Starting new data upload'
+    elif state == DataUploaderFileState.UPLOADING.value:
+        response['progress'] = '10'
+        response['info'] = 'Uploading data'
+    elif state == DataUploaderFileState.UPLOADED.value:
+        response['progress'] = '20'
+        response['info'] = 'Data successfully uploaded'
+    elif state == DataUploaderFileState.VERIFIED.value:
+        response['progress'] = '30'
+        response['info'] = 'Data successfully verified'
+    elif state == DataUploaderFileState.PROCESSING_DSS.value:
+        response['progress'] = '40'
+        response['info'] = 'Data is being processed by Data Store Service'
+    elif state == DataUploaderFileState.PROCESSING_DATAFLOW.value:
+        response['progress'] = '70'
+        response['info'] = 'Data is being processed by Data Flow'
+    elif state == DataUploaderFileState.COMPLETED.value:
+        response['progress'] = '100'
+        response['info'] = 'Data successfully processed'
+    elif state == DataUploaderFileState.FAILED.value:
+        response['progress'] = '100'
+        response['info'] = 'Oops, something went wrong'
+    return response

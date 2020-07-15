@@ -31,3 +31,8 @@ s3:
   bucket_url: $ENV{S3_BUCKET_URL, inputs}
   datasets_folder: $ENV{DATASETS_FOLDER, datasets}
   upload_folder: $ENV{UPLOAD_FOLDER, uploads}
+dataflow:
+  base_url: $ENV{DATAFLOW_BASE_URL, }
+  data_uploader_dag_id : $ENV{DATAFLOW_UPLOADER_DAG_ID, DSSCSVUploaderPipeline}
+  hawk_id: $ENV{DATAFLOW_HAWK_ID, }
+  hawk_key: $ENV{DATAFLOW_HAWK_KEY, }
