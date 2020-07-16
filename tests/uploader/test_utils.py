@@ -7,7 +7,6 @@ from datatools.io.storage import S3Storage
 
 from app.constants import DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR
 from app.uploader.utils import get_column_types, get_s3_file_sample, upload_file
-from tests.fixtures.factories import PipelineFactory
 
 
 @pytest.mark.parametrize(
@@ -48,10 +47,8 @@ def test_get_s3_file_sample_when_invalid_csv(mock_smart_open, app_with_db):
 
 @mock.patch('app.uploader.utils.StorageFactory.create')
 def test_upload_file(mock_create_storage, app_with_db):
-    pipeline = PipelineFactory(organisation='org', dataset='set')
     with mock.patch.object(S3Storage, 'write_file', return_value=None) as mock_write_file:
         mock_create_storage.return_value = S3Storage('s3://bucket')
-        actual_file_name = upload_file('', pipeline, '00000000-0000-0000-0000-000000000001')
+        upload_file('test.csv', 'bla')
     assert mock_create_storage.called is True
     assert mock_write_file.called is True
-    assert actual_file_name == 'uploads/org/set/00000000-0000-0000-0000-000000000001'

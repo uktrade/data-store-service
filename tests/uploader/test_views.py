@@ -6,7 +6,13 @@ import pytest
 from flask import template_rendered, url_for
 from slugify import slugify
 
-from app.constants import DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR, NO, YES
+from app.constants import (
+    DataUploaderFileState,
+    DEFAULT_CSV_DELIMITER,
+    DEFAULT_CSV_QUOTECHAR,
+    NO,
+    YES
+)
 from app.db.models.internal import Pipeline, PipelineDataFile
 from tests.api.views import make_sso_request
 from tests.fixtures.factories import PipelineDataFileFactory, PipelineFactory
@@ -305,7 +311,6 @@ def test_submit_data_upload_view(
 ):
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)
-    mock_upload_file.return_value = 'fakefile.csv'
     pipeline = PipelineFactory(delimiter=DEFAULT_CSV_DELIMITER, quote=DEFAULT_CSV_QUOTECHAR)
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
@@ -321,8 +326,8 @@ def test_submit_data_upload_view(
     file_contents = template_context['file_contents']
     assert file_contents == {'goodbye': {0: '2', 1: '4'}, 'hello': {0: '1', 1: '3'}}
 
-    assert pipeline.data_files[0].data_file_url == 'fakefile.csv'
-    assert pipeline.data_files[0].latest_version is False
+    assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
+    assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
@@ -353,8 +358,8 @@ def test_submit_data_upload_view_additional_dataset(
     file_contents = template_context['file_contents']
     assert file_contents == {'goodbye': {0: '2', 1: '4'}, 'hello': {0: '1', 1: '3'}}
     assert len(pipeline.data_files) == 1
-    assert pipeline.data_files[0].data_file_url == 'fakefile_1.csv'
-    assert pipeline.data_files[0].latest_version is False
+    assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
+    assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
 
     # upload another file
     mock_smart_open.return_value = io.StringIO(file_2_csv_string)
@@ -372,8 +377,10 @@ def test_submit_data_upload_view_additional_dataset(
     file_contents = template_context['file_contents']
     assert file_contents == {'goodbye': {0: '1', 1: '3'}, 'hello': {0: '2', 1: '4'}}
     assert len(pipeline.data_files) == 2
-    assert pipeline.data_files[1].data_file_url == 'fakefile_2.csv'
-    assert pipeline.data_files[1].latest_version is False
+    assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
+    assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
+    assert pipeline.data_files[1].data_file_url.split("/")[1] == pipeline.organisation
+    assert pipeline.data_files[1].data_file_url.split("/")[2] == pipeline.dataset
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
@@ -381,15 +388,19 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
     pipeline = PipelineFactory()
     # Latest version
     PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=True, processed_at=datetime.datetime.now()
+        pipeline=pipeline,
+        state=DataUploaderFileState.COMPLETED.value,
+        processed_at=datetime.date.fromisoformat('2020-07-01')
     )
     # Version that can be restored
     PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=False, processed_at=datetime.datetime.now()
+        pipeline=pipeline,
+        state=DataUploaderFileState.COMPLETED.value,
+        processed_at=datetime.date.fromisoformat('2020-06-01')
     )
     # Version that is yet to be processed
     PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=False, processed_at=None
+        pipeline=pipeline, state=DataUploaderFileState.UPLOADED.value, processed_at=None
     )
 
     client = get_client(app_with_db)
@@ -420,11 +431,15 @@ def test_get_restore_version_view(
     pipeline = PipelineFactory()
     # Latest version
     PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=True, processed_at=datetime.datetime.now()
+        pipeline=pipeline,
+        state=DataUploaderFileState.COMPLETED.value,
+        processed_at=datetime.date.fromisoformat('2020-07-01')
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=False, processed_at=datetime.datetime.now()
+        pipeline=pipeline,
+        state=DataUploaderFileState.COMPLETED.value,
+        processed_at=datetime.date.fromisoformat('2020-06-01')
     )
 
     client = get_client(app_with_db)
@@ -454,11 +469,15 @@ def test_submit_restore_version_cancel(
     pipeline = PipelineFactory()
     # Latest version
     PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=True, processed_at=datetime.datetime.now()
+        pipeline=pipeline,
+        state=DataUploaderFileState.COMPLETED.value,
+        processed_at=datetime.date.fromisoformat('2020-07-01')
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=False, processed_at=datetime.datetime.now()
+        pipeline=pipeline,
+        state=DataUploaderFileState.COMPLETED.value,
+        processed_at=datetime.date.fromisoformat('2020-06-01')
     )
 
     client = get_client(app_with_db)
@@ -497,11 +516,15 @@ def test_submit_restore_version_proceed(
     pipeline = PipelineFactory()
     # Latest version
     PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=True, processed_at=datetime.datetime.now()
+        pipeline=pipeline,
+        state=DataUploaderFileState.COMPLETED.value,
+        processed_at=datetime.date.fromisoformat('2020-07-01')
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
-        pipeline=pipeline, latest_version=False, processed_at=datetime.datetime.now()
+        pipeline=pipeline,
+        state=DataUploaderFileState.COMPLETED.value,
+        processed_at=datetime.date.fromisoformat('2020-06-01')
     )
 
     client = get_client(app_with_db)
