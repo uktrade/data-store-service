@@ -85,8 +85,7 @@ def pipeline_data_upload(slug):
     if form.validate_on_submit():
         upload_folder = app.config['s3']['upload_folder']
         data_file_url = (
-            f'{upload_folder}/{pipeline.organisation}/'
-            f'{pipeline.dataset}/{uuid.uuid4()}'
+            f'{upload_folder}/{pipeline.organisation}/' f'{pipeline.dataset}/{uuid.uuid4()}'
         )
         data_file = PipelineDataFile(
             data_file_url=data_file_url,
@@ -115,9 +114,7 @@ def pipeline_data_upload(slug):
 @login_required
 def pipeline_data_verify(slug, file_id):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    pipeline_data_file = get_object_or_404(
-        PipelineDataFile, pipeline=pipeline, id=file_id
-    )
+    pipeline_data_file = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
 
     form = forms.VerifyDataFileForm()
     is_form_valid = form.validate_on_submit()
@@ -164,19 +161,14 @@ def pipeline_restore_version(slug, file_id):
     form = forms.RestoreVersionForm()
     is_form_valid = form.validate_on_submit()
     if is_form_valid and form.proceed.data != YES:
-        return redirect(url_for(
-            'uploader_views.pipeline_data_upload',
-            slug=pipeline.slug,
-        ))
+        return redirect(url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug,))
 
     data_file_latest = pipeline.latest_version
     file_contents_latest = get_s3_file_sample(
         data_file_latest.data_file_url, pipeline.delimiter, pipeline.quote
     )
 
-    data_file_to_restore = get_object_or_404(
-        PipelineDataFile, pipeline=pipeline, id=file_id
-    )
+    data_file_to_restore = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
     file_contents_to_restore = get_s3_file_sample(
         data_file_to_restore.data_file_url, pipeline.delimiter, pipeline.quote
     )
@@ -218,9 +210,7 @@ def format_row_data(row):
 @login_required
 def pipeline_data_uploaded(slug, file_id):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    pipeline_data_file = get_object_or_404(
-        PipelineDataFile, pipeline=pipeline, id=file_id
-    )
+    pipeline_data_file = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
     schema_parts = pipeline.pipeline_schema.split('.')
     if len(schema_parts) != 2:
         raise BadRequest("Invalid schema for this pipeline.")

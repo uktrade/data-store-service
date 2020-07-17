@@ -11,7 +11,7 @@ from app.constants import (
     DEFAULT_CSV_DELIMITER,
     DEFAULT_CSV_QUOTECHAR,
     NO,
-    YES
+    YES,
 )
 from app.db.models.internal import Pipeline, PipelineDataFile
 from tests.api.views import make_sso_request
@@ -390,13 +390,13 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01')
+        processed_at=datetime.date.fromisoformat('2020-07-01'),
     )
     # Version that can be restored
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01')
+        processed_at=datetime.date.fromisoformat('2020-06-01'),
     )
     # Version that is yet to be processed
     PipelineDataFileFactory(
@@ -410,7 +410,7 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
     )
     html = response.get_data(as_text=True)
 
-    assert 'Latest' in html   # data_file_1
+    assert 'Latest' in html  # data_file_1
     assert 'Restore' in html  # data_file_2
     assert 'Process' in html  # data_file_3
 
@@ -418,13 +418,10 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.utils.open')
 def test_get_restore_version_view(
-    mock_smart_open,
-    is_authenticated,
-    app_with_db,
-    captured_templates
+    mock_smart_open, is_authenticated, app_with_db, captured_templates
 ):
     csv_string_1 = 'hello,goodbye\n1,2\n3,4'  # latest
-    csv_string_2 = 'hi,bye\n1,2\n3,4'         # version to restore
+    csv_string_2 = 'hi,bye\n1,2\n3,4'  # version to restore
     # The view first gets the s3 sample of the latest version and then the version to restore
     mock_smart_open.side_effect = [io.StringIO(csv_string_1), io.StringIO(csv_string_2)]
 
@@ -433,13 +430,13 @@ def test_get_restore_version_view(
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01')
+        processed_at=datetime.date.fromisoformat('2020-07-01'),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01')
+        processed_at=datetime.date.fromisoformat('2020-06-01'),
     )
 
     client = get_client(app_with_db)
@@ -450,7 +447,7 @@ def test_get_restore_version_view(
         client, url, 'pipeline_restore_version.html', captured_templates,
     )
     html = response.get_data(as_text=True)
-    assert 'Latest version' in html      # data_file_1
+    assert 'Latest version' in html  # data_file_1
     assert 'hello' in html
     assert 'goodbye' in html
     assert 'Version to restore' in html  # data_file_2
@@ -461,23 +458,20 @@ def test_get_restore_version_view(
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.utils.open')
 def test_submit_restore_version_cancel(
-    mock_smart_open,
-    is_authenticated,
-    app_with_db,
-    captured_templates
+    mock_smart_open, is_authenticated, app_with_db, captured_templates
 ):
     pipeline = PipelineFactory()
     # Latest version
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01')
+        processed_at=datetime.date.fromisoformat('2020-07-01'),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01')
+        processed_at=datetime.date.fromisoformat('2020-06-01'),
     )
 
     client = get_client(app_with_db)
@@ -505,7 +499,7 @@ def test_submit_restore_version_proceed(
     mock_process_pipeline_data_file,
     is_authenticated,
     app_with_db,
-    captured_templates
+    captured_templates,
 ):
     mock_thread = mock.Mock()
     mock_process_pipeline_data_file.return_value = mock_thread
@@ -518,13 +512,13 @@ def test_submit_restore_version_proceed(
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01')
+        processed_at=datetime.date.fromisoformat('2020-07-01'),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01')
+        processed_at=datetime.date.fromisoformat('2020-06-01'),
     )
 
     client = get_client(app_with_db)
