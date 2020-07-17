@@ -33,6 +33,6 @@ s3:
   upload_folder: $ENV{UPLOAD_FOLDER, uploads}
 dataflow:
   base_url: $ENV{DATAFLOW_BASE_URL, }
-  data_uploader_dag_id : $ENV{DATAFLOW_UPLOADER_DAG_ID, DSSCSVUploaderPipeline}
+  data_uploader_dag_id : $ENV{DATAFLOW_UPLOADER_DAG_ID, DSSGenericPipeline}
   hawk_id: $ENV{DATAFLOW_HAWK_ID, }
   hawk_key: $ENV{DATAFLOW_HAWK_KEY, }

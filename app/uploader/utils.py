@@ -135,7 +135,7 @@ def process_pipeline_data_file(pipeline_data_file):
             state = 'running'
             count = 0
             while state == 'running':
-                if count > 50:
+                if count > 120:  # stop waiting after 10 mins
                     raise Exception("We can't wait forever for airflow task completion!")
                 time.sleep(5)
                 response = hawk_api_request(
