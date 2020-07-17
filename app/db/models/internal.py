@@ -23,7 +23,7 @@ from app.constants import (
     DatafileState,
     DataUploaderFileState,
     DEFAULT_CSV_DELIMITER,
-    DEFAULT_CSV_QUOTECHAR
+    DEFAULT_CSV_QUOTECHAR,
 )
 
 

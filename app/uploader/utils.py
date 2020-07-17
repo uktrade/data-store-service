@@ -131,11 +131,11 @@ def process_pipeline_data_file(pipeline_data_file):
             response = hawk_api_request(
                 dataflow_source_url, "POST", dataflow_hawk_creds, dag_config
             )
-            run_id = response['run_id'].split('__')[1]
+            run_id = response['run_id'].split('__')[1].split('+')[0]
             state = 'running'
             count = 0
             while state == 'running':
-                if count > 50:
+                if count > 120:  # stop waiting after 10 mins
                     raise Exception("We can't wait forever for airflow task completion!")
                 time.sleep(5)
                 response = hawk_api_request(
@@ -188,15 +188,19 @@ def hawk_api_request(
 ):
     if body:
         body = json.dumps(body)
-    header = Sender(
-        credentials, url, method.lower(), content_type="application/json", content=body
-    ).request_header
-    response = requests.request(
-        method,
+    auth_header = Sender(
+        credentials,
         url,
-        data=body,
-        headers={"Authorization": header, "Content-Type": "application/json"},
-    )
+        method.lower(),
+        content_type="application/json" if body else None,
+        content=body,
+    ).request_header
+
+    headers = {"Authorization": auth_header}
+    if body:
+        headers["Content-Type"] = "application/json"
+    response = requests.request(method, url, data=body, headers=headers,)
+
     response.raise_for_status()
     response_json = response.json()
     return response_json

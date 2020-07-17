@@ -6,10 +6,21 @@
     <div class="govuk-panel__body">by&nbsp;<strong>{{ pipeline }}</strong>&nbsp;pipeline</div>
     <div id="pipeline_progress_label" class="govuk-panel__body">Please wait</div>
     <progress id="pipeline_progress" value="0" max="100"></progress>
-    <p id="pipeline_info"></p>
+    <p id="pipeline_info">&nbsp;</p>
 </div>
 <script type="text/javascript">
-function loadXMLDoc(file_id, interval) {
+var count = 0
+var interval_time = 5000
+var timeout = 900000
+function check_progress(file_id, interval) {
+    if (count > timeout/interval_time) {  // stop polling after 15 mins
+        clearInterval(interval);
+        document.getElementById("pipeline_progress").value = 100;
+        document.getElementById("pipeline_progress_label").innerHTML = 'Failed';
+        document.getElementById("pipeline_info").innerHTML = "Didn't get a successful completion \
+         update from Data Flow in time";
+        return
+    }
     var xmlhttp = new XMLHttpRequest();
 
     xmlhttp.onreadystatechange = function() {
@@ -41,11 +52,15 @@ function loadXMLDoc(file_id, interval) {
     };
     xmlhttp.open("GET", "/upload/progress/" + file_id + '/', true);
     xmlhttp.send();
+    count = count + 1
 }
 
-const interval = setInterval(function() {
-   loadXMLDoc('{{ file_id }}', interval);
- }, 2000);
+window.onload = function() {
+    count = 0
+    const interval = setInterval(function() {
+       check_progress('{{ file_id }}', interval);
+     }, interval_time);
+}
 
 </script>
 {% endblock content %}
