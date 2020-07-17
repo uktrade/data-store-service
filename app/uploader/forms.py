@@ -58,3 +58,14 @@ class VerifyDataFileForm(FlaskForm):
         label='Does the contents of the file look correct?',
         validators=[DataRequired()],
     )
+
+
+class RestoreVersionForm(FlaskForm):
+    proceed = SelectField(
+        choices=[
+            (YES, 'Restore'),
+            (NO, 'Cancel'),
+        ],
+        label='Are you sure you want to restore this version of the data',
+        validators=[DataRequired()],
+    )

@@ -18,9 +18,14 @@ from app.constants import DataUploaderFileState
 from app.etl.pipeline_type.dsv_to_table import DSVToTablePipeline
 
 
-def upload_file(stream, file_name):
+def upload_file(file_name, stream):
     storage = StorageFactory.create(app.config['s3']['bucket_url'])
     storage.write_file(file_name, stream)
+
+
+def delete_file(pipeline_data_file):
+    storage = StorageFactory.create(app.config['s3']['bucket_url'])
+    storage.delete_file(pipeline_data_file.data_file_url)
 
 
 def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
@@ -197,8 +202,6 @@ def hawk_api_request(
     return response_json
 
 
-def save_column_types(pipeline, file_contents):
+def get_column_types(file_contents):
     columns = file_contents.columns.to_list()
-    mapped_column_types = list(zip(columns, ['text'] * len(columns)))
-    pipeline.column_types = mapped_column_types
-    pipeline.save()
+    return list(zip(columns, ['text'] * len(columns)))
