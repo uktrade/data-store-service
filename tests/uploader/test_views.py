@@ -412,13 +412,13 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01'),
+        processed_at=datetime.datetime(2020, 7, 1),
     )
     # Version that can be restored
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01'),
+        processed_at=datetime.datetime(2020, 6, 1),
     )
     # Version that is yet to be processed
     PipelineDataFileFactory(
@@ -452,13 +452,13 @@ def test_get_restore_version_view(
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01'),
+        processed_at=datetime.datetime(2020, 7, 1),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01'),
+        processed_at=datetime.datetime(2020, 6, 1),
     )
 
     client = get_client(app_with_db)
@@ -487,13 +487,13 @@ def test_submit_restore_version_cancel(
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01'),
+        processed_at=datetime.datetime(2020, 7, 1),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01'),
+        processed_at=datetime.datetime(2020, 6, 1),
     )
 
     client = get_client(app_with_db)
@@ -534,13 +534,13 @@ def test_submit_restore_version_proceed(
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01'),
+        processed_at=datetime.datetime(2020, 7, 1),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01'),
+        processed_at=datetime.datetime(2020, 6, 1),
     )
 
     client = get_client(app_with_db)
