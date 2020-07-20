@@ -79,7 +79,9 @@ def test_get_select_pipeline_view_with_pipelines(is_authenticated, app_with_db, 
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-def test_select_pipeline_view_radios_have_distinct_ids(is_authenticated, app_with_db, captured_templates):
+def test_select_pipeline_view_radios_have_distinct_ids(
+    is_authenticated, app_with_db, captured_templates
+):
     PipelineFactory()
     PipelineFactory()
     client = get_client(app_with_db)
@@ -88,8 +90,14 @@ def test_select_pipeline_view_radios_have_distinct_ids(is_authenticated, app_wit
         client, url, 'pipeline_select.html', captured_templates,
     )
     html = response.get_data(as_text=True)
-    assert '<input class="govuk-radios__input" id="pipeline-0" name="pipeline" type="radio" value="1">' in html
-    assert '<input class="govuk-radios__input" id="pipeline-1" name="pipeline" type="radio" value="2">' in html
+    assert (
+        '<input class="govuk-radios__input" id="pipeline-0" name="pipeline" type="radio" value="1">'
+        in html
+    )
+    assert (
+        '<input class="govuk-radios__input" id="pipeline-1" name="pipeline" type="radio" value="2">'
+        in html
+    )
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
