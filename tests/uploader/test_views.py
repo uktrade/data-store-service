@@ -79,6 +79,28 @@ def test_get_select_pipeline_view_with_pipelines(is_authenticated, app_with_db, 
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+def test_select_pipeline_view_radios_have_distinct_ids(
+    is_authenticated, app_with_db, captured_templates
+):
+    PipelineFactory()
+    PipelineFactory()
+    client = get_client(app_with_db)
+    url = url_for('uploader_views.pipeline_select')
+    response, template_context = _test_view(
+        client, url, 'pipeline_select.html', captured_templates,
+    )
+    html = response.get_data(as_text=True)
+    assert (
+        '<input class="govuk-radios__input" id="pipeline-0" name="pipeline" type="radio" value="1">'
+        in html
+    )
+    assert (
+        '<input class="govuk-radios__input" id="pipeline-1" name="pipeline" type="radio" value="2">'
+        in html
+    )
+
+
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 def test_submit_form_select_pipeline_view(is_authenticated, app_with_db, captured_templates):
     pipeline = PipelineFactory()
     client = get_client(app_with_db)
@@ -250,7 +272,10 @@ def test_get_data_verify_error_view(
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-def test_submit_data_verify_proceed_no(is_authenticated, app_with_db, captured_templates):
+@mock.patch('app.uploader.views.delete_file')
+def test_submit_data_verify_proceed_no(
+    mock_delete_file, is_authenticated, app_with_db, captured_templates
+):
     data_file = PipelineDataFileFactory()
     client = get_client(app_with_db)
     url = url_for(
@@ -266,6 +291,7 @@ def test_submit_data_verify_proceed_no(is_authenticated, app_with_db, captured_t
     assert template.name == 'pipeline_select.html'
     assert template_context['request'].path == url_for('uploader_views.pipeline_select')
     assert not PipelineDataFile.query.get(data_file.id)
+    assert mock_delete_file.called is True
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
@@ -390,13 +416,13 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01'),
+        processed_at=datetime.datetime(2020, 7, 1),
     )
     # Version that can be restored
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01'),
+        processed_at=datetime.datetime(2020, 6, 1),
     )
     # Version that is yet to be processed
     PipelineDataFileFactory(
@@ -430,13 +456,13 @@ def test_get_restore_version_view(
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01'),
+        processed_at=datetime.datetime(2020, 7, 1),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01'),
+        processed_at=datetime.datetime(2020, 6, 1),
     )
 
     client = get_client(app_with_db)
@@ -465,13 +491,13 @@ def test_submit_restore_version_cancel(
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01'),
+        processed_at=datetime.datetime(2020, 7, 1),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01'),
+        processed_at=datetime.datetime(2020, 6, 1),
     )
 
     client = get_client(app_with_db)
@@ -512,13 +538,13 @@ def test_submit_restore_version_proceed(
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-07-01'),
+        processed_at=datetime.datetime(2020, 7, 1),
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
-        processed_at=datetime.date.fromisoformat('2020-06-01'),
+        processed_at=datetime.datetime(2020, 6, 1),
     )
 
     client = get_client(app_with_db)

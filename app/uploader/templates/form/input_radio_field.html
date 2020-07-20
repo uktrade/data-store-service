@@ -6,8 +6,8 @@
     <div class="govuk-radios">
         {% for choice in field  %}
             <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="{{ choice.name }}" name="{{ choice.name }}" type="radio" value="{{ choice.data }}">
-                <label class="govuk-label govuk-radios__label" for="{{ choice.name }}">
+                <input class="govuk-radios__input" id="{{ choice.id }}" name="{{ choice.name }}" type="radio" value="{{ choice.data }}">
+                <label class="govuk-label govuk-radios__label" for="{{ choice.id }}">
                     {{ choice.label.text }}
                 </label>
             </div>
