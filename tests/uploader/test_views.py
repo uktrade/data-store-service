@@ -272,7 +272,10 @@ def test_get_data_verify_error_view(
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-def test_submit_data_verify_proceed_no(is_authenticated, app_with_db, captured_templates):
+@mock.patch('app.uploader.views.delete_file')
+def test_submit_data_verify_proceed_no(
+    mock_delete_file, is_authenticated, app_with_db, captured_templates
+):
     data_file = PipelineDataFileFactory()
     client = get_client(app_with_db)
     url = url_for(
@@ -288,6 +291,7 @@ def test_submit_data_verify_proceed_no(is_authenticated, app_with_db, captured_t
     assert template.name == 'pipeline_select.html'
     assert template_context['request'].path == url_for('uploader_views.pipeline_select')
     assert not PipelineDataFile.query.get(data_file.id)
+    assert mock_delete_file.called is True
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
