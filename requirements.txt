@@ -42,7 +42,7 @@ flask-oauthlib==0.9.5     # via -r requirements.in, data-engineering-common
 flask-principal==0.4.0    # via flask-security
 flask-security==3.0.0     # via -r requirements.in, data-engineering-common
 flask-shell-ipython==0.4.1  # via -r requirements.in
-flask-sqlalchemy==2.4.1   # via -r requirements.in, data-engineering-common, flask-migrate
+flask-sqlalchemy==2.4.4   # via -r requirements.in, data-engineering-common, flask-migrate
 flask-wtf==0.14.3         # via -r requirements.in, flask-security
 flask==1.1.1              # via -r requirements.in, data-engineering-common, flask-babelex, flask-login, flask-mail, flask-migrate, flask-oauthlib, flask-principal, flask-security, flask-shell-ipython, flask-sqlalchemy, flask-wtf
 freezegun==0.3.15         # via -r requirements.in, data-engineering-common
