@@ -16,13 +16,16 @@ class PipelineForm(FlaskForm):
         'Dataset', validators=[DataRequired()], render_kw={'class': 'govuk-input'}
     )
 
+    def format(self, field):
+        return field.lower().replace('.', '_')
+
     def validate(self):
         rv = FlaskForm.validate(self)
         if not rv:
             return False
 
         pipeline = Pipeline.query.filter_by(
-            organisation=self.organisation.data, dataset=self.dataset.data
+            organisation=self.format(self.organisation.data), dataset=self.format(self.dataset.data)
         ).first()
         if pipeline is not None:
             self.errors['non_field_errors'] = [
@@ -53,5 +56,13 @@ class VerifyDataFileForm(FlaskForm):
             (NO, 'No and return back to the beginning to try again'),
         ],
         label='Does the contents of the file look correct?',
+        validators=[DataRequired()],
+    )
+
+
+class RestoreVersionForm(FlaskForm):
+    proceed = SelectField(
+        choices=[(YES, 'Restore'), (NO, 'Cancel')],
+        label='Are you sure you want to restore this version of the data',
         validators=[DataRequired()],
     )

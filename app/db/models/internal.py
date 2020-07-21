@@ -4,7 +4,6 @@ from collections import defaultdict
 
 from data_engineering.common.db.models import (
     _array,
-    _bool,
     _col,
     _dt,
     _enum,
@@ -20,7 +19,12 @@ from data_engineering.common.db.models import (
 from slugify import slugify
 from sqlalchemy import event, or_
 
-from app.constants import DatafileState, DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR
+from app.constants import (
+    DatafileState,
+    DataUploaderFileState,
+    DEFAULT_CSV_DELIMITER,
+    DEFAULT_CSV_QUOTECHAR,
+)
 
 
 class DatafileRegistryModel(BaseModel):
@@ -100,6 +104,8 @@ class Pipeline(BaseModel):
     delimiter = _col(_text, nullable=False, server_default=DEFAULT_CSV_DELIMITER)
     quote = _col(_text, server_default=DEFAULT_CSV_QUOTECHAR)
 
+    data_files = _relationship('PipelineDataFile', order_by='desc(PipelineDataFile.processed_at)')
+
     @staticmethod
     def generate_slug(mapper, connection, target):
         if not target.slug:
@@ -108,6 +114,14 @@ class Pipeline(BaseModel):
     @property
     def pipeline_schema(self):
         return f'{self.organisation}.{self.dataset}'
+
+    @property
+    def latest_version(self):
+        # data_files is always sorted by processed_at descending
+        for data_file in self.data_files:
+            if data_file.state == DataUploaderFileState.COMPLETED.value:
+                return data_file
+        return None
 
     def __str__(self):
         return self.pipeline_schema
@@ -122,8 +136,9 @@ class PipelineDataFile(BaseModel):
     id = _col(_uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     data_file_url = _col(_text, nullable=False)
     pipeline_id = _col(_int, _foreign_key('pipeline.id'), nullable=False)
-    deleted = _col(_bool, default=False)
+    state = _col(_text)
+    error_message = _col(_text)
     uploaded_at = _col(_dt, default=lambda: datetime.datetime.utcnow())
     processed_at = _col(_dt)
 
-    pipeline = _relationship('Pipeline', backref='data_files')
+    pipeline = _relationship('Pipeline')

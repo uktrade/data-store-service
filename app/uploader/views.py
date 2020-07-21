@@ -1,16 +1,20 @@
 import os
+import uuid
 
 from data_engineering.common.sso.token import login_required
 from flask import abort, redirect, render_template, url_for
+from flask import current_app as app
 from flask.blueprints import Blueprint
+from werkzeug.exceptions import BadRequest
 
-from app.constants import YES
+from app.constants import DataUploaderFileState, YES
 from app.db.models.internal import Pipeline, PipelineDataFile
-from app.uploader.forms import DataFileForm, PipelineForm, PipelineSelectForm, VerifyDataFileForm
+from app.uploader import forms
 from app.uploader.utils import (
+    delete_file,
+    get_column_types,
     get_s3_file_sample,
     process_pipeline_data_file,
-    save_column_types,
     upload_file,
 )
 
@@ -43,7 +47,7 @@ def pipeline_select():
     first_pipeline = Pipeline.query.first()
     if first_pipeline:
         show_form = True
-    form = PipelineSelectForm()
+    form = forms.PipelineSelectForm()
     if form.validate_on_submit():
         return redirect(
             url_for('uploader_views.pipeline_data_upload', slug=form.pipeline.data.slug)
@@ -54,11 +58,11 @@ def pipeline_select():
 @uploader_views.route('/create/', methods=('GET', 'POST'))
 @login_required
 def pipeline_create():
-    form = PipelineForm()
+    form = forms.PipelineForm()
     if form.validate_on_submit():
         pipeline = Pipeline(
-            dataset=form.dataset.data,
-            organisation=form.organisation.data,
+            dataset=form.format(form.dataset.data),
+            organisation=form.format(form.organisation.data),
             column_types=[['temp', 'text']],  # temporary placeholder
         )
         pipeline.save()
@@ -77,16 +81,32 @@ def pipeline_created(slug):
 @login_required
 def pipeline_data_upload(slug):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    form = DataFileForm()
+    form = forms.DataFileForm()
     if form.validate_on_submit():
-        data_file_url = upload_file(form.csv_file.data, form.csv_file.data.filename, pipeline)
-        data_file = PipelineDataFile(data_file_url=data_file_url, pipeline=pipeline)
-        data_file.save()
+        upload_folder = app.config['s3']['upload_folder']
+        data_file_url = (
+            f'{upload_folder}/{pipeline.organisation}/' f'{pipeline.dataset}/{uuid.uuid4()}'
+        )
+        data_file = PipelineDataFile(
+            data_file_url=data_file_url,
+            pipeline=pipeline,
+            state=DataUploaderFileState.UPLOADING.value,
+        )
+        try:
+            upload_file(data_file_url, form.csv_file.data)
+            data_file.state = DataUploaderFileState.UPLOADED.value
+            data_file.save()
+        except Exception as e:
+            data_file.state = DataUploaderFileState.FAILED.value
+            data_file.error_message = str(e)
+            data_file.save()
+            raise
         return redirect(
             url_for('uploader_views.pipeline_data_verify', slug=pipeline.slug, file_id=data_file.id)
         )
+
     return render_uploader_template(
-        'pipeline_data_upload.html', pipeline=pipeline, form=form, heading='Upload data'
+        'pipeline_data_upload.html', pipeline=pipeline, form=form, heading='Upload data',
     )
 
 
@@ -94,22 +114,24 @@ def pipeline_data_upload(slug):
 @login_required
 def pipeline_data_verify(slug, file_id):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    pipeline_data_file = get_object_or_404(
-        PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False
-    )
+    pipeline_data_file = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
 
-    form = VerifyDataFileForm()
+    form = forms.VerifyDataFileForm()
     is_form_valid = form.validate_on_submit()
     if is_form_valid and form.proceed.data != YES:
-        pipeline_data_file.deleted = True
-        pipeline_data_file.save()
+        pipeline_data_file.delete()
+        delete_file(pipeline_data_file)
         return redirect(url_for('uploader_views.pipeline_select'))
 
     file_contents = get_s3_file_sample(
         pipeline_data_file.data_file_url, pipeline.delimiter, pipeline.quote
     )
     if is_form_valid:
-        save_column_types(pipeline, file_contents)
+        pipeline.column_types = get_column_types(file_contents)
+        pipeline.save()
+        pipeline_data_file.state = DataUploaderFileState.VERIFIED.value
+        pipeline_data_file.save()
+
         return redirect(
             url_for(
                 'uploader_views.pipeline_data_uploaded',
@@ -133,6 +155,53 @@ def pipeline_data_verify(slug, file_id):
     )
 
 
+@uploader_views.route('/data/<slug>/restore/<file_id>/', methods=('GET', 'POST'))
+def pipeline_restore_version(slug, file_id):
+    pipeline = get_object_or_404(Pipeline, slug=slug)
+    form = forms.RestoreVersionForm()
+    is_form_valid = form.validate_on_submit()
+    if is_form_valid and form.proceed.data != YES:
+        return redirect(url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug,))
+
+    data_file_latest = pipeline.latest_version
+    file_contents_latest = get_s3_file_sample(
+        data_file_latest.data_file_url, pipeline.delimiter, pipeline.quote
+    )
+
+    data_file_to_restore = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
+    file_contents_to_restore = get_s3_file_sample(
+        data_file_to_restore.data_file_url, pipeline.delimiter, pipeline.quote
+    )
+
+    if is_form_valid:
+        pipeline.column_types = get_column_types(file_contents_to_restore)
+        pipeline.save()
+        data_file_to_restore.state = DataUploaderFileState.VERIFIED.value
+        data_file_to_restore.save()
+
+        return redirect(
+            url_for(
+                'uploader_views.pipeline_data_uploaded',
+                slug=pipeline.slug,
+                file_id=data_file_to_restore.id,
+            )
+        )
+
+    if not file_contents_latest.empty:
+        file_contents_latest = file_contents_latest.to_dict()
+
+    if not file_contents_to_restore.empty:
+        file_contents_to_restore = file_contents_to_restore.to_dict()
+
+    return render_uploader_template(
+        'pipeline_restore_version.html',
+        form=form,
+        file_contents_latest=file_contents_latest,
+        file_contents_to_restore=file_contents_to_restore,
+        format_row_data=format_row_data,
+    )
+
+
 def format_row_data(row):
     return ", ".join(row.values())
 
@@ -141,14 +210,21 @@ def format_row_data(row):
 @login_required
 def pipeline_data_uploaded(slug, file_id):
     pipeline = get_object_or_404(Pipeline, slug=slug)
-    pipeline_data_file = get_object_or_404(
-        PipelineDataFile, pipeline=pipeline, id=file_id, deleted=False
-    )
+    pipeline_data_file = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
+    schema_parts = pipeline.pipeline_schema.split('.')
+    if len(schema_parts) != 2:
+        raise BadRequest("Invalid schema for this pipeline.")
+    data_workspace_schema_name = schema_parts[0]
+    data_workspace_table_name = schema_parts[1]
     thread = process_pipeline_data_file(pipeline_data_file)
     file_id = pipeline_data_file.id
     thread.start()
     return render_uploader_template(
-        'pipeline_data_uploaded.html', pipeline=pipeline, file_id=file_id
+        'pipeline_data_uploaded.html',
+        pipeline=pipeline,
+        file_id=file_id,
+        data_workspace_schema_name=data_workspace_schema_name,
+        data_workspace_table_name=data_workspace_table_name,
     )
 
 
@@ -156,4 +232,30 @@ def pipeline_data_uploaded(slug, file_id):
 @login_required
 def progress(file_id):
     file = get_object_or_404(PipelineDataFile, id=file_id)
-    return '100' if file.processed_at else '0'
+    state = file.state
+    response = {'state': state}
+    if not state:
+        response['progress'] = '0'
+        response['info'] = 'Starting new data upload'
+    elif state == DataUploaderFileState.UPLOADING.value:
+        response['progress'] = '10'
+        response['info'] = 'Uploading data'
+    elif state == DataUploaderFileState.UPLOADED.value:
+        response['progress'] = '20'
+        response['info'] = 'Data successfully uploaded'
+    elif state == DataUploaderFileState.VERIFIED.value:
+        response['progress'] = '30'
+        response['info'] = 'Data successfully verified'
+    elif state == DataUploaderFileState.PROCESSING_DSS.value:
+        response['progress'] = '40'
+        response['info'] = 'Data is being processed by Data Store Service'
+    elif state == DataUploaderFileState.PROCESSING_DATAFLOW.value:
+        response['progress'] = '70'
+        response['info'] = 'Data is being processed by Data Flow'
+    elif state == DataUploaderFileState.COMPLETED.value:
+        response['progress'] = '100'
+        response['info'] = 'Data successfully processed'
+    elif state == DataUploaderFileState.FAILED.value:
+        response['progress'] = '100'
+        response['info'] = 'Oops, something went wrong'
+    return response
