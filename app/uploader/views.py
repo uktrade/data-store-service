@@ -123,7 +123,7 @@ def pipeline_data_verify(slug, file_id):
         delete_file(pipeline_data_file)
         return redirect(url_for('uploader_views.pipeline_select'))
 
-    file_contents = get_s3_file_sample(
+    file_contents, err = get_s3_file_sample(
         pipeline_data_file.data_file_url, pipeline.delimiter, pipeline.quote
     )
     if is_form_valid:
@@ -140,12 +140,13 @@ def pipeline_data_verify(slug, file_id):
             )
         )
 
-    if not file_contents.empty:
+    elif not file_contents.empty and not err:
         file_contents = file_contents.to_dict()
     else:
-        form.errors['non_field_errors'] = [
-            'Unable to process file - please check your file is a valid CSV and try again'
-        ]
+        pipeline_data_file.state = DataUploaderFileState.FAILED.value
+        pipeline_data_file.error_message = err
+        pipeline_data_file.save()
+        form.errors['non_field_errors'] = [f'Unable to process file - {err}']
     return render_uploader_template(
         'pipeline_data_verify.html',
         pipeline=pipeline,
@@ -164,12 +165,12 @@ def pipeline_restore_version(slug, file_id):
         return redirect(url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug,))
 
     data_file_latest = pipeline.latest_version
-    file_contents_latest = get_s3_file_sample(
+    file_contents_latest, _ = get_s3_file_sample(
         data_file_latest.data_file_url, pipeline.delimiter, pipeline.quote
     )
 
     data_file_to_restore = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
-    file_contents_to_restore = get_s3_file_sample(
+    file_contents_to_restore, _ = get_s3_file_sample(
         data_file_to_restore.data_file_url, pipeline.delimiter, pipeline.quote
     )
 
@@ -257,5 +258,7 @@ def progress(file_id):
         response['info'] = 'Data successfully processed'
     elif state == DataUploaderFileState.FAILED.value:
         response['progress'] = '100'
-        response['info'] = 'Oops, something went wrong'
+        response[
+            'info'
+        ] = f'Oops, something went wrong{": " + file.error_message if file.error_message else ""}'
     return response

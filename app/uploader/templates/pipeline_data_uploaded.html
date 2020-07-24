@@ -11,9 +11,9 @@
 <script type="text/javascript">
 var count = 0
 var interval_time = 5000
-var timeout = 900000
+var timeout = 2700000
 function check_progress(file_id, interval) {
-    if (count > timeout/interval_time) {  // stop polling after 15 mins
+    if (count > timeout/interval_time) {  // stop polling after 45 mins
         clearInterval(interval);
         document.getElementById("pipeline_progress").value = 100;
         document.getElementById("pipeline_progress_label").innerHTML = 'Failed';
@@ -44,8 +44,7 @@ function check_progress(file_id, interval) {
            }
            else {
                document.getElementById("pipeline_progress_label").innerHTML = 'Failed';
-               document.getElementById("pipeline_progress").value = 0;
-               document.getElementById("pipeline_info").innerHTML = response.info;
+               document.getElementById("pipeline_info").innerHTML = 'Could not retrieve progress';
                clearInterval(interval);
            }
         }
