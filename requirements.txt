@@ -6,7 +6,6 @@
 #
 alembic==1.4.2            # via flask-migrate
 appdirs==1.4.3            # via black
-appnope==0.1.0            # via ipython
 apscheduler==3.6.3        # via -r requirements.in
 attrs==19.3.0             # via black, pytest
 babel==2.8.0              # via flask-babelex
@@ -84,7 +83,7 @@ psycopg2==2.8.5           # via -r requirements.in, data-engineering-common
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest
 pycodestyle==2.5.0        # via flake8, flake8-import-order
-pycountry==19.8.18        # via -r requirements.in
+pycountry==20.7.3         # via -r requirements.in
 pyflakes==2.1.1           # via flake8
 pygments==2.5.2           # via ipython
 pyparsing==2.4.6          # via packaging
