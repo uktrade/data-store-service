@@ -93,7 +93,7 @@ pytest==5.4.3             # via -r requirements.in, data-engineering-common, pyt
 python-dateutil==2.8.1    # via alembic, botocore, faker, freezegun, pandas
 python-dotenv==0.12.0     # via data-engineering-common
 python-editor==1.0.4      # via alembic
-python-slugify==4.0.0     # via -r requirements.in
+python-slugify==4.0.1     # via -r requirements.in
 pytz==2019.3              # via apscheduler, babel, pandas, tzlocal
 pyyaml==5.3.1             # via -r requirements.in, data-engineering-common
 redis==3.5.3              # via -r requirements.in, data-engineering-common
