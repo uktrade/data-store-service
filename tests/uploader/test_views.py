@@ -150,6 +150,40 @@ def test_submit_form_pipeline_create_view(is_authenticated, app_with_db, capture
     assert pipeline.dataset == form_data['dataset']
 
 
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+@pytest.mark.parametrize(
+    "organisation, dataset, expected_error",
+    (
+        ("schema", "table", False),
+        ("schema.valid", "table123", False),
+        ("schema", "table_name", False),
+        ("schema", " strips_spaces_ok ", False),
+        ("schema-invalid", "table", True),
+        ("schema(bad)", "table@thing", True),
+        ("schema spaces", "table&now", True),
+    ),
+)
+def test_submit_form_with_bad_names_on_pipeline_create_view(
+    is_authenticated, app_with_db, captured_templates, organisation, dataset, expected_error
+):
+    form_data = {'organisation': organisation, 'dataset': dataset}
+
+    client = get_client(app_with_db)
+    url = url_for('uploader_views.pipeline_create')
+    post_response = client.post(url, data=form_data, follow_redirects=True)
+
+    assert post_response.status_code == 200
+
+    if expected_error:
+        assert (
+            "Please choose a name that meets our dataset naming conventions."
+            in post_response.get_data(as_text=True)
+        )
+
+    else:
+        assert "Dataset pipeline created" in post_response.get_data(as_text=True)
+
+
 @pytest.mark.parametrize(
     'form_data,expected_error',
     (
