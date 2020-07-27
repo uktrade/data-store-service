@@ -6,6 +6,7 @@ from io import BytesIO
 from threading import Thread
 
 import pandas
+import pandas as pd
 import requests
 from datatools.io.fileinfo import FileInfo
 from datatools.io.storage import StorageFactory
@@ -31,24 +32,28 @@ def delete_file(pipeline_data_file):
 def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
     bucket = app.config['s3']['bucket_url']
     full_url = os.path.join(bucket, url)
-    contents = []
-    i = 0
     try:
         with open(full_url, encoding='utf-8-sig') as csv_file:
-            reader = csv.DictReader(csv_file, delimiter=delimiter, quotechar=quotechar, strict=True)
-            for row in reader:
-                contents.append(row)
-                i += 1
-                if i == number_of_lines:
+            csv_reader = csv.reader(csv_file, quotechar=quotechar, delimiter=delimiter,)
+            csv_headings = next(csv_reader)
+            if len(csv_headings) != len(set(csv_headings)):
+                raise csv.Error('Invalid CSV: duplicate header names not allowed')
+            if '' in csv_headings:
+                raise csv.Error('Invalid CSV: empty header names not allowed')
+            csv_contents = []
+            count = 0
+            for row in csv_reader:
+                if count == number_of_lines:
                     break
+                if len(row) != len(csv_headings):
+                    raise csv.Error('Invalid CSV: content length not matching header length')
+                csv_contents.append(row)
+                count += 1
 
-        df = pandas.DataFrame(data=contents)
-        empty_column = None in df.columns.to_list()
-        if empty_column:
-            raise csv.Error('Invalid CSV')
-        return df
-    except (UnicodeDecodeError, csv.Error):
-        return pandas.DataFrame()
+        df = pd.DataFrame(csv_contents, columns=csv_headings)
+        return df, None
+    except (UnicodeDecodeError, csv.Error) as e:
+        return pd.DataFrame(), str(e)
 
 
 def _move_file_to_s3(file_url, organisation, dataset):
@@ -135,7 +140,7 @@ def process_pipeline_data_file(pipeline_data_file):
             state = 'running'
             count = 0
             while state == 'running':
-                if count > 120:  # stop waiting after 10 mins
+                if count > 360:  # stop waiting after 30 mins
                     raise Exception("We can't wait forever for airflow task completion!")
                 time.sleep(5)
                 response = hawk_api_request(
@@ -147,6 +152,7 @@ def process_pipeline_data_file(pipeline_data_file):
                 pipeline_data_file.state = DataUploaderFileState.COMPLETED.value
                 pipeline_data_file.processed_at = now()
             else:
+                pipeline_data_file.error_message = 'Airflow dag failed'
                 pipeline_data_file.state = DataUploaderFileState.FAILED.value
             pipeline_data_file.save()
         except Exception as e:
