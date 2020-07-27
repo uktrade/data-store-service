@@ -53,7 +53,7 @@ def ls():
         for o in objects['Contents']:
             click.echo(f'\t{o["Key"]}')
     else:
-        click.echo(f'No objects found.n')
+        click.echo('No objects found.n')
 
 
 @s3.command(help='Move s3 objects in the data-store-service bucket')

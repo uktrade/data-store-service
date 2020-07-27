@@ -82,7 +82,7 @@ psycopg2==2.8.5           # via -r requirements.in, data-engineering-common
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest
 pycodestyle==2.6.0        # via flake8, flake8-import-order
-pycountry==20.7.3        # via -r requirements.in
+pycountry==20.7.3         # via -r requirements.in
 pyflakes==2.2.0           # via flake8
 pygments==2.5.2           # via ipython
 pyparsing==2.4.6          # via packaging

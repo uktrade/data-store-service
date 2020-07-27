@@ -255,7 +255,7 @@ SPIRE_SCHEMA_NAME = 'spire'
 
 
 class SPIRECountryGroup(BaseModel):
-    __tablename__ = f'country_groups'
+    __tablename__ = 'country_groups'
     __table_args__ = {'schema': SPIRE_SCHEMA_NAME}
 
     id = _col(_int, primary_key=True, autoincrement=True)

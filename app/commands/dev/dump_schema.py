@@ -25,7 +25,7 @@ def make_csv_folder(schema):
 
 def dump_table(db_uri, folder, schema, table):
     dump_sql = (
-        f"""\COPY \\"{schema}\\".\\"{table}\\" to '{folder}/{table.upper()}.csv' """
+        f"""\\COPY \\"{schema}\\".\\"{table}\\" to '{folder}/{table.upper()}.csv' """
         f"WITH ("
         f"FORMAT "
         f"CSV, HEADER, "
