@@ -1,19 +1,34 @@
+import re
+
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import FileField, SelectField, StringField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, StopValidation
 
 from app.constants import NO, YES
 from app.db.models.internal import Pipeline
 
 
+class DBIdentifierValidator:
+    def __call__(self, form, field):
+        if not re.match(r'^[a-zA-Z0-9_\.]+$', field.data.strip()):
+            # Intentionally a bit vague because only Data Workspace users will see this right now.
+            # It should also provide a prompt for us to revisit this before releasing to more
+            # users, at which point we should be enforcing our data standards more automatically.
+            raise StopValidation("Please choose a name that meets our dataset naming conventions.")
+
+
 class PipelineForm(FlaskForm):
     organisation = StringField(
-        'Organisation', validators=[DataRequired()], render_kw={'class': 'govuk-input'}
+        'Organisation',
+        validators=[DataRequired(), DBIdentifierValidator()],
+        render_kw={'class': 'govuk-input'},
     )
     dataset = StringField(
-        'Dataset', validators=[DataRequired()], render_kw={'class': 'govuk-input'}
+        'Dataset',
+        validators=[DataRequired(), DBIdentifierValidator()],
+        render_kw={'class': 'govuk-input'},
     )
 
     def format(self, field):
