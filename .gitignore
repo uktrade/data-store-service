@@ -108,3 +108,5 @@ node_modules/
 static/dist/
 
 .csv/
+
+inputs/

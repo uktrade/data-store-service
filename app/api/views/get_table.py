@@ -9,7 +9,12 @@ from werkzeug.exceptions import NotFound, UnprocessableEntity
 
 def _get_columns(schema, table_name):
     insp = Inspector.from_engine(flask_app.db.engine)
-    return insp.get_columns(table_name, schema=schema)
+    columns = insp.get_columns(table_name, schema=schema)
+    return [
+        {'name': col['name'], 'type': col['type']}
+        for col in columns
+        if col['name'] not in ['data_hash', 'datafile_created', 'datafile_updated']
+    ]
 
 
 def table_valid(view_func):
@@ -44,14 +49,15 @@ class TableStructureView(View):
     decorators = [table_valid, ac.authorization_required, ac.authentication_required, json_error]
 
     def dispatch_request(self, schema, table_name):
-        columns = _get_columns(schema, table_name)
-        response = {}
-        response['columns'] = [{'name': col['name'], 'type': col['type']} for col in columns]
+        response = {'columns': _get_columns(schema, table_name)}
         return flask_app.make_response(response)
 
 
 class TableDataView(base.PaginatedListView):
     decorators = [table_valid, ac.authorization_required, ac.authentication_required, json_error]
+
+    camel_case_columns = False
+    include_id_column = True
 
     def dispatch_request(self, schema, table_name):
         self.schema = schema
@@ -63,7 +69,7 @@ class TableDataView(base.PaginatedListView):
         # the id column is required for pagination
         if 'id' not in columns:
             raise UnprocessableEntity('The table must have an id column')
-        return ','.join([c for c in columns if c != 'id'])
+        return ','.join([f'"{c}"' for c in columns if c != 'id'])
 
     def get_from_clause(self):
         return f'"{self.schema}"."{self.table_name}"'
