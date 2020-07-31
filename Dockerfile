@@ -14,4 +14,5 @@ WORKDIR /app
 
 COPY . /app
 
+RUN npm install
 CMD /app/scripts/entrypoint.sh
