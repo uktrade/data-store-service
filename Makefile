@@ -4,14 +4,11 @@ COV ?= --cov
 BLACK_CONFIG ?= --exclude=venv --exclude=node_modules --skip-string-normalization --line-length 100
 CHECK ?= --check
 
-npm_install:
-	npm install
-
 compile_assets:
 	./scripts/compile_assets.sh
 
 .PHONY: run_server
-run_server: npm_install compile_assets
+run_server: compile_assets
 	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn_config.py'
 
 
