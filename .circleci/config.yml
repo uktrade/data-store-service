@@ -69,6 +69,32 @@ jobs:
   build:
     <<: *job_defaults
 
+  test-compile:
+    docker:
+      - image: circleci/node
+ 
+    steps:
+      - checkout
+      - restore_cache:
+          name: Restore node cache
+          keys:
+            - dss-node-{{ checksum "package-lock.json" }}
+            - dss-node-
+
+      - run:
+          name: Install dependencies
+          command: npm install
+
+      - save_cache:
+          name: Save node cache
+          key: dss-node-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+
+      - run:
+          name: Compile assets
+          command: ./scripts/compile_assets.sh
+
 workflows:
   version: 2
 
@@ -78,3 +104,4 @@ workflows:
           publish_coverage: true
           python_image: python:3.6.8
           postgres_image: postgres:10.5
+      - test-compile
