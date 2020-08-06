@@ -6,18 +6,19 @@
 #
 alembic==1.4.2            # via flask-migrate
 appdirs==1.4.3            # via black
+appnope==0.1.0            # via ipython
 apscheduler==3.6.3        # via -r requirements.in
 attrs==19.3.0             # via black, pytest
 babel==2.8.0              # via flask-babelex
 backcall==0.1.0           # via ipython
 black==19.10b0            # via -r requirements.in, data-engineering-common
-blinker==1.4              # via flask-mail, flask-principal
+blinker==1.4              # via flask-mail, flask-principal, sentry-sdk
 blis==0.4.1               # via spacy, thinc
 boto3==1.11.10            # via smart-open, uktrade-data-tools
 boto==2.49.0              # via smart-open
 botocore==1.14.10         # via boto3, s3transfer
 catalogue==1.0.0          # via spacy, thinc
-certifi==2019.11.28       # via data-engineering-common, requests
+certifi==2019.11.28       # via data-engineering-common, requests, sentry-sdk
 chardet==3.0.4            # via requests
 click==7.0                # via black, flask, flask-shell-ipython, pip-tools
 codecov==2.1.8            # via -r requirements.in
@@ -42,14 +43,13 @@ flask-security==3.0.0     # via -r requirements.in, data-engineering-common
 flask-shell-ipython==0.4.1  # via -r requirements.in
 flask-sqlalchemy==2.4.4   # via -r requirements.in, data-engineering-common, flask-migrate
 flask-wtf==0.14.3         # via -r requirements.in, flask-security
-flask==1.1.1              # via -r requirements.in, data-engineering-common, flask-babelex, flask-login, flask-mail, flask-migrate, flask-oauthlib, flask-principal, flask-security, flask-shell-ipython, flask-sqlalchemy, flask-wtf
+flask==1.1.1              # via -r requirements.in, data-engineering-common, flask-babelex, flask-login, flask-mail, flask-migrate, flask-oauthlib, flask-principal, flask-security, flask-shell-ipython, flask-sqlalchemy, flask-wtf, sentry-sdk
 freezegun==0.3.15         # via -r requirements.in, data-engineering-common
 fuzzywuzzy==0.18.0        # via -r requirements.in
 gevent==20.6.2            # via gunicorn
 greenlet==0.4.16          # via gevent
 gunicorn[gevent]==20.0.4  # via -r requirements.in
 idna==2.8                 # via email-validator, requests
-importlib-metadata==1.5.0  # via catalogue, flake8, pluggy, pytest
 iniconfig==1.0.1          # via pytest
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.11.1           # via flask-shell-ipython
@@ -101,6 +101,7 @@ regex==2020.1.8           # via black
 requests-oauthlib==1.1.0  # via -r requirements.in, data-engineering-common, flask-oauthlib
 requests==2.22.0          # via codecov, data-engineering-common, requests-oauthlib, smart-open, spacy
 s3transfer==0.3.2         # via boto3
+sentry_sdk[flask]==0.16.3  # via -r requirements.in
 six==1.14.0               # via apscheduler, freezegun, mohawk, packaging, pip-tools, python-dateutil, sqlalchemy-utils, traitlets
 smart_open==2.1.0         # via -r requirements.in
 spacy==2.3.2              # via -r requirements.in
@@ -117,13 +118,12 @@ traitlets==4.3.3          # via ipython
 typed-ast==1.4.1          # via black
 tzlocal==2.0.0            # via apscheduler
 git+https://github.com/uktrade/dt08-data-tools.git  # via -r requirements.in
-urllib3==1.25.8           # via botocore, requests
+urllib3==1.25.8           # via botocore, requests, sentry-sdk
 wasabi==0.6.0             # via spacy, thinc
 watchdog==0.10.3          # via -r requirements.in
 wcwidth==0.1.8            # via prompt-toolkit
 werkzeug==0.16.1          # via -r requirements.in, data-engineering-common, flask
 wtforms==2.2.1            # via flask-wtf
-zipp==2.1.0               # via importlib-metadata
 zope.event==4.4           # via gevent
 zope.interface==5.1.0     # via gevent
 

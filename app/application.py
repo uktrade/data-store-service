@@ -1,12 +1,17 @@
 import os
 
+import sentry_sdk
 from data_engineering.common.sso.register import register_sso_component
 from flask_migrate import Migrate
+from sentry_sdk.integrations.flask import FlaskIntegration
 
 config_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__), 'config'))
 
 
 def register_app_components(flask_app):
+    if os.environ.get("SENTRY_DSN"):
+        sentry_sdk.init(os.environ['SENTRY_DSN'], integrations=[FlaskIntegration()])
+
     Migrate(app=flask_app, db=flask_app.db, compare_type=True)
 
     from app.uploader.views import uploader_views
