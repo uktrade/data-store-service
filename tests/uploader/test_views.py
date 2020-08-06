@@ -420,7 +420,7 @@ def test_submit_data_upload_view_additional_dataset(
     assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
 
     # upload another file
-    mock_smart_open.return_value = io.StringIO(file_2_csv_string)
+    mock_smart_open.side_effect = [io.StringIO(file_2_csv_string), io.StringIO(file_1_csv_string)]
     mock_upload_file.return_value = 'fakefile_2.csv'
 
     form_data = {'csv_file': (io.BytesIO(bytes(file_2_csv_string, encoding='utf-8')), 'test.csv')}
@@ -439,6 +439,45 @@ def test_submit_data_upload_view_additional_dataset(
     assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
     assert pipeline.data_files[1].data_file_url.split("/")[1] == pipeline.organisation
     assert pipeline.data_files[1].data_file_url.split("/")[2] == pipeline.dataset
+
+
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.views.upload_file')
+def test_submit_data_upload_view_where_new_file_is_missing_columns_present_in_previous_file(
+    mock_upload_file, mock_smart_open, is_authenticated, app_with_db, captured_templates
+):
+    file_1_csv_string = 'one,two\n1,2\n3,4'
+    file_2_csv_string = 'two,three\n1,2\n3,4'
+
+    mock_smart_open.return_value = io.StringIO(file_1_csv_string)
+    mock_upload_file.return_value = 'fakefile_1.csv'
+    pipeline = PipelineFactory(delimiter=",", quote='"')
+    client = get_client(app_with_db)
+    url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
+
+    # upload first file
+    form_data = {'csv_file': (io.BytesIO(bytes(file_1_csv_string, encoding='utf-8')), 'test.csv')}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    assert mock_upload_file.called is True
+    html = response.get_data(as_text=True)
+    assert 'Data successfully uploaded' in html
+
+    # upload another file
+    mock_smart_open.side_effect = [io.StringIO(file_2_csv_string), io.StringIO(file_1_csv_string)]
+    mock_upload_file.return_value = 'fakefile_2.csv'
+
+    form_data = {'csv_file': (io.BytesIO(bytes(file_2_csv_string, encoding='utf-8')), 'test.csv')}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    assert mock_upload_file.called is True
+    html = response.get_data(as_text=True)
+    assert 'Data successfully uploaded' in html
+    assert 'Missing column: one' in html
+    assert 'Continue with missing columns' in html
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)

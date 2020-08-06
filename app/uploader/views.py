@@ -110,6 +110,22 @@ def pipeline_data_upload(slug):
     )
 
 
+def get_missing_headers_compared_to_previous_data(file_contents, pipeline):
+    if len(pipeline.data_files) < 2:
+        return set()
+
+    previous_data_file = pipeline.data_files[-2]
+
+    previous_file_contents, err = get_s3_file_sample(
+        previous_data_file.data_file_url, pipeline.delimiter, pipeline.quote
+    )
+
+    new_file_headers = set(str(k) for k in file_contents.to_dict().keys())
+    previous_file_headers = set(str(k) for k in previous_file_contents.to_dict().keys())
+
+    return previous_file_headers - new_file_headers
+
+
 @uploader_views.route('/data/<slug>/verify/<file_id>/', methods=('GET', 'POST'))
 @login_required
 def pipeline_data_verify(slug, file_id):
@@ -126,6 +142,9 @@ def pipeline_data_verify(slug, file_id):
     file_contents, err = get_s3_file_sample(
         pipeline_data_file.data_file_url, pipeline.delimiter, pipeline.quote
     )
+
+    missing_headers = get_missing_headers_compared_to_previous_data(file_contents, pipeline)
+
     if is_form_valid:
         pipeline.column_types = get_column_types(file_contents)
         pipeline.save()
@@ -153,6 +172,7 @@ def pipeline_data_verify(slug, file_id):
         file_contents=file_contents,
         format_row_data=format_row_data,
         form=form,
+        missing_headers=missing_headers,
     )
 
 
