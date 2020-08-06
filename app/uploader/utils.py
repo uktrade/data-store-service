@@ -1,6 +1,7 @@
 import csv
 import json
 import os.path
+import re
 import time
 from io import BytesIO
 from threading import Thread
@@ -40,6 +41,18 @@ def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
                 raise csv.Error('Invalid CSV: duplicate header names not allowed')
             if '' in csv_headings:
                 raise csv.Error('Invalid CSV: empty header names not allowed')
+
+            invalid_headings = list(
+                filter(lambda x: not re.match("^[a-z][a-z0-9_]+$", x), csv_headings)
+            )
+            if invalid_headings:
+                joined_invalid_headings = '"' + '", "'.join(invalid_headings) + '"'
+                raise csv.Error(
+                    f"Invalid CSV: column headers must start with a letter and may only contain "
+                    f"lowercase letters, numbers, and underscores. Invalid headers: "
+                    f"{joined_invalid_headings}"
+                )
+
             csv_contents = []
             count = 0
             for row in csv_reader:

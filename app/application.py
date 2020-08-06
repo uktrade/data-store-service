@@ -17,6 +17,7 @@ def register_app_components(flask_app):
 
     if os.environ.get('NO_BROWSER_CACHE'):
         no_browser_cache(flask_app)
+
     return flask_app
 
 
