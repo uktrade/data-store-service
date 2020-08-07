@@ -151,6 +151,9 @@ def pipeline_data_verify(slug, file_id):
         pipeline_data_file.state = DataUploaderFileState.VERIFIED.value
         pipeline_data_file.save()
 
+        thread = process_pipeline_data_file(pipeline_data_file)
+        thread.start()
+
         return redirect(
             url_for(
                 'uploader_views.pipeline_data_uploaded',
@@ -200,6 +203,9 @@ def pipeline_restore_version(slug, file_id):
         data_file_to_restore.state = DataUploaderFileState.VERIFIED.value
         data_file_to_restore.save()
 
+        thread = process_pipeline_data_file(data_file_to_restore)
+        thread.start()
+
         return redirect(
             url_for(
                 'uploader_views.pipeline_data_uploaded',
@@ -237,9 +243,7 @@ def pipeline_data_uploaded(slug, file_id):
         raise BadRequest("Invalid schema for this pipeline.")
     data_workspace_schema_name = schema_parts[0]
     data_workspace_table_name = schema_parts[1]
-    thread = process_pipeline_data_file(pipeline_data_file)
     file_id = pipeline_data_file.id
-    thread.start()
     return render_uploader_template(
         'pipeline_data_uploaded.html',
         pipeline=pipeline,

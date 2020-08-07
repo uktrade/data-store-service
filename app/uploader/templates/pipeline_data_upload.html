@@ -14,10 +14,18 @@
         </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for data_file in pipeline.data_files if data_file.state in ('completed', 'uploaded') %}
+    {% for data_file in pipeline.data_files if data_file.state in ('processing_dss', 'processing_dataflow', 'completed', 'uploaded') %}
         <tr class="govuk-table__row">
             <td class="govuk-table__cell">{{ data_file.uploaded_at }}</td>
-            <td class="govuk-table__cell">{% if data_file.processed_at %} {{ data_file.processed_at }} {% elif data_file.state == 'uploaded' %}<a href="{{ url_for('uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id)}}">Process</a>{% endif %}</td>
+
+            {% if data_file.processed_at %}
+              <td class="govuk-table__cell">{{ data_file.processed_at }}</td>
+            {% elif data_file.state == 'uploaded' %}
+              <td class="govuk-table__cell"><a href="{{ url_for('uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id)}}">Process</a></td>
+            {% elif data_file.state in ('processing_dss', 'processing_dataflow') %}
+              <td class="govuk-table__cell"><a href="{{ url_for('uploader_views.pipeline_data_uploaded', slug=data_file.pipeline.slug, file_id=data_file.id) }}">View progress</a></td>
+            {% endif %}
+
             <td class="govuk-table__cell">{% if data_file.processed_at %} {% if data_file.id == data_file.pipeline.latest_version.id %}Latest{% else %}<a href="{{ url_for('uploader_views.pipeline_restore_version', slug=data_file.pipeline.slug, file_id=data_file.id)}}">Restore</a>{% endif %}{% endif %}</td>
         </tr>
     {% endfor %}
