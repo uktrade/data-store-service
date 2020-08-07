@@ -5,7 +5,6 @@ import pandas
 import pytest
 from datatools.io.storage import S3Storage
 
-from app.constants import DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR
 from app.uploader.utils import get_column_types, get_s3_file_sample, upload_file
 
 
@@ -21,9 +20,9 @@ def test_save_column_types(data, expected_column_types, app_with_db):
 @pytest.mark.parametrize(
     'csv_string,delimiter,quotechar',
     (
-        ('hello,goodbye\n"1,1,1",2\n3,4\n5,6', DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR),
-        ('hello~goodbye\n1~2\n3~4\n5~6', '~', DEFAULT_CSV_QUOTECHAR),
-        ('hello,goodbye\n$1,1,1$,2\n3,4\n5,6', DEFAULT_CSV_DELIMITER, '$'),
+        ('hello,goodbye\n"1,1,1",2\n3,4\n5,6', ',', '"'),
+        ('hello~goodbye\n1~2\n3~4\n5~6', '~', '"'),
+        ('hello,goodbye\n$1,1,1$,2\n3,4\n5,6', ',', '$'),
     ),
 )
 @mock.patch('app.uploader.utils.open')
@@ -40,7 +39,7 @@ def test_get_s3_file_sample(mock_smart_open, csv_string, delimiter, quotechar, a
 def test_get_s3_file_sample_when_empty_column(mock_smart_open, app_with_db):
     csv_string = 'hello,goodbye\n1,2,3\n4,5,6\n7,8,9'
     mock_smart_open.return_value = io.StringIO(csv_string)
-    result, err = get_s3_file_sample('', DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR)
+    result, err = get_s3_file_sample('', ',', '"')
     assert result.empty is True
     assert result.columns.to_list() == []
     assert len(result.index) == 0
@@ -51,7 +50,7 @@ def test_get_s3_file_sample_when_empty_column(mock_smart_open, app_with_db):
 def test_get_s3_file_sample_when_invalid_header(mock_smart_open, app_with_db):
     csv_string = 'hello,goodbye,\n1,2,3\n4,5,6\n7,8,9'
     mock_smart_open.return_value = io.StringIO(csv_string)
-    result, err = get_s3_file_sample('', DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR)
+    result, err = get_s3_file_sample('', ',', '"')
     assert result.empty is True
     assert result.columns.to_list() == []
     assert len(result.index) == 0
@@ -62,11 +61,26 @@ def test_get_s3_file_sample_when_invalid_header(mock_smart_open, app_with_db):
 def test_get_s3_file_sample_when_duplicate_header_names(mock_smart_open, app_with_db):
     csv_string = 'hello,goodbye,goodbye\n1,2,3\n4,5,6\n7,8,9'
     mock_smart_open.return_value = io.StringIO(csv_string)
-    result, err = get_s3_file_sample('', DEFAULT_CSV_DELIMITER, DEFAULT_CSV_QUOTECHAR)
+    result, err = get_s3_file_sample('', ',', '"')
     assert result.empty is True
     assert result.columns.to_list() == []
     assert len(result.index) == 0
     assert err == 'Invalid CSV: duplicate header names not allowed'
+
+
+@mock.patch('app.uploader.utils.open')
+def test_get_s3_file_sample_with_invalid_header_names(mock_smart_open, app_with_db):
+    csv_string = 'spaces in header,weird :@£$% characters,Uppercase\n1,2,3\n4,5,6\n7,8,9'
+    mock_smart_open.return_value = io.StringIO(csv_string)
+    result, err = get_s3_file_sample('', ',', '"')
+    assert result.empty is True
+    assert result.columns.to_list() == []
+    assert len(result.index) == 0
+    assert err == (
+        'Invalid CSV: column headers must start with a letter and may only contain lowercase '
+        'letters, numbers, and underscores. Invalid headers: "spaces in header", '
+        '"weird :@£$% characters", "Uppercase"'
+    )
 
 
 @mock.patch('app.uploader.utils.StorageFactory.create')

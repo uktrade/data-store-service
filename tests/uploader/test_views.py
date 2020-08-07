@@ -8,8 +8,6 @@ from slugify import slugify
 
 from app.constants import (
     DataUploaderFileState,
-    DEFAULT_CSV_DELIMITER,
-    DEFAULT_CSV_QUOTECHAR,
     NO,
     YES,
 )
@@ -267,7 +265,7 @@ def test_get_data_upload_view(is_authenticated, app_with_db, captured_templates)
 def test_get_data_verify_view(mock_smart_open, is_authenticated, app_with_db, captured_templates):
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)
-    data_file = PipelineDataFileFactory()
+    data_file = PipelineDataFileFactory(pipeline__delimiter=',')
     client = get_client(app_with_db)
     url = url_for(
         'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
@@ -342,7 +340,7 @@ def test_submit_data_verify_proceed_yes(
     mock_process_pipeline_data_file.return_value = mock_thread
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)
-    data_file = PipelineDataFileFactory()
+    data_file = PipelineDataFileFactory(pipeline__delimiter=',')
     client = get_client(app_with_db)
     url = url_for(
         'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
@@ -371,7 +369,7 @@ def test_submit_data_upload_view(
 ):
     csv_string = 'hello,goodbye\n1,2\n3,4'
     mock_smart_open.return_value = io.StringIO(csv_string)
-    pipeline = PipelineFactory(delimiter=DEFAULT_CSV_DELIMITER, quote=DEFAULT_CSV_QUOTECHAR)
+    pipeline = PipelineFactory(delimiter=",", quote='"')
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
     form_data = {'csv_file': (io.BytesIO(bytes(csv_string, encoding='utf-8')), 'test.csv')}
@@ -401,7 +399,7 @@ def test_submit_data_upload_view_additional_dataset(
 
     mock_smart_open.return_value = io.StringIO(file_1_csv_string)
     mock_upload_file.return_value = 'fakefile_1.csv'
-    pipeline = PipelineFactory(delimiter=DEFAULT_CSV_DELIMITER, quote=DEFAULT_CSV_QUOTECHAR)
+    pipeline = PipelineFactory(delimiter=",", quote='"')
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
 
@@ -422,7 +420,7 @@ def test_submit_data_upload_view_additional_dataset(
     assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
 
     # upload another file
-    mock_smart_open.return_value = io.StringIO(file_2_csv_string)
+    mock_smart_open.side_effect = [io.StringIO(file_2_csv_string), io.StringIO(file_1_csv_string)]
     mock_upload_file.return_value = 'fakefile_2.csv'
 
     form_data = {'csv_file': (io.BytesIO(bytes(file_2_csv_string, encoding='utf-8')), 'test.csv')}
@@ -441,6 +439,45 @@ def test_submit_data_upload_view_additional_dataset(
     assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
     assert pipeline.data_files[1].data_file_url.split("/")[1] == pipeline.organisation
     assert pipeline.data_files[1].data_file_url.split("/")[2] == pipeline.dataset
+
+
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.views.upload_file')
+def test_submit_data_upload_view_where_new_file_is_missing_columns_present_in_previous_file(
+    mock_upload_file, mock_smart_open, is_authenticated, app_with_db, captured_templates
+):
+    file_1_csv_string = 'one,two\n1,2\n3,4'
+    file_2_csv_string = 'two,three\n1,2\n3,4'
+
+    mock_smart_open.return_value = io.StringIO(file_1_csv_string)
+    mock_upload_file.return_value = 'fakefile_1.csv'
+    pipeline = PipelineFactory(delimiter=",", quote='"')
+    client = get_client(app_with_db)
+    url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
+
+    # upload first file
+    form_data = {'csv_file': (io.BytesIO(bytes(file_1_csv_string, encoding='utf-8')), 'test.csv')}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    assert mock_upload_file.called is True
+    html = response.get_data(as_text=True)
+    assert 'Data successfully uploaded' in html
+
+    # upload another file
+    mock_smart_open.side_effect = [io.StringIO(file_2_csv_string), io.StringIO(file_1_csv_string)]
+    mock_upload_file.return_value = 'fakefile_2.csv'
+
+    form_data = {'csv_file': (io.BytesIO(bytes(file_2_csv_string, encoding='utf-8')), 'test.csv')}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    assert mock_upload_file.called is True
+    html = response.get_data(as_text=True)
+    assert 'Data successfully uploaded' in html
+    assert 'Missing column: one' in html
+    assert 'Continue with missing columns' in html
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
@@ -485,7 +522,7 @@ def test_get_restore_version_view(
     # The view first gets the s3 sample of the latest version and then the version to restore
     mock_smart_open.side_effect = [io.StringIO(csv_string_1), io.StringIO(csv_string_2)]
 
-    pipeline = PipelineFactory()
+    pipeline = PipelineFactory(delimiter=',')
     # Latest version
     PipelineDataFileFactory(
         pipeline=pipeline,
@@ -567,7 +604,7 @@ def test_submit_restore_version_proceed(
     # The view first gets the s3 sample of the latest version and then the version to restore
     mock_smart_open.side_effect = [io.StringIO(csv_string), io.StringIO(csv_string)]
 
-    pipeline = PipelineFactory()
+    pipeline = PipelineFactory(delimiter=',')
     # Latest version
     PipelineDataFileFactory(
         pipeline=pipeline,
