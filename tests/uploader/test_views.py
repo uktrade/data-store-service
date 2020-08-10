@@ -495,6 +495,10 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
         state=DataUploaderFileState.COMPLETED.value,
         processed_at=datetime.datetime(2020, 6, 1),
     )
+    # Version that is in the middle of processing
+    PipelineDataFileFactory(
+        pipeline=pipeline, state=DataUploaderFileState.PROCESSING_DATAFLOW.value, processed_at=None
+    )
     # Version that is yet to be processed
     PipelineDataFileFactory(
         pipeline=pipeline, state=DataUploaderFileState.UPLOADED.value, processed_at=None
@@ -509,7 +513,8 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
 
     assert 'Latest' in html  # data_file_1
     assert 'Restore' in html  # data_file_2
-    assert 'Process' in html  # data_file_3
+    assert 'View progress' in html  # data_file_3
+    assert 'Process' in html  # data_file_4
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
