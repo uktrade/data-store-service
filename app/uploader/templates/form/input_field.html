@@ -1,6 +1,6 @@
 
 <div class="govuk-form-group{% if field.errors %}--error{% endif %}">
-    <label class="govuk-label" for="{{ field.name }}">{{ field.label }}</label>
+    <label class="govuk-label" for="{{ field.id }}">{{ field.label }}</label>
     {% if hint %}
         <span id="{{ field.name }}-hint" class="govuk-hint">{{ hint }}</span>
     {% endif %}
