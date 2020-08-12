@@ -2,7 +2,7 @@
 {% block title %}Data Store Service - Verify data upload{% endblock %}
 
 {% block content %}
-{% if file_contents.empty %}
+{% if new_file_contents.empty %}
    {% include 'form/error_summary.html' %}
     <a href="{{ url_for('uploader_views.pipeline_data_upload',  slug=pipeline.slug) }}" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
         Try again
@@ -53,7 +53,7 @@
   </form>
 
   <table class="govuk-table">
-    <caption class="govuk-table__caption">File contents</caption>
+    <caption class="govuk-table__caption">New file contents</caption>
     <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Column</th>
@@ -62,7 +62,7 @@
         </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for column, data in file_contents.items() %}
+    {% for column, data in new_file_contents.items() %}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">{{ column }}</th>
             <td class="govuk-table__cell">text</td>
@@ -71,5 +71,27 @@
     {% endfor %}
     </tbody>
   </table>
+
+  {% if current_file_contents is not none and not current_file_contents.empty %}
+    <table class="govuk-table">
+      <caption class="govuk-table__caption">Existing file contents</caption>
+      <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">Column</th>
+              <th scope="col" class="govuk-table__header">Data type</th>
+              <th scope="col" class="govuk-table__header">Sample data taken from the first few rows</th>
+          </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+      {% for column, data in current_file_contents.items() %}
+          <tr class="govuk-table__row">
+              <th scope="row" class="govuk-table__header">{{ column }}</th>
+              <td class="govuk-table__cell">text</td>
+              <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
+          </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
 {% endif %}
 {% endblock content %}
