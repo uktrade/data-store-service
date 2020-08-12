@@ -14,43 +14,6 @@
   <div class="govuk-panel govuk-panel--confirmation">
       <h1 class="govuk-panel__title">Data successfully uploaded</h1>
   </div>
-  <form method="post" name="verify_form" enctype="multipart/form-data">
-      {{ form.csrf_token }}
-      {% include 'form/error_summary.html' %}
-      <fieldset class="govuk-fieldset">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
-              <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
-          </legend>
-
-          {% with field=form.proceed %}
-              {% include 'form/input_radio_field.html' %}
-          {% endwith %}
-
-          {% if missing_headers %}
-            <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-              <div class="govuk-warning-text govuk-!-margin-bottom-0">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                  <span class="govuk-warning-text__assistive">Warning</span>
-                  The uploaded file is missing columns that were present in the last data file. Continuing will break any queries that currently rely on those columns.
-                  <br>
-                  <br>
-                  Missing column{% if missing_headers|length > 1 %}s{% endif %}: {{ missing_headers | join(', ') }}
-                </strong>
-              </div>
-            </div></div>
-          {% endif %}
-          <div class="gov-form-group govuk-!-padding-top-6">
-              <ul class="govuk-list">
-                  <li>
-                      <input type="submit" value="Continue{% if missing_headers %} with missing columns{% endif %}" class="govuk-button govuk-!-margin-bottom-4{% if missing_headers %} govuk-button--warning{% endif %}">
-                  </li>
-              </ul>
-          </div>
-
-      </fieldset>
-  </form>
 
   <table class="govuk-table">
     <caption class="govuk-table__caption">New file contents</caption>
@@ -93,5 +56,43 @@
       </tbody>
     </table>
   {% endif %}
+
+  {% if missing_headers %}
+    <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-warning-text govuk-!-margin-bottom-0">
+        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+        <strong class="govuk-warning-text__text">
+          <span class="govuk-warning-text__assistive">Warning</span>
+          The uploaded file is missing columns that were present in the last data file. Continuing will break any queries that currently rely on those columns.
+          <br>
+          <br>
+          Missing column{% if missing_headers|length > 1 %}s{% endif %}: {{ missing_headers | join(', ') }}
+        </strong>
+      </div>
+    </div></div>
+  {% endif %}
+
+  <form method="post" name="verify_form" enctype="multipart/form-data">
+      {{ form.csrf_token }}
+      {% include 'form/error_summary.html' %}
+      <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
+              <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
+          </legend>
+
+          {% with field=form.proceed %}
+              {% include 'form/input_radio_field.html' %}
+          {% endwith %}
+          <div class="gov-form-group govuk-!-padding-top-6">
+              <ul class="govuk-list">
+                  <li>
+                      <input type="submit" value="Continue{% if missing_headers %} with missing columns{% endif %}" class="govuk-button govuk-!-margin-bottom-4{% if missing_headers %} govuk-button--warning{% endif %}">
+                  </li>
+              </ul>
+          </div>
+
+      </fieldset>
+  </form>
 {% endif %}
 {% endblock content %}
