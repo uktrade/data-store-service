@@ -64,7 +64,7 @@
         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
         <strong class="govuk-warning-text__text">
           <span class="govuk-warning-text__assistive">Warning</span>
-          The uploaded file is missing columns that were present in the last data file. Continuing will break any queries that currently rely on those columns.
+          The uploaded file is missing columns that were present in the last data file. Continuing will break any queries that use those columns.
           <br>
           <br>
           Missing column{% if missing_headers|length > 1 %}s{% endif %}: {{ missing_headers | join(', ') }}
