@@ -7,7 +7,7 @@
                     {% for error in form.errors.non_field_errors %}
                         {% if error != 'None' %}
                             <li>
-                                <a href="#id_non_field_error_{{ loop.index }}">{{ error }}</a>
+                                <a href="#non_field_error_{{ loop.index }}">{{ error }}</a>
                             </li>
                         {% endif %}
                         <br />
@@ -17,7 +17,7 @@
                     {% for error in field.errors %}
                         {% if error != 'None' %}
                             <li>
-                                <a href="#id_{{ field.name }}">{{ field.label }} - {{ error }}</a>
+                                <a href="#{{ field.id }}">{{ field.label }} - {{ error }}</a>
                             </li>
                         {% endif %}
                      {% endfor %}

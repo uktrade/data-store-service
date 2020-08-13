@@ -89,7 +89,7 @@ def test_select_pipeline_view_radios_have_distinct_ids(
     )
     html = response.get_data(as_text=True)
     assert (
-        '<input class="govuk-radios__input" id="pipeline-0" name="pipeline" type="radio" value="1">'
+        '<input class="govuk-radios__input" id="pipeline" name="pipeline" type="radio" value="1">'
         in html
     )
     assert (
