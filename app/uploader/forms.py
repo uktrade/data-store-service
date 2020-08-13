@@ -53,7 +53,10 @@ class PipelineForm(FlaskForm):
 
 
 class PipelineSelectForm(FlaskForm):
-    pipeline = QuerySelectField(query_factory=lambda: Pipeline.query.all())
+    pipeline = QuerySelectField(
+        query_factory=lambda: Pipeline.query.all(),
+        validators=[DataRequired(message="Select one of the existing pipelines to upload data to")],
+    )
 
 
 class DataFileForm(FlaskForm):
