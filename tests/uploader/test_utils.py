@@ -43,7 +43,10 @@ def test_get_s3_file_sample_when_empty_column(mock_smart_open, app_with_db):
     assert result.empty is True
     assert result.columns.to_list() == []
     assert len(result.index) == 0
-    assert err == 'Invalid CSV: content length not matching header length'
+    assert err == (
+        'Unable to process CSV file: some rows have a different number of '
+        'data points (3) than there are column headers (2)'
+    )
 
 
 @mock.patch('app.uploader.utils.open')
@@ -54,7 +57,7 @@ def test_get_s3_file_sample_when_invalid_header(mock_smart_open, app_with_db):
     assert result.empty is True
     assert result.columns.to_list() == []
     assert len(result.index) == 0
-    assert err == 'Invalid CSV: empty header names not allowed'
+    assert err == 'Unable to process CSV file: empty header names not allowed'
 
 
 @mock.patch('app.uploader.utils.open')
@@ -65,7 +68,7 @@ def test_get_s3_file_sample_when_duplicate_header_names(mock_smart_open, app_wit
     assert result.empty is True
     assert result.columns.to_list() == []
     assert len(result.index) == 0
-    assert err == 'Invalid CSV: duplicate header names not allowed'
+    assert err == 'Unable to process CSV file: duplicate header names not allowed'
 
 
 @mock.patch('app.uploader.utils.open')
@@ -77,9 +80,9 @@ def test_get_s3_file_sample_with_invalid_header_names(mock_smart_open, app_with_
     assert result.columns.to_list() == []
     assert len(result.index) == 0
     assert err == (
-        'Invalid CSV: column headers must start with a letter and may only contain lowercase '
-        'letters, numbers, and underscores. Invalid headers: "spaces in header", '
-        '"weird :@£$% characters", "Uppercase"'
+        'Unable to process CSV file: column headers must start with a letter and may only '
+        'contain lowercase letters, numbers, and underscores. Invalid headers: "spaces in '
+        'header", "weird :@£$% characters", "Uppercase"'
     )
 
 

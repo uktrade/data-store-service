@@ -298,7 +298,10 @@ def test_get_data_verify_error_view(
     form = template_context['form']
     assert form.errors == {
         'non_field_errors': [
-            "Unable to process file - 'Error' codec can't decode bytes in position 1-1: "
+            (
+                "The CSV file could not be opened. "
+                "(Technical details: 'Error' codec can't decode bytes in position 1-1: )"
+            )
         ]
     }
 
