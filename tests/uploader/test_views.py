@@ -381,7 +381,7 @@ def test_submit_data_upload_view(
     assert 'Data successfully uploaded' in html
 
     template, template_context = captured_templates.pop()
-    file_contents = template_context['file_contents']
+    file_contents = template_context['new_file_contents']
     assert file_contents == {'goodbye': {0: '2', 1: '4'}, 'hello': {0: '1', 1: '3'}}
 
     assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
@@ -413,7 +413,7 @@ def test_submit_data_upload_view_additional_dataset(
     assert 'Data successfully uploaded' in html
 
     template, template_context = captured_templates.pop()
-    file_contents = template_context['file_contents']
+    file_contents = template_context['new_file_contents']
     assert file_contents == {'goodbye': {0: '2', 1: '4'}, 'hello': {0: '1', 1: '3'}}
     assert len(pipeline.data_files) == 1
     assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
@@ -432,7 +432,7 @@ def test_submit_data_upload_view_additional_dataset(
     assert 'Data successfully uploaded' in html
 
     template, template_context = captured_templates.pop()
-    file_contents = template_context['file_contents']
+    file_contents = template_context['new_file_contents']
     assert file_contents == {'goodbye': {0: '1', 1: '3'}, 'hello': {0: '2', 1: '4'}}
     assert len(pipeline.data_files) == 2
     assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
@@ -464,6 +464,9 @@ def test_submit_data_upload_view_where_new_file_is_missing_columns_present_in_pr
     assert mock_upload_file.called is True
     html = response.get_data(as_text=True)
     assert 'Data successfully uploaded' in html
+
+    # Mark the last upload as complete
+    pipeline.data_files[0].state = DataUploaderFileState.COMPLETED.value
 
     # upload another file
     mock_smart_open.side_effect = [io.StringIO(file_2_csv_string), io.StringIO(file_1_csv_string)]

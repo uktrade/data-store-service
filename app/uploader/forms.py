@@ -70,7 +70,7 @@ class VerifyDataFileForm(FlaskForm):
             (YES, 'Yes and start processing'),
             (NO, 'No and return back to the beginning to try again'),
         ],
-        label='Does the contents of the file look correct?',
+        label='Do the contents of the file look correct?',
         validators=[DataRequired()],
     )
 

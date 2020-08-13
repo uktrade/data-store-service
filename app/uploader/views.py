@@ -1,10 +1,12 @@
 import os
 import uuid
+from typing import Set
 
 from data_engineering.common.sso.token import login_required
 from flask import abort, redirect, render_template, url_for
 from flask import current_app as app
 from flask.blueprints import Blueprint
+from pandas import DataFrame
 from werkzeug.exceptions import BadRequest
 
 from app.constants import DataUploaderFileState, YES
@@ -110,20 +112,11 @@ def pipeline_data_upload(slug):
     )
 
 
-def get_missing_headers_compared_to_previous_data(file_contents, pipeline):
-    if len(pipeline.data_files) < 2:
-        return set()
+def get_missing_headers(current_version: DataFrame, new_version: DataFrame) -> Set:
+    current_headers = set(str(k) for k in current_version.to_dict().keys())
+    new_headers = set(str(k) for k in new_version.to_dict().keys())
 
-    previous_data_file = pipeline.data_files[-2]
-
-    previous_file_contents, err = get_s3_file_sample(
-        previous_data_file.data_file_url, pipeline.delimiter, pipeline.quote
-    )
-
-    new_file_headers = set(str(k) for k in file_contents.to_dict().keys())
-    previous_file_headers = set(str(k) for k in previous_file_contents.to_dict().keys())
-
-    return previous_file_headers - new_file_headers
+    return current_headers - new_headers
 
 
 @uploader_views.route('/data/<slug>/verify/<file_id>/', methods=('GET', 'POST'))
@@ -139,14 +132,26 @@ def pipeline_data_verify(slug, file_id):
         delete_file(pipeline_data_file)
         return redirect(url_for('uploader_views.pipeline_select'))
 
-    file_contents, err = get_s3_file_sample(
+    new_file_contents, new_file_err = get_s3_file_sample(
         pipeline_data_file.data_file_url, pipeline.delimiter, pipeline.quote
     )
 
-    missing_headers = get_missing_headers_compared_to_previous_data(file_contents, pipeline)
+    current_file_contents, missing_headers = None, set()
+    if pipeline.latest_version:
+        data_file_latest = pipeline.latest_version
+        current_file_contents, current_file_err = get_s3_file_sample(
+            data_file_latest.data_file_url, pipeline.delimiter, pipeline.quote
+        )
+
+        missing_headers = get_missing_headers(
+            current_version=current_file_contents, new_version=new_file_contents
+        )
+
+        if not current_file_contents.empty and not current_file_err:
+            current_file_contents = current_file_contents.to_dict()
 
     if is_form_valid:
-        pipeline.column_types = get_column_types(file_contents)
+        pipeline.column_types = get_column_types(new_file_contents)
         pipeline.save()
         pipeline_data_file.state = DataUploaderFileState.VERIFIED.value
         pipeline_data_file.save()
@@ -162,17 +167,18 @@ def pipeline_data_verify(slug, file_id):
             )
         )
 
-    elif not file_contents.empty and not err:
-        file_contents = file_contents.to_dict()
+    elif not new_file_contents.empty and not new_file_err:
+        new_file_contents = new_file_contents.to_dict()
     else:
         pipeline_data_file.state = DataUploaderFileState.FAILED.value
-        pipeline_data_file.error_message = err
+        pipeline_data_file.error_message = new_file_err
         pipeline_data_file.save()
-        form.errors['non_field_errors'] = [f'Unable to process file - {err}']
+        form.errors['non_field_errors'] = [f'Unable to process file - {new_file_err}']
     return render_uploader_template(
         'pipeline_data_verify.html',
         pipeline=pipeline,
-        file_contents=file_contents,
+        new_file_contents=new_file_contents,
+        current_file_contents=current_file_contents,
         format_row_data=format_row_data,
         form=form,
         missing_headers=missing_headers,
