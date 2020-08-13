@@ -308,6 +308,27 @@ def test_get_data_verify_error_view(
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.views.delete_file')
+@mock.patch('app.uploader.utils.open')
+def test_submit_data_verify_proceed_blank(
+    mock_open, mock_delete_file, is_authenticated, app_with_db, captured_templates
+):
+    csv_string = 'hello,goodbye\n1,2\n3,4'
+    mock_open.side_effect = [io.StringIO(csv_string), io.StringIO(csv_string)]
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    form_data = {}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    html = response.get_data(as_text=True)
+    assert 'Confirm or reject the data file contents' in html
+
+
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+@mock.patch('app.uploader.views.delete_file')
 def test_submit_data_verify_proceed_no(
     mock_delete_file, is_authenticated, app_with_db, captured_templates
 ):

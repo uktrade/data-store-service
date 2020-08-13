@@ -70,8 +70,16 @@ class DataFileForm(FlaskForm):
     )
 
 
+class ValidateContentsSelectField(SelectField):
+    def pre_validate(self, form):
+        try:
+            super().pre_validate(form)
+        except ValueError:
+            raise ValueError("Confirm or reject the data file contents")
+
+
 class VerifyDataFileForm(FlaskForm):
-    proceed = SelectField(
+    proceed = ValidateContentsSelectField(
         choices=[
             (YES, 'Yes and start processing'),
             (NO, 'No and return back to the beginning to try again'),
@@ -82,7 +90,7 @@ class VerifyDataFileForm(FlaskForm):
 
 
 class RestoreVersionForm(FlaskForm):
-    proceed = SelectField(
+    proceed = ValidateContentsSelectField(
         choices=[(YES, 'Restore'), (NO, 'Cancel')],
         label='Are you sure you want to restore this version of the data',
         validators=[DataRequired()],
