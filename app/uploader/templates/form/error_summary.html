@@ -17,7 +17,7 @@
                     {% for error in field.errors %}
                         {% if error != 'None' %}
                             <li>
-                                <a href="#{{ field.id }}">{{ field.label }} - {{ error }}</a>
+                                <a href="#{{ field.id }}">{{ error }}</a>
                             </li>
                         {% endif %}
                      {% endfor %}
