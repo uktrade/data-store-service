@@ -8,7 +8,7 @@ import tabulator
 import unicodecsv
 from flask import current_app as app
 from tableschema import Schema
-from tabulator import TabulatorException
+from tabulator import EncodingError, TabulatorException
 
 from app.constants import CSV_NULL_VALUES, DataUploaderDataTypes
 
@@ -81,7 +81,7 @@ class CSVParser:
             if invalid_headings:
                 joined_invalid_headings = '"' + '", "'.join(invalid_headings) + '"'
                 raise csv.Error(
-                    f"Unable to process CSV file: column headers must start with a letter and "
+                    f"column headers must start with a letter and "
                     f"may only contain lowercase letters, numbers, and underscores. Invalid "
                     f"headers: {joined_invalid_headings}"
                 )
@@ -94,7 +94,11 @@ class CSVParser:
             )
             return sample, None
         except (TabulatorException, csv.Error) as e:
-            error_message = str(e)
+            error_message = 'Unable to process CSV file: '
+            if isinstance(e, EncodingError):
+                error_message += f'the CSV file could not be opened. (Technical details: {str(e)})'
+            else:
+                error_message += str(e)
             app.logger.error(error_message)
             return [], error_message
 
@@ -104,7 +108,7 @@ class CSVParser:
         for row_number, headers, row in extended_rows:
             if len(row) != len(headers):
                 raise csv.Error(
-                    f'Unable to process CSV file: row {row_number} has a different number of data '
+                    f'row {row_number} has a different number of data '
                     f'points ({len(row)}) than there are column headers ({len(headers)})'
                 )
             cleaned_row = list(
