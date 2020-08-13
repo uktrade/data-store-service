@@ -288,7 +288,5 @@ def progress(file_id):
         response['info'] = 'Data successfully processed'
     elif state == DataUploaderFileState.FAILED.value:
         response['progress'] = '100'
-        response[
-            'info'
-        ] = f'Oops, something went wrong{": " + file.error_message if file.error_message else ""}'
+        response['info'] = 'Sorry, there is a problem with the service. Try again later.'
     return response

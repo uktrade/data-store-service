@@ -173,8 +173,7 @@ def process_pipeline_data_file(pipeline_data_file):
                 pipeline_data_file.state = DataUploaderFileState.COMPLETED.value
                 pipeline_data_file.processed_at = now()
             else:
-                pipeline_data_file.error_message = 'Airflow dag failed'
-                pipeline_data_file.state = DataUploaderFileState.FAILED.value
+                raise Exception("Airflow dag failed")
             pipeline_data_file.save()
         except Exception as e:
             pipeline_data_file.error_message = str(e)
