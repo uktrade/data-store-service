@@ -1,23 +1,18 @@
-import csv
 import json
 import os.path
-import re
 import time
-from io import BytesIO
 from threading import Thread
 
-import pandas
-import pandas as pd
 import requests
 from datatools.io.fileinfo import FileInfo
 from datatools.io.storage import StorageFactory
 from flask import copy_current_request_context, current_app as app
 from mohawk import Sender
-from smart_open import open
 from sqlalchemy.sql.functions import now
 
 from app.constants import DataUploaderFileState
 from app.etl.pipeline_type.dsv_to_table import DSVToTablePipeline
+from app.uploader.csv_parser import CSVParser
 
 
 def upload_file(file_name, stream):
@@ -30,62 +25,14 @@ def delete_file(pipeline_data_file):
     storage.delete_file(pipeline_data_file.data_file_url)
 
 
-def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
-    bucket = app.config['s3']['bucket_url']
-    full_url = os.path.join(bucket, url)
-    try:
-        with open(full_url, encoding='utf-8-sig') as csv_file:
-            csv_reader = csv.reader(csv_file, quotechar=quotechar, delimiter=delimiter,)
-            csv_headings = next(csv_reader)
-            if len(csv_headings) != len(set(csv_headings)):
-                raise csv.Error('Unable to process CSV file: duplicate header names not allowed')
-            if '' in csv_headings:
-                raise csv.Error('Unable to process CSV file: empty header names not allowed')
-
-            invalid_headings = list(
-                filter(lambda x: not re.match("^[a-z][a-z0-9_]+$", x), csv_headings)
-            )
-            if invalid_headings:
-                joined_invalid_headings = '"' + '", "'.join(invalid_headings) + '"'
-                raise csv.Error(
-                    f"Unable to process CSV file: column headers must start with a letter and "
-                    f"may only contain lowercase letters, numbers, and underscores. Invalid "
-                    f"headers: {joined_invalid_headings}"
-                )
-
-            csv_contents = []
-            count = 0
-            for row in csv_reader:
-                if count == number_of_lines:
-                    break
-                if len(row) != len(csv_headings):
-                    raise csv.Error(
-                        f'Unable to process CSV file: some rows have a different number of data '
-                        f'points ({len(row)}) than there are column headers ({len(csv_headings)})'
-                    )
-                csv_contents.append(row)
-                count += 1
-
-        df = pd.DataFrame(csv_contents, columns=csv_headings)
-        return df, None
-    except (UnicodeDecodeError, csv.Error) as e:
-        if isinstance(e, UnicodeDecodeError):
-            error_message = f'The CSV file could not be opened. (Technical details: {str(e)})'
-        else:
-            error_message = str(e)
-
-        return pd.DataFrame(), error_message
-
-
-def _move_file_to_s3(file_url, organisation, dataset):
+def _move_file_to_s3(file_url, organisation, dataset, delimiter, quote):
     bucket = app.config['s3']['bucket_url']
     file_name = file_url.split('/')[-1]
     full_url = os.path.join(bucket, file_url)
-    file_contents = open(full_url, encoding='utf-8-sig').read()
-    file_contents_utf_8 = BytesIO(str.encode(file_contents, 'utf-8'))
-    file_contents_utf_8.seek(0)
-    file_info = FileInfo(file_url, file_contents_utf_8)
-
+    utf_8_byte_stream = CSVParser.get_csv_as_utf_8_byte_stream(
+        full_url=full_url, delimiter=delimiter, quotechar=quote,
+    )
+    file_info = FileInfo(file_url, utf_8_byte_stream)
     storage = StorageFactory.create(bucket)
     datasets_folder = app.config['s3']['datasets_folder']
     target_file_url = f'{datasets_folder}/{organisation}/{dataset}/{file_name}'
@@ -98,10 +45,13 @@ def process_pipeline_data_file(pipeline_data_file):
     pipeline = pipeline_data_file.pipeline
     organisation = pipeline.organisation
     dataset = pipeline.dataset
+    column_types = pipeline_data_file.column_types
+    delimiter = pipeline_data_file.delimiter
+    quote = pipeline_data_file.quote
 
     # move file to s3
     file_url = pipeline_data_file.data_file_url
-    file_info = _move_file_to_s3(file_url, organisation, dataset)
+    file_info = _move_file_to_s3(file_url, organisation, dataset, delimiter, quote,)
 
     # create pipeline
     class PipelineThread(Thread):
@@ -120,9 +70,9 @@ def process_pipeline_data_file(pipeline_data_file):
         dbi=app.dbi,
         organisation=organisation,
         dataset=dataset,
-        data_column_types=pipeline.column_types,
-        quote=pipeline.quote,
-        separator=pipeline.delimiter,
+        data_column_types=column_types,
+        quote=quote,
+        separator=delimiter,
     )
 
     @copy_current_request_context
@@ -136,7 +86,7 @@ def process_pipeline_data_file(pipeline_data_file):
             pipeline.process(file_info)
             time.sleep(5)
         except Exception as e:
-            pipeline_data_file.error_message = str(e)
+            pipeline_data_file.error_message = str(e).split('CONTEXT')[0]
             pipeline_data_file.state = DataUploaderFileState.FAILED.value
             pipeline_data_file.save()
             raise
@@ -230,8 +180,3 @@ def hawk_api_request(
     response.raise_for_status()
     response_json = response.json()
     return response_json
-
-
-def get_column_types(file_contents):
-    columns = file_contents.columns.to_list()
-    return list(zip(columns, ['text'] * len(columns)))

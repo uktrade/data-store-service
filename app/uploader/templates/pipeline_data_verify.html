@@ -4,7 +4,7 @@
 {% block content %}
 {% include 'form/error_summary.html' %}
 
-{% if new_file_contents.empty %}
+{% if not new_file_contents %}
     <a href="{{ url_for('uploader_views.pipeline_data_upload',  slug=pipeline.slug) }}" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
         Try again
         <svg class="govuk-button__start-icon" xmlns="http://www.w3.org/2000/svg" width="17.5" height="19" viewBox="0 0 33 40" aria-hidden="true" focusable="false">
@@ -16,66 +16,76 @@
       <h1 class="govuk-panel__title">Data successfully uploaded</h1>
   </div>
 
-  <table class="govuk-table">
-    <caption class="govuk-table__caption">New file contents</caption>
-    <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Column</th>
-            <th scope="col" class="govuk-table__header">Data type</th>
-            <th scope="col" class="govuk-table__header">Sample data taken from the first few rows</th>
-        </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-    {% for column, data in new_file_contents.items() %}
-        <tr class="govuk-table__row">
-            <th scope="row" class="govuk-table__header">{{ column }}</th>
-            <td class="govuk-table__cell">text</td>
-            <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-
-  {% if current_file_contents is not none and not current_file_contents.empty %}
-    <table class="govuk-table">
-      <caption class="govuk-table__caption">Existing file contents</caption>
-      <thead class="govuk-table__head">
-          <tr class="govuk-table__row">
-              <th scope="col" class="govuk-table__header">Column</th>
-              <th scope="col" class="govuk-table__header">Data type</th>
-              <th scope="col" class="govuk-table__header">Sample data taken from the first few rows</th>
-          </tr>
-      </thead>
-      <tbody class="govuk-table__body">
-      {% for column, data in current_file_contents.items() %}
-          <tr class="govuk-table__row">
-              <th scope="row" class="govuk-table__header">{{ column }}</th>
-              <td class="govuk-table__cell">text</td>
-              <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
-          </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% endif %}
-
-  {% if missing_headers %}
-    <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-warning-text govuk-!-margin-bottom-0">
-        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-        <strong class="govuk-warning-text__text">
-          <span class="govuk-warning-text__assistive">Warning</span>
-          The uploaded file is missing columns that were present in the last data file. Continuing will break any queries that use those columns.
-          <br>
-          <br>
-          Missing column{% if missing_headers|length > 1 %}s{% endif %}: {{ missing_headers | join(', ') }}
-        </strong>
-      </div>
-    </div></div>
-  {% endif %}
-
   <form method="post" name="verify_form" enctype="multipart/form-data">
       {{ form.csrf_token }}
+      <table class="govuk-table">
+        <caption class="govuk-table__caption">New file contents</caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Column</th>
+                <th scope="col" class="govuk-table__header">Data type</th>
+                <th scope="col" class="govuk-table__header">Sample data taken from the first few rows</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+        {% for column, type, data in new_file_contents %}
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">{{ column }}</th>
+                <td class="govuk-table__cell">
+                    <select class="govuk-select" id="data_types" name="{{ column }}">
+                    {% for data_type in data_types %}
+                        <option value="{{ data_type }}" {% if type==data_type %} selected="selected"{% endif %}>
+                            {{ data_type[0]|upper}}{{data_type[1:] }}
+                        </option>
+                    {% endfor %}
+                    </select>
+                </td>
+                <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+      {% if current_file_contents %}
+        <table class="govuk-table">
+            <caption class="govuk-table__caption">Existing file contents</caption>
+            <thead class="govuk-table__head">
+              <tr class="govuk-table__row">
+                  <th scope="col" class="govuk-table__header">Column</th>
+                  <th scope="col" class="govuk-table__header">Data type</th>
+                  <th scope="col" class="govuk-table__header">Sample data taken from the first few rows</th>
+              </tr>
+            </thead>
+            <tbody class="govuk-table__body">
+            {% for column, _, data in current_file_contents %}
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">{{ column }}</th>
+                    <td class="govuk-table__cell">
+                        {{ current_column_types[column][0]|upper}}{{current_column_types[column][1:] }}
+                    </td>
+                    <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+      {% endif %}
+
+      {% if missing_headers %}
+        <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <div class="govuk-warning-text govuk-!-margin-bottom-0">
+            <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+            <strong class="govuk-warning-text__text">
+              <span class="govuk-warning-text__assistive">Warning</span>
+              The uploaded file is missing columns that were present in the last data file. Continuing will break any queries that use those columns.
+              <br>
+              <br>
+              Missing column{% if missing_headers|length > 1 %}s{% endif %}: {{ missing_headers | join(', ') }}
+            </strong>
+          </div>
+        </div></div>
+      {% endif %}
+
       <fieldset class="govuk-fieldset">
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
               <h1 class="govuk-fieldset__heading">{{ heading }}</h1>
@@ -91,7 +101,6 @@
                   </li>
               </ul>
           </div>
-
       </fieldset>
   </form>
 {% endif %}

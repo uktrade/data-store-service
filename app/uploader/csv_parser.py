@@ -39,7 +39,8 @@ class CSVParser:
             file_contents_utf_8.seek(0)
             return file_contents_utf_8
         except (TabulatorException, csv.Error) as e:
-            app.logger.error(f"Invalid CSV: {str(e)}")
+            error_message = str(e)
+            app.logger.error(error_message)
             raise e
 
     @classmethod
@@ -80,9 +81,9 @@ class CSVParser:
             if invalid_headings:
                 joined_invalid_headings = '"' + '", "'.join(invalid_headings) + '"'
                 raise csv.Error(
-                    f"column headers must start with a letter and may only contain "
-                    f"lowercase letters, numbers, and underscores. Invalid headers: "
-                    f"{joined_invalid_headings}"
+                    f"Unable to process CSV file: column headers must start with a letter and "
+                    f"may only contain lowercase letters, numbers, and underscores. Invalid "
+                    f"headers: {joined_invalid_headings}"
                 )
             if not sample or not contents:
                 raise csv.Error("no data found")
@@ -93,16 +94,19 @@ class CSVParser:
             )
             return sample, None
         except (TabulatorException, csv.Error) as e:
-            err = f"Invalid CSV: {str(e)}"
-            app.logger.error(err)
-            return [], err
+            error_message = str(e)
+            app.logger.error(error_message)
+            return [], error_message
 
     @classmethod
     def check_and_clean_up_row(cls, extended_rows):
         """ Check if row length is same as header and standardize null values as empty strings """
         for row_number, headers, row in extended_rows:
             if len(row) != len(headers):
-                raise csv.Error(f'content length does not match header length on line {row_number}')
+                raise csv.Error(
+                    f'Unable to process CSV file: row {row_number} has a different number of data '
+                    f'points ({len(row)}) than there are column headers ({len(headers)})'
+                )
             cleaned_row = list(
                 map(
                     lambda value: reduce(
