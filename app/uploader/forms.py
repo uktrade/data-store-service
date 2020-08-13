@@ -62,8 +62,11 @@ class PipelineSelectForm(FlaskForm):
 class DataFileForm(FlaskForm):
     csv_file = FileField(
         'CSV File',
-        validators=[DataRequired(), FileAllowed(['csv'], 'Unsupported file type')],
-        render_kw={'class': 'govuk-input'},
+        validators=[
+            DataRequired(message="Select a CSV data file to upload"),
+            FileAllowed(['csv'], 'Select a CSV data file to upload'),
+        ],
+        render_kw={'class': 'govuk-input', "required": False},
     )
 
 
