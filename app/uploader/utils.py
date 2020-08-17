@@ -38,9 +38,9 @@ def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
             csv_reader = csv.reader(csv_file, quotechar=quotechar, delimiter=delimiter,)
             csv_headings = next(csv_reader)
             if len(csv_headings) != len(set(csv_headings)):
-                raise csv.Error('Invalid CSV: duplicate header names not allowed')
+                raise csv.Error('Unable to process CSV file: duplicate header names not allowed')
             if '' in csv_headings:
-                raise csv.Error('Invalid CSV: empty header names not allowed')
+                raise csv.Error('Unable to process CSV file: empty header names not allowed')
 
             invalid_headings = list(
                 filter(lambda x: not re.match("^[a-z][a-z0-9_]+$", x), csv_headings)
@@ -48,9 +48,9 @@ def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
             if invalid_headings:
                 joined_invalid_headings = '"' + '", "'.join(invalid_headings) + '"'
                 raise csv.Error(
-                    f"Invalid CSV: column headers must start with a letter and may only contain "
-                    f"lowercase letters, numbers, and underscores. Invalid headers: "
-                    f"{joined_invalid_headings}"
+                    f"Unable to process CSV file: column headers must start with a letter and "
+                    f"may only contain lowercase letters, numbers, and underscores. Invalid "
+                    f"headers: {joined_invalid_headings}"
                 )
 
             csv_contents = []
@@ -59,14 +59,22 @@ def get_s3_file_sample(url, delimiter, quotechar, number_of_lines=4):
                 if count == number_of_lines:
                     break
                 if len(row) != len(csv_headings):
-                    raise csv.Error('Invalid CSV: content length not matching header length')
+                    raise csv.Error(
+                        f'Unable to process CSV file: some rows have a different number of data '
+                        f'points ({len(row)}) than there are column headers ({len(csv_headings)})'
+                    )
                 csv_contents.append(row)
                 count += 1
 
         df = pd.DataFrame(csv_contents, columns=csv_headings)
         return df, None
     except (UnicodeDecodeError, csv.Error) as e:
-        return pd.DataFrame(), str(e)
+        if isinstance(e, UnicodeDecodeError):
+            error_message = f'The CSV file could not be opened. (Technical details: {str(e)})'
+        else:
+            error_message = str(e)
+
+        return pd.DataFrame(), error_message
 
 
 def _move_file_to_s3(file_url, organisation, dataset):
@@ -165,8 +173,7 @@ def process_pipeline_data_file(pipeline_data_file):
                 pipeline_data_file.state = DataUploaderFileState.COMPLETED.value
                 pipeline_data_file.processed_at = now()
             else:
-                pipeline_data_file.error_message = 'Airflow dag failed'
-                pipeline_data_file.state = DataUploaderFileState.FAILED.value
+                raise Exception("Airflow dag failed")
             pipeline_data_file.save()
         except Exception as e:
             pipeline_data_file.error_message = str(e)

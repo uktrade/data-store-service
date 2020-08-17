@@ -53,19 +53,33 @@ class PipelineForm(FlaskForm):
 
 
 class PipelineSelectForm(FlaskForm):
-    pipeline = QuerySelectField(query_factory=lambda: Pipeline.query.all())
+    pipeline = QuerySelectField(
+        query_factory=lambda: Pipeline.query.all(),
+        validators=[DataRequired(message="Select one of the existing pipelines to upload data to")],
+    )
 
 
 class DataFileForm(FlaskForm):
     csv_file = FileField(
         'CSV File',
-        validators=[DataRequired(), FileAllowed(['csv'], 'Unsupported file type')],
-        render_kw={'class': 'govuk-input'},
+        validators=[
+            DataRequired(message="Select a CSV data file to upload"),
+            FileAllowed(['csv'], 'Select a CSV data file to upload'),
+        ],
+        render_kw={'class': 'govuk-input', "required": False},
     )
 
 
+class ValidateContentsSelectField(SelectField):
+    def pre_validate(self, form):
+        try:
+            super().pre_validate(form)
+        except ValueError:
+            raise ValueError("Confirm or reject the data file contents")
+
+
 class VerifyDataFileForm(FlaskForm):
-    proceed = SelectField(
+    proceed = ValidateContentsSelectField(
         choices=[
             (YES, 'Yes and start processing'),
             (NO, 'No and return back to the beginning to try again'),
@@ -76,7 +90,7 @@ class VerifyDataFileForm(FlaskForm):
 
 
 class RestoreVersionForm(FlaskForm):
-    proceed = SelectField(
+    proceed = ValidateContentsSelectField(
         choices=[(YES, 'Restore'), (NO, 'Cancel')],
         label='Are you sure you want to restore this version of the data',
         validators=[DataRequired()],

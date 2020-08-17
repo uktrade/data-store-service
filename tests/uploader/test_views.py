@@ -89,7 +89,7 @@ def test_select_pipeline_view_radios_have_distinct_ids(
     )
     html = response.get_data(as_text=True)
     assert (
-        '<input class="govuk-radios__input" id="pipeline-0" name="pipeline" type="radio" value="1">'
+        '<input class="govuk-radios__input" id="pipeline" name="pipeline" type="radio" value="1">'
         in html
     )
     assert (
@@ -298,9 +298,33 @@ def test_get_data_verify_error_view(
     form = template_context['form']
     assert form.errors == {
         'non_field_errors': [
-            "Unable to process file - 'Error' codec can't decode bytes in position 1-1: "
+            (
+                "The CSV file could not be opened. "
+                "(Technical details: 'Error' codec can't decode bytes in position 1-1: )"
+            )
         ]
     }
+
+
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+@mock.patch('app.uploader.views.delete_file')
+@mock.patch('app.uploader.utils.open')
+def test_submit_data_verify_proceed_blank(
+    mock_open, mock_delete_file, is_authenticated, app_with_db, captured_templates
+):
+    csv_string = 'hello,goodbye\n1,2\n3,4'
+    mock_open.side_effect = [io.StringIO(csv_string), io.StringIO(csv_string)]
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    form_data = {}
+    response = client.post(
+        url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
+    )
+    html = response.get_data(as_text=True)
+    assert 'Confirm or reject the data file contents' in html
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
