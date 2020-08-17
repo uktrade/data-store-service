@@ -1,21 +1,19 @@
 import os
 import uuid
-from typing import Set
+from typing import List, Set
 
 from data_engineering.common.sso.token import login_required
-from flask import abort, redirect, render_template, url_for
+from flask import abort, redirect, render_template, request, url_for
 from flask import current_app as app
 from flask.blueprints import Blueprint
-from pandas import DataFrame
 from werkzeug.exceptions import BadRequest
 
-from app.constants import DataUploaderFileState, YES
+from app.constants import DataUploaderDataTypes, DataUploaderFileState, YES
 from app.db.models.internal import Pipeline, PipelineDataFile
 from app.uploader import forms
+from app.uploader.csv_parser import CSVParser
 from app.uploader.utils import (
     delete_file,
-    get_column_types,
-    get_s3_file_sample,
     process_pipeline_data_file,
     upload_file,
 )
@@ -65,7 +63,6 @@ def pipeline_create():
         pipeline = Pipeline(
             dataset=form.format(form.dataset.data),
             organisation=form.format(form.organisation.data),
-            column_types=[['temp', 'text']],  # temporary placeholder
         )
         pipeline.save()
         return redirect(url_for('uploader_views.pipeline_created', slug=pipeline.slug))
@@ -112,9 +109,9 @@ def pipeline_data_upload(slug):
     )
 
 
-def get_missing_headers(current_version: DataFrame, new_version: DataFrame) -> Set:
-    current_headers = set(str(k) for k in current_version.to_dict().keys())
-    new_headers = set(str(k) for k in new_version.to_dict().keys())
+def get_missing_headers(current_version: List, new_version: List) -> Set:
+    current_headers = set(header for header, _, _ in current_version)
+    new_headers = set(header for header, _, _ in new_version)
 
     return current_headers - new_headers
 
@@ -132,27 +129,26 @@ def pipeline_data_verify(slug, file_id):
         delete_file(pipeline_data_file)
         return redirect(url_for('uploader_views.pipeline_select'))
 
-    new_file_contents, new_file_err = get_s3_file_sample(
-        pipeline_data_file.data_file_url, pipeline.delimiter, pipeline.quote
+    new_file_contents, new_file_err = CSVParser.get_csv_sample(
+        pipeline_data_file.data_file_url, pipeline_data_file.delimiter, pipeline_data_file.quote
     )
 
-    current_file_contents, missing_headers = None, set()
+    current_file_contents, current_column_types, missing_headers = None, None, set()
     if pipeline.latest_version:
         data_file_latest = pipeline.latest_version
-        current_file_contents, current_file_err = get_s3_file_sample(
-            data_file_latest.data_file_url, pipeline.delimiter, pipeline.quote
+        current_file_contents, current_file_err = CSVParser.get_csv_sample(
+            data_file_latest.data_file_url, data_file_latest.delimiter, data_file_latest.quote
         )
-
         missing_headers = get_missing_headers(
             current_version=current_file_contents, new_version=new_file_contents
         )
-
-        if not current_file_contents.empty and not current_file_err:
-            current_file_contents = current_file_contents.to_dict()
+        current_column_types = dict(data_file_latest.column_types)
 
     if is_form_valid:
-        pipeline.column_types = get_column_types(new_file_contents)
-        pipeline.save()
+        selected_column_types = [
+            (column, request.form[column]) for column, _, _ in new_file_contents
+        ]
+        pipeline_data_file.column_types = selected_column_types
         pipeline_data_file.state = DataUploaderFileState.VERIFIED.value
         pipeline_data_file.save()
 
@@ -167,9 +163,7 @@ def pipeline_data_verify(slug, file_id):
             )
         )
 
-    elif not new_file_contents.empty and not new_file_err:
-        new_file_contents = new_file_contents.to_dict()
-    else:
+    elif new_file_err is not None:
         pipeline_data_file.state = DataUploaderFileState.FAILED.value
         pipeline_data_file.error_message = new_file_err
         pipeline_data_file.save()
@@ -179,6 +173,8 @@ def pipeline_data_verify(slug, file_id):
         pipeline=pipeline,
         new_file_contents=new_file_contents,
         current_file_contents=current_file_contents,
+        current_column_types=current_column_types,
+        data_types=DataUploaderDataTypes.values(),
         format_row_data=format_row_data,
         form=form,
         missing_headers=missing_headers,
@@ -194,18 +190,18 @@ def pipeline_restore_version(slug, file_id):
         return redirect(url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug,))
 
     data_file_latest = pipeline.latest_version
-    file_contents_latest, _ = get_s3_file_sample(
-        data_file_latest.data_file_url, pipeline.delimiter, pipeline.quote
+    file_contents_latest, _ = CSVParser.get_csv_sample(
+        data_file_latest.data_file_url, data_file_latest.delimiter, data_file_latest.quote
     )
 
     data_file_to_restore = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
-    file_contents_to_restore, _ = get_s3_file_sample(
-        data_file_to_restore.data_file_url, pipeline.delimiter, pipeline.quote
+    file_contents_to_restore, _ = CSVParser.get_csv_sample(
+        data_file_to_restore.data_file_url,
+        data_file_to_restore.delimiter,
+        data_file_to_restore.quote,
     )
 
     if is_form_valid:
-        pipeline.column_types = get_column_types(file_contents_to_restore)
-        pipeline.save()
         data_file_to_restore.state = DataUploaderFileState.VERIFIED.value
         data_file_to_restore.save()
 
@@ -220,23 +216,19 @@ def pipeline_restore_version(slug, file_id):
             )
         )
 
-    if not file_contents_latest.empty:
-        file_contents_latest = file_contents_latest.to_dict()
-
-    if not file_contents_to_restore.empty:
-        file_contents_to_restore = file_contents_to_restore.to_dict()
-
     return render_uploader_template(
         'pipeline_restore_version.html',
         form=form,
         file_contents_latest=file_contents_latest,
         file_contents_to_restore=file_contents_to_restore,
+        column_types_latest=dict(data_file_latest.column_types),
+        column_types_to_restore=dict(data_file_to_restore.column_types),
         format_row_data=format_row_data,
     )
 
 
 def format_row_data(row):
-    return ", ".join(row.values())
+    return ", ".join(row)
 
 
 @uploader_views.route('/data/<slug>/uploaded/<file_id>/')

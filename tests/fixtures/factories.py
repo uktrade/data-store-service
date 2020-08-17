@@ -531,6 +531,14 @@ class SPIREUltimateEndUserFactory(BaseFactory):
 class PipelineFactory(BaseFactory):
     organisation = factory.Faker('word')
     dataset = factory.Faker('word')
+
+    class Meta:
+        model = Pipeline
+
+
+class PipelineDataFileFactory(BaseFactory):
+    pipeline = factory.SubFactory(PipelineFactory)
+    data_file_url = factory.Faker('word')
     delimiter = factory.Faker('random_element', elements=[',', '\t', ';'])
     quote = factory.Faker('random_element', elements=['"', None])
 
@@ -545,14 +553,6 @@ class PipelineFactory(BaseFactory):
                 ]
             )
         return _types
-
-    class Meta:
-        model = Pipeline
-
-
-class PipelineDataFileFactory(BaseFactory):
-    pipeline = factory.SubFactory(PipelineFactory)
-    data_file_url = factory.Faker('word')
 
     class Meta:
         model = PipelineDataFile

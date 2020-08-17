@@ -33,10 +33,12 @@
         </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for column, data in file_contents_latest.items() %}
+    {% for column, _, data in file_contents_latest %}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">{{ column }}</th>
-            <td class="govuk-table__cell">text</td>
+            <td class="govuk-table__cell">
+                {{ column_types_latest[column][0]|upper}}{{column_types_latest[column][1:] }}
+            </td>
             <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
         </tr>
     {% endfor %}
@@ -53,10 +55,12 @@
         </tr>
     </thead>
     <tbody class="govuk-table__body">
-    {% for column, data in file_contents_to_restore.items() %}
+    {% for column, _, data in file_contents_to_restore %}
         <tr class="govuk-table__row">
             <th scope="row" class="govuk-table__header">{{ column }}</th>
-            <td class="govuk-table__cell">text</td>
+            <td class="govuk-table__cell">
+                {{ column_types_to_restore[column][0]|upper}}{{column_types_to_restore[column][1:] }}
+            </td>
             <td class="govuk-table__cell">{{ format_row_data(data) }}</td>
         </tr>
     {% endfor %}

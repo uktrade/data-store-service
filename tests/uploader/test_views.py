@@ -5,8 +5,10 @@ from unittest import mock
 import pytest
 from flask import template_rendered, url_for
 from slugify import slugify
+from tabulator import EncodingError, Stream
 
 from app.constants import (
+    DataUploaderDataTypes,
     DataUploaderFileState,
     NO,
     YES,
@@ -261,11 +263,12 @@ def test_get_data_upload_view(is_authenticated, app_with_db, captured_templates)
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-@mock.patch('app.uploader.utils.open')
-def test_get_data_verify_view(mock_smart_open, is_authenticated, app_with_db, captured_templates):
-    csv_string = 'hello,goodbye\n1,2\n3,4'
-    mock_smart_open.return_value = io.StringIO(csv_string)
-    data_file = PipelineDataFileFactory(pipeline__delimiter=',')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
+def test_get_data_verify_view(
+    mock_tabulator_stream, is_authenticated, app_with_db, captured_templates
+):
+    _mock_stream_return_values(mock_tabulator_stream, ['hello,goodbye\n1,2\n3,4'])
+    data_file = PipelineDataFileFactory(delimiter=',')
     client = get_client(app_with_db)
     url = url_for(
         'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
@@ -278,11 +281,11 @@ def test_get_data_verify_view(mock_smart_open, is_authenticated, app_with_db, ca
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
 def test_get_data_verify_error_view(
-    mock_smart_open, is_authenticated, app_with_db, captured_templates
+    mock_tabulator_stream, is_authenticated, app_with_db, captured_templates
 ):
-    mock_smart_open.side_effect = UnicodeDecodeError('Error', b'', 1, 2, '')
+    mock_tabulator_stream.side_effect = EncodingError('invalid encoding')
 
     data_file = PipelineDataFileFactory()
     client = get_client(app_with_db)
@@ -299,8 +302,8 @@ def test_get_data_verify_error_view(
     assert form.errors == {
         'non_field_errors': [
             (
-                "The CSV file could not be opened. "
-                "(Technical details: 'Error' codec can't decode bytes in position 1-1: )"
+                "Unable to process CSV file: the CSV file could not be opened. "
+                "(Technical details: invalid encoding)"
             )
         ]
     }
@@ -352,9 +355,9 @@ def test_submit_data_verify_proceed_no(
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.views.process_pipeline_data_file')
-@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
 def test_submit_data_verify_proceed_yes(
-    mock_smart_open,
+    mock_tabulator_stream,
     mock_process_pipeline_data_file,
     is_authenticated,
     app_with_db,
@@ -362,14 +365,13 @@ def test_submit_data_verify_proceed_yes(
 ):
     mock_thread = mock.Mock()
     mock_process_pipeline_data_file.return_value = mock_thread
-    csv_string = 'hello,goodbye\n1,2\n3,4'
-    mock_smart_open.return_value = io.StringIO(csv_string)
-    data_file = PipelineDataFileFactory(pipeline__delimiter=',')
+    _mock_stream_return_values(mock_tabulator_stream, 'hello,goodbye\n1,2\n3,4')
+    data_file = PipelineDataFileFactory(delimiter=',')
     client = get_client(app_with_db)
     url = url_for(
         'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
     )
-    form_data = {'proceed': YES}
+    form_data = {'proceed': YES, 'hello': 'integer', 'goodbye': 'integer'}
     response = client.post(
         url, data=form_data, follow_redirects=True, content_type='multipart/form-data'
     )
@@ -386,14 +388,14 @@ def test_submit_data_verify_proceed_yes(
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
 @mock.patch('app.uploader.views.upload_file')
 def test_submit_data_upload_view(
-    mock_upload_file, mock_smart_open, is_authenticated, app_with_db, captured_templates
+    mock_upload_file, mock_tabulator_stream, is_authenticated, app_with_db, captured_templates
 ):
     csv_string = 'hello,goodbye\n1,2\n3,4'
-    mock_smart_open.return_value = io.StringIO(csv_string)
-    pipeline = PipelineFactory(delimiter=",", quote='"')
+    _mock_stream_return_values(mock_tabulator_stream, [csv_string])
+    pipeline = PipelineFactory()
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
     form_data = {'csv_file': (io.BytesIO(bytes(csv_string, encoding='utf-8')), 'test.csv')}
@@ -406,24 +408,26 @@ def test_submit_data_upload_view(
 
     template, template_context = captured_templates.pop()
     file_contents = template_context['new_file_contents']
-    assert file_contents == {'goodbye': {0: '2', 1: '4'}, 'hello': {0: '1', 1: '3'}}
-
+    assert file_contents == [
+        ('hello', 'integer', ['1', '3']),
+        ('goodbye', 'integer', ['2', '4']),
+    ]
     assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
     assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
 @mock.patch('app.uploader.views.upload_file')
 def test_submit_data_upload_view_additional_dataset(
-    mock_upload_file, mock_smart_open, is_authenticated, app_with_db, captured_templates
+    mock_upload_file, mock_tabulator_stream, is_authenticated, app_with_db, captured_templates
 ):
     file_1_csv_string = 'hello,goodbye\n1,2\n3,4'
     file_2_csv_string = 'goodbye,hello\n1,2\n3,4'
 
-    mock_smart_open.return_value = io.StringIO(file_1_csv_string)
+    _mock_stream_return_values(mock_tabulator_stream, [file_1_csv_string])
     mock_upload_file.return_value = 'fakefile_1.csv'
-    pipeline = PipelineFactory(delimiter=",", quote='"')
+    pipeline = PipelineFactory()
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
 
@@ -438,13 +442,17 @@ def test_submit_data_upload_view_additional_dataset(
 
     template, template_context = captured_templates.pop()
     file_contents = template_context['new_file_contents']
-    assert file_contents == {'goodbye': {0: '2', 1: '4'}, 'hello': {0: '1', 1: '3'}}
+    assert file_contents == [
+        ('hello', 'integer', ['1', '3']),
+        ('goodbye', 'integer', ['2', '4']),
+    ]
+    assert template_context['data_types'] == DataUploaderDataTypes.values()
     assert len(pipeline.data_files) == 1
     assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
     assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
 
     # upload another file
-    mock_smart_open.side_effect = [io.StringIO(file_2_csv_string), io.StringIO(file_1_csv_string)]
+    _mock_stream_return_values(mock_tabulator_stream, [file_2_csv_string, file_1_csv_string])
     mock_upload_file.return_value = 'fakefile_2.csv'
 
     form_data = {'csv_file': (io.BytesIO(bytes(file_2_csv_string, encoding='utf-8')), 'test.csv')}
@@ -456,8 +464,11 @@ def test_submit_data_upload_view_additional_dataset(
     assert 'Data successfully uploaded' in html
 
     template, template_context = captured_templates.pop()
-    file_contents = template_context['new_file_contents']
-    assert file_contents == {'goodbye': {0: '1', 1: '3'}, 'hello': {0: '2', 1: '4'}}
+    assert template_context['new_file_contents'] == [
+        ('goodbye', 'integer', ['1', '3']),
+        ('hello', 'integer', ['2', '4']),
+    ]
+    assert template_context['data_types'] == DataUploaderDataTypes.values()
     assert len(pipeline.data_files) == 2
     assert pipeline.data_files[0].data_file_url.split("/")[1] == pipeline.organisation
     assert pipeline.data_files[0].data_file_url.split("/")[2] == pipeline.dataset
@@ -466,17 +477,17 @@ def test_submit_data_upload_view_additional_dataset(
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
 @mock.patch('app.uploader.views.upload_file')
 def test_submit_data_upload_view_where_new_file_is_missing_columns_present_in_previous_file(
-    mock_upload_file, mock_smart_open, is_authenticated, app_with_db, captured_templates
+    mock_upload_file, mock_tabulator_stream, is_authenticated, app_with_db, captured_templates
 ):
     file_1_csv_string = 'one,two\n1,2\n3,4'
     file_2_csv_string = 'two,three\n1,2\n3,4'
 
-    mock_smart_open.return_value = io.StringIO(file_1_csv_string)
+    _mock_stream_return_values(mock_tabulator_stream, [file_1_csv_string])
     mock_upload_file.return_value = 'fakefile_1.csv'
-    pipeline = PipelineFactory(delimiter=",", quote='"')
+    pipeline = PipelineFactory()
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
 
@@ -490,10 +501,11 @@ def test_submit_data_upload_view_where_new_file_is_missing_columns_present_in_pr
     assert 'Data successfully uploaded' in html
 
     # Mark the last upload as complete
+    pipeline.data_files[0].column_types = [('one', 'integer'), ('two', 'integer')]
     pipeline.data_files[0].state = DataUploaderFileState.COMPLETED.value
 
     # upload another file
-    mock_smart_open.side_effect = [io.StringIO(file_2_csv_string), io.StringIO(file_1_csv_string)]
+    _mock_stream_return_values(mock_tabulator_stream, [file_2_csv_string, file_1_csv_string])
     mock_upload_file.return_value = 'fakefile_2.csv'
 
     form_data = {'csv_file': (io.BytesIO(bytes(file_2_csv_string, encoding='utf-8')), 'test.csv')}
@@ -545,27 +557,29 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
 def test_get_restore_version_view(
-    mock_smart_open, is_authenticated, app_with_db, captured_templates
+    mock_tabulator_stream, is_authenticated, app_with_db, captured_templates
 ):
     csv_string_1 = 'hello,goodbye\n1,2\n3,4'  # latest
     csv_string_2 = 'hi,bye\n1,2\n3,4'  # version to restore
     # The view first gets the s3 sample of the latest version and then the version to restore
-    mock_smart_open.side_effect = [io.StringIO(csv_string_1), io.StringIO(csv_string_2)]
+    _mock_stream_return_values(mock_tabulator_stream, [csv_string_1, csv_string_2])
 
-    pipeline = PipelineFactory(delimiter=',')
+    pipeline = PipelineFactory()
     # Latest version
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
         processed_at=datetime.datetime(2020, 7, 1),
+        column_types=[('hello', 'integer'), ('goodbye', 'integer')],
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
         processed_at=datetime.datetime(2020, 6, 1),
+        column_types=[('hi', 'integer'), ('bye', 'integer')],
     )
 
     client = get_client(app_with_db)
@@ -585,9 +599,9 @@ def test_get_restore_version_view(
 
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
-@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
 def test_submit_restore_version_cancel(
-    mock_smart_open, is_authenticated, app_with_db, captured_templates
+    mock_tabulator_stream, is_authenticated, app_with_db, captured_templates
 ):
     pipeline = PipelineFactory()
     # Latest version
@@ -622,9 +636,9 @@ def test_submit_restore_version_cancel(
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.views.process_pipeline_data_file')
-@mock.patch('app.uploader.utils.open')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
 def test_submit_restore_version_proceed(
-    mock_smart_open,
+    mock_tabulator_stream,
     mock_process_pipeline_data_file,
     is_authenticated,
     app_with_db,
@@ -634,20 +648,22 @@ def test_submit_restore_version_proceed(
     mock_process_pipeline_data_file.return_value = mock_thread
     csv_string = 'hello,goodbye\n1,2\n3,4'
     # The view first gets the s3 sample of the latest version and then the version to restore
-    mock_smart_open.side_effect = [io.StringIO(csv_string), io.StringIO(csv_string)]
+    _mock_stream_return_values(mock_tabulator_stream, [csv_string, csv_string])
 
-    pipeline = PipelineFactory(delimiter=',')
+    pipeline = PipelineFactory()
     # Latest version
     PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
         processed_at=datetime.datetime(2020, 7, 1),
+        delimiter=',',
     )
     # Version that can be restored
     data_file_2 = PipelineDataFileFactory(
         pipeline=pipeline,
         state=DataUploaderFileState.COMPLETED.value,
         processed_at=datetime.datetime(2020, 6, 1),
+        delimiter=',',
     )
 
     client = get_client(app_with_db)
@@ -668,3 +684,20 @@ def test_submit_restore_version_proceed(
     )
     assert mock_process_pipeline_data_file.called is True
     assert mock_thread.start.called is True
+
+
+def _mock_stream_return_values(mock, csv_strings, sample_size=4):
+    streams = []
+    for s in csv_strings:
+        bio = io.BytesIO(bytes(s, encoding='utf-8'))
+        streams.append(
+            Stream(
+                bio,
+                format='csv',
+                headers=1,
+                sample_size=sample_size,
+                ignore_blank_headers=True,
+                force_parse=True,
+            )
+        )
+    mock.side_effect = streams
