@@ -6,7 +6,6 @@
 #
 alembic==1.4.2            # via flask-migrate
 appdirs==1.4.3            # via black
-appnope==0.1.0            # via ipython
 apscheduler==3.6.3        # via -r requirements.in
 attrs==19.3.0             # via black, jsonschema, pytest
 babel==2.8.0              # via flask-babelex
@@ -21,7 +20,7 @@ catalogue==1.0.0          # via spacy, thinc
 certifi==2019.11.28       # via data-engineering-common, requests, sentry-sdk
 chardet==3.0.4            # via requests, tabulator
 click==7.0                # via black, flask, flask-shell-ipython, pip-tools, tableschema, tabulator
-codecov==2.1.8            # via -r requirements.in
+codecov==2.1.9            # via -r requirements.in
 coverage==5.0.3           # via codecov, pytest-cov
 cymem==2.0.3              # via preshed, spacy, thinc
 git+https://github.com/uktrade/data-engineering-common.git@v1.2.3  # via -r requirements.in
