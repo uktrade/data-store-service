@@ -118,7 +118,7 @@ speaklater==1.3           # via flask-babelex
 sqlalchemy-utils==0.36.8  # via -r requirements.in, data-engineering-common
 sqlalchemy==1.3.18        # via -r requirements.in, alembic, flask-sqlalchemy, sqlalchemy-utils, tabulator
 srsly==1.0.2              # via spacy, thinc
-tableschema==1.19.2       # via -r requirements.in
+tableschema==1.19.3       # via -r requirements.in
 tabulator==1.52.3         # via -r requirements.in, tableschema
 text-unidecode==1.3       # via faker, python-slugify
 thinc==7.4.1              # via spacy
