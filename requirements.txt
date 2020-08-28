@@ -75,7 +75,7 @@ numpy==1.19.1             # via -r requirements.in, blis, data-engineering-commo
 oauthlib==2.1.0           # via flask-oauthlib, requests-oauthlib
 openpyxl==3.0.4           # via tabulator
 packaging==20.1           # via pytest
-pandas==1.1.0             # via -r requirements.in, data-engineering-common
+pandas==1.1.1             # via -r requirements.in, data-engineering-common
 parso==0.6.0              # via jedi
 passlib==1.7.2            # via flask-security
 pathspec==0.7.0           # via black
