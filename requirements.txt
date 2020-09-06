@@ -44,7 +44,7 @@ flask-shell-ipython==0.4.1  # via -r requirements.in
 flask-sqlalchemy==2.4.4   # via -r requirements.in, data-engineering-common, flask-migrate
 flask-wtf==0.14.3         # via -r requirements.in, flask-security
 flask==1.1.1              # via -r requirements.in, data-engineering-common, flask-babelex, flask-login, flask-mail, flask-migrate, flask-oauthlib, flask-principal, flask-security, flask-shell-ipython, flask-sqlalchemy, flask-wtf, sentry-sdk
-freezegun==0.3.15         # via -r requirements.in, data-engineering-common
+freezegun==1.0.0          # via -r requirements.in, data-engineering-common
 fuzzywuzzy==0.18.0        # via -r requirements.in
 gevent==20.6.2            # via gunicorn
 greenlet==0.4.16          # via gevent
@@ -112,7 +112,7 @@ requests==2.22.0          # via codecov, data-engineering-common, requests-oauth
 rfc3986==1.4.0            # via tableschema
 s3transfer==0.3.2         # via boto3
 sentry_sdk[flask]==0.16.5  # via -r requirements.in
-six==1.14.0               # via apscheduler, freezegun, isodate, jsonlines, jsonschema, linear-tsv, mohawk, packaging, pip-tools, pyrsistent, python-dateutil, sqlalchemy-utils, tableschema, tabulator, traitlets
+six==1.14.0               # via apscheduler, isodate, jsonlines, jsonschema, linear-tsv, mohawk, packaging, pip-tools, pyrsistent, python-dateutil, sqlalchemy-utils, tableschema, tabulator, traitlets
 spacy==2.3.2              # via -r requirements.in
 speaklater==1.3           # via flask-babelex
 sqlalchemy-utils==0.36.8  # via -r requirements.in, data-engineering-common
