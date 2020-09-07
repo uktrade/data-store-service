@@ -3,7 +3,7 @@ services:
   dss_web:
     build: .
     environment:
-      - DOCKER=1
+      - USE_DOTENV=1
     env_file:
       - ${ENV_FILE:-.env}
     ports:
