@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 from app.etl.pipeline_type.base import LDataPipeline
+from app.utils import trigger_dataflow_dag
 
 
 class L0IncrementalDataPipeline(LDataPipeline):
@@ -94,7 +95,7 @@ class L0IncrementalDataPipeline(LDataPipeline):
         self.dbi.execute_statement(stmt)
 
     def trigger_dataflow_dag(self):
-        self._trigger_dataflow_dag(self.schema, self.L0_TABLE)
+        return trigger_dataflow_dag(self.schema, self.L0_TABLE)
 
 
 class L1IncrementalDataPipeline(L0IncrementalDataPipeline):
@@ -186,4 +187,4 @@ class L1IncrementalDataPipeline(L0IncrementalDataPipeline):
         self.dbi.execute_statement(stmt)
 
     def trigger_dataflow_dag(self):
-        self._trigger_dataflow_dag(self.schema, self.L1_TABLE)
+        return trigger_dataflow_dag(self.schema, self.L1_TABLE)
