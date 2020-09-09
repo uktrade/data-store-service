@@ -9,7 +9,9 @@ from tqdm import tqdm
 from app.constants import DatafileState
 from app.db.models.internal import DatafileRegistryModel
 
-PipelineConfig = namedtuple('PipelineConfig', 'pipeline sub_directory force')
+PipelineConfig = namedtuple(
+    'PipelineConfig', 'pipeline sub_directory force unpack trigger_dataflow_dag'
+)
 
 
 class DSSDatafileProvider(DatafileProvider):
@@ -54,6 +56,7 @@ class Manager:
     def pipeline_process(self, pipeline_id, progress_bar=None):
         pipeline_config = self.pipeline_get(pipeline_id)
         pipeline = pipeline_config.pipeline
+        data_changed = False
         if pipeline_config.sub_directory:
             storage = self.storage.get_sub_storage(pipeline_config.sub_directory)
             dfp = DSSDatafileProvider(storage)
@@ -66,17 +69,19 @@ class Manager:
                     and pipeline_config.force is False
                 ):
                     continue
-                file_info = next(dfp.read_files(file_name, unpack=True))
-                self._update_registry_and_process(
+                file_info = next(dfp.read_files(file_name, unpack=pipeline_config.unpack))
+                data_changed = self._update_registry_and_process(
                     pipeline=pipeline,
                     orig_file_name=file_name,
                     file_info=file_info,
                     progress_bar=progress_bar,
                 )
         else:
-            self._update_registry_and_process(
+            data_changed = self._update_registry_and_process(
                 pipeline=pipeline, progress_bar=progress_bar,
             )
+        if data_changed and pipeline_config.trigger_dataflow_dag:
+            pipeline.trigger_dataflow_dag()
 
     @staticmethod
     def _update_registry_and_process(
@@ -85,11 +90,13 @@ class Manager:
         if progress_bar:
             progress_bar.set_postfix(str=orig_file_name or pipeline.id)
         entry = None
+        data_changed = False
         try:
             entry, _ = DatafileRegistryModel.get_update_or_create(
                 source=pipeline.id, file_name=orig_file_name, state=DatafileState.PROCESSING.value,
             )
             pipeline.process(file_info)
+            data_changed = True
             entry.state = DatafileState.PROCESSED.value
             entry.save()
         except Exception as e:
@@ -98,6 +105,7 @@ class Manager:
                 entry.error_message = str(e)
                 entry.save()
             flask_app.logger.error(f'pipeline processing failed: {e}')
+        return data_changed
 
     def pipeline_process_all(self):
         progress = tqdm(self._pipelines.keys())
@@ -129,7 +137,11 @@ class Manager:
         if pipeline_id in self._pipelines:
             raise ValueError(f'{pipeline_id} pipeline is already registered')
         force = kwargs.get('force', False)
-        self._pipelines[pipeline_id] = PipelineConfig(po, sub_directory, force)
+        unpack = kwargs.get('unpack', True)
+        trigger_dataflow_dag = kwargs.get('trigger_dataflow_dag', False)
+        self._pipelines[pipeline_id] = PipelineConfig(
+            po, sub_directory, force, unpack, trigger_dataflow_dag
+        )
 
     def pipeline_remove(self, pipeline):
         """ Remove this pipeline.

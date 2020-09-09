@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from app.etl.pipeline_type.snapshot_data import L0SnapshotDataPipeline
+from app.utils import trigger_dataflow_dag
 
 
 class DSVToTablePipeline(L0SnapshotDataPipeline):
@@ -34,3 +35,6 @@ class DSVToTablePipeline(L0SnapshotDataPipeline):
     @property
     def _l0_data_column_types(self):
         return self._data_column_types
+
+    def trigger_dataflow_dag(self):
+        return trigger_dataflow_dag(self.schema, self.L0_TABLE)

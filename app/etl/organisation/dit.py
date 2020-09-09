@@ -1,10 +1,10 @@
 from io import BytesIO
 
-from app.etl.pipeline_type.incremental_data import IncrementalDataPipeline
+from app.etl.pipeline_type.incremental_data import L1IncrementalDataPipeline
 from app.etl.pipeline_type.snapshot_data import L1SnapshotDataPipeline
 
 
-class DITBACIPipeline(IncrementalDataPipeline):
+class DITBACIPipeline(L1IncrementalDataPipeline):
     organisation = 'dit'
     dataset = 'baci'
 

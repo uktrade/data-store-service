@@ -51,7 +51,11 @@ class TestETLManager:
     def test_transform_pipeline_process(self, app_with_db):
         manager = Manager(dbi=app_with_db.dbi)
         manager._pipelines['fake_pipeline'] = PipelineConfig(
-            pipeline=FakePipeline(1234), sub_directory=None, force=False
+            pipeline=FakePipeline(1234),
+            sub_directory=None,
+            force=False,
+            unpack=False,
+            trigger_dataflow_dag=False,
         )
         manager.pipeline_process('fake_pipeline')
         actual_data_file_registry_list = DatafileRegistryModel.query.all()
@@ -96,6 +100,8 @@ class TestETLManager:
             pipeline=FakePipeline(1234, raise_processing_exception=raise_exception),
             sub_directory='/tmp/fake_pipeline',
             force=False,
+            unpack=False,
+            trigger_dataflow_dag=False,
         )
         manager.pipeline_process('fake_pipeline')
         actual_data_file_registry_list = DatafileRegistryModel.query.all()
@@ -121,22 +127,40 @@ class TestETLManager:
     def test_pipeline_register(self):
         manager = Manager()
         manager.pipeline_register(
-            'test_pipeline', pipeline_id='fake_pipeline', custom_parameter=True, force=True
+            'test_pipeline',
+            pipeline_id='fake_pipeline',
+            custom_parameter=True,
+            force=True,
+            unpack=True,
+            trigger_dataflow_dag=True,
         )
         assert len(manager._pipelines) == 1
-        self.assert_pipeline_config(manager, 'fake_pipeline', True, 'test_pipeline', None)
+        self.assert_pipeline_config(
+            manager, 'fake_pipeline', True, 'test_pipeline', None, True, True
+        )
 
     def test_pipeline_register_when_already_registered(self):
         manager = Manager()
         manager.pipeline_register('test_pipeline', pipeline_id='fake_pipeline')
         with pytest.raises(ValueError):
             manager.pipeline_register('test_pipeline', pipeline_id='fake_pipeline')
-        self.assert_pipeline_config(manager, 'fake_pipeline', False, 'test_pipeline', None)
+        self.assert_pipeline_config(
+            manager, 'fake_pipeline', False, 'test_pipeline', None, True, False
+        )
 
     def assert_pipeline_config(
-        self, manager, pipeline, expected_force, expected_pipeline, expected_sub_directory
+        self,
+        manager,
+        pipeline,
+        expected_force,
+        expected_pipeline,
+        expected_sub_directory,
+        expected_unpack,
+        expected_trigger_dataflow_dag,
     ):
         assert pipeline in manager._pipelines
         assert manager._pipelines[pipeline].force == expected_force
         assert manager._pipelines[pipeline].pipeline == expected_pipeline
         assert manager._pipelines[pipeline].sub_directory == expected_sub_directory
+        assert manager._pipelines[pipeline].unpack == expected_unpack
+        assert manager._pipelines[pipeline].trigger_dataflow_dag == expected_trigger_dataflow_dag

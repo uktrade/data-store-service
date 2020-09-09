@@ -1,2 +1,0 @@
-app:
-  database_url: postgresql://postgres:postgres@dss_postgres/postgres

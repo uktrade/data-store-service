@@ -13,9 +13,11 @@ from data_engineering.common.db.models import (
 from sqlalchemy import Index
 
 from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
-from app.etl.organisation.dit import DITBACIPipeline
-from app.etl.organisation.dit import DITEUCountryMembershipPipeline
-from app.etl.organisation.dit import DITReferencePostcodesPipeline
+from app.etl.organisation.dit import (
+    DITBACIPipeline,
+    DITEUCountryMembershipPipeline,
+    DITReferencePostcodesPipeline,
+)
 from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
 from app.etl.organisation.world_bank import (
     WorldBankBoundRatesPipeline,

@@ -1,18 +1,16 @@
-import json
 import os.path
 import time
 from threading import Thread
 
-import requests
 from datatools.io.fileinfo import FileInfo
 from datatools.io.storage import StorageFactory
 from flask import copy_current_request_context, current_app as app
-from mohawk import Sender
 from sqlalchemy.sql.functions import now
 
 from app.constants import DataUploaderFileState
 from app.etl.pipeline_type.dsv_to_table import DSVToTablePipeline
 from app.uploader.csv_parser import CSVParser
+from app.utils import check_dataflow_dag_progress
 
 
 def upload_file(file_name, stream):
@@ -99,14 +97,12 @@ def process_pipeline_data_file(pipeline_data_file):
 
     @copy_current_request_context
     def _trigger_dag(
-        dataflow_source_url, dag_config, dataflow_hawk_creds, pipeline_data_file,
+        pipeline, pipeline_data_file,
     ):
         try:
             pipeline_data_file.state = DataUploaderFileState.PROCESSING_DATAFLOW.value
             pipeline_data_file.save()
-            response = hawk_api_request(
-                dataflow_source_url, "POST", dataflow_hawk_creds, dag_config
-            )
+            response = pipeline.trigger_dataflow_dag()
             run_id = response['run_id'].split('__')[1].split('+')[0]
             state = 'running'
             count = 0
@@ -114,9 +110,7 @@ def process_pipeline_data_file(pipeline_data_file):
                 if count > 360:  # stop waiting after 30 mins
                     raise Exception("We can't wait forever for airflow task completion!")
                 time.sleep(5)
-                response = hawk_api_request(
-                    f'{dataflow_source_url}/{run_id}', "GET", dataflow_hawk_creds,
-                )
+                response = check_dataflow_dag_progress(run_id)
                 state = response['state']
                 count += 1
             if state == 'success':
@@ -131,25 +125,9 @@ def process_pipeline_data_file(pipeline_data_file):
             pipeline_data_file.save()
             raise
 
-    dag_id = app.config['dataflow']['data_uploader_dag_id']
-    base_url = app.config['dataflow']['base_url']
-    dataflow_source_url = f"{base_url}/api/experimental/dags/{dag_id}/dag_runs"
-    dag_config = {
-        'conf': {
-            'data_uploader_schema_name': dsv_pipeline.schema,
-            'data_uploader_table_name': dsv_pipeline.L0_TABLE,
-        }
-    }
-    dataflow_hawk_creds = {
-        "id": app.config['dataflow']['hawk_id'],
-        "key": app.config['dataflow']['hawk_key'],
-        "algorithm": "sha256",
-    }
     _trigger_dag_params = {
+        'pipeline': dsv_pipeline,
         'pipeline_data_file': pipeline_data_file,
-        'dataflow_source_url': dataflow_source_url,
-        'dag_config': dag_config,
-        'dataflow_hawk_creds': dataflow_hawk_creds,
     }
 
     thread = PipelineThread(
@@ -157,26 +135,3 @@ def process_pipeline_data_file(pipeline_data_file):
         trigger_dag=(_trigger_dag, _trigger_dag_params),
     )
     return thread
-
-
-def hawk_api_request(
-    url, method, credentials, body=None,
-):
-    if body:
-        body = json.dumps(body)
-    auth_header = Sender(
-        credentials,
-        url,
-        method.lower(),
-        content_type="application/json" if body else None,
-        content=body,
-    ).request_header
-
-    headers = {"Authorization": auth_header}
-    if body:
-        headers["Content-Type"] = "application/json"
-    response = requests.request(method, url, data=body, headers=headers,)
-
-    response.raise_for_status()
-    response_json = response.json()
-    return response_json

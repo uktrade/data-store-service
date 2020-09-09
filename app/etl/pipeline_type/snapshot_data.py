@@ -1,6 +1,7 @@
 from abc import abstractmethod
 
 from app.etl.pipeline_type.base import LDataPipeline
+from app.utils import trigger_dataflow_dag
 
 
 class L0SnapshotDataPipeline(LDataPipeline):
@@ -142,6 +143,9 @@ class L0SnapshotDataPipeline(LDataPipeline):
                 """
         self.dbi.execute_statement(delete)
 
+    def trigger_dataflow_dag(self):
+        return trigger_dataflow_dag(self.schema, self.L0_TABLE)
+
 
 class L1SnapshotDataPipeline(L0SnapshotDataPipeline):
     """ Abstract class for standard pipelines that ingest data snapshots
@@ -248,3 +252,6 @@ class L1SnapshotDataPipeline(L0SnapshotDataPipeline):
             )
         """
         self.dbi.execute_statement(delete)
+
+    def trigger_dataflow_dag(self):
+        return trigger_dataflow_dag(self.schema, self.L1_TABLE)

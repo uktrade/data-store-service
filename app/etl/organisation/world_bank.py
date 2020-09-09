@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
 from app.etl.organisation.dit import DITEUCountryMembershipPipeline
-from app.etl.pipeline_type.incremental_data import IncrementalDataPipeline
+from app.etl.pipeline_type.incremental_data import L1IncrementalDataPipeline
 from app.etl.pipeline_type.snapshot_data import L1SnapshotDataPipeline
 
 
@@ -78,7 +78,7 @@ class WorldBankBoundRatesPipeline(L1SnapshotDataPipeline):
         self.dbi.execute_statement(stmt)
 
 
-class WorldBankTariffPipeline(IncrementalDataPipeline):
+class WorldBankTariffPipeline(L1IncrementalDataPipeline):
     organisation = 'world_bank'
     dataset = 'tariff'
 
@@ -120,7 +120,7 @@ class WorldBankTariffPipeline(IncrementalDataPipeline):
         pass
 
 
-class WorldBankTariffTransformPipeline(IncrementalDataPipeline):
+class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     organisation = WorldBankTariffPipeline.organisation
     dataset = WorldBankTariffPipeline.dataset
     subdataset = 'transformed'
