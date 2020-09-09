@@ -114,7 +114,7 @@ requests-oauthlib==1.1.0  # via -r requirements.in, data-engineering-common, fla
 requests==2.22.0          # via codecov, data-engineering-common, requests-oauthlib, spacy, tableschema, tabulator
 rfc3986==1.4.0            # via tableschema
 s3transfer==0.3.2         # via boto3
-sentry_sdk[flask]==0.16.5  # via -r requirements.in
+sentry_sdk[flask]==0.17.3  # via -r requirements.in
 six==1.14.0               # via apscheduler, freezegun, isodate, jsonlines, jsonschema, linear-tsv, mohawk, packaging, pip-tools, pyrsistent, python-dateutil, sqlalchemy-utils, tableschema, tabulator, traitlets
 soupsieve==2.0.1          # via beautifulsoup4
 spacy==2.3.2              # via -r requirements.in
