@@ -695,7 +695,8 @@ class TestWorldBankTariffPipeline:
         ) as mock_get_products:
             mock_get_products.return_value = [['201']]
             with mock.patch(
-                'app.etl.organisation.world_bank.WorldBankTariffTransformPipeline.finish_processing'
+                'app.etl.organisation.world_bank.WorldBankTariffTransformPipeline'
+                '.finish_processing'
             ) as mock_finish_processing:
                 mock_finish_processing.return_value = None
 

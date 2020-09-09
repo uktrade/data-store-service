@@ -38,6 +38,7 @@ from app.commands.dev.datafiles_to_db_by_source import (
     WorldBankTariffPipeline,
     WorldBankTariffTransformPipeline,
 )
+from app.etl.organisation.companies_house import CompaniesHouseAccountsPipeline
 
 
 class TestDataFileToDBBySource:
@@ -285,6 +286,15 @@ class TestDataFileToDBBySource:
                         'sub_directory': 'dit/spire/ultimate_end_user',
                         'pipeline': SPIREUltimateEndUserPipeline,
                     },
+                    {
+                        'continue_transform': False,
+                        'force': False,
+                        'products': None,
+                        'unpack': False,
+                        'trigger_dataflow_dag': True,
+                        'sub_directory': 'companies_house/accounts/',
+                        'pipeline': CompaniesHouseAccountsPipeline,
+                    },
                 ],
                 True,
                 None,
@@ -438,6 +448,22 @@ class TestDataFileToDBBySource:
                         'products': '1234,5623',
                         'sub_directory': None,
                         'pipeline': WorldBankTariffTransformPipeline,
+                    },
+                ],
+                True,
+                None,
+            ),
+            (
+                ['--companies_house.accounts', '--force'],
+                [
+                    {
+                        'continue_transform': False,
+                        'force': True,
+                        'products': None,
+                        'unpack': False,
+                        'trigger_dataflow_dag': True,
+                        'sub_directory': 'companies_house/accounts/',
+                        'pipeline': CompaniesHouseAccountsPipeline,
                     },
                 ],
                 True,
