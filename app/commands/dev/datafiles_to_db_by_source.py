@@ -64,7 +64,7 @@ arg_to_pipeline_config_list = {
         (ComtradeCountryCodeAndISOPipeline, 'comtrade/country_code_and_iso', {}),
         (WorldBankBoundRatesPipeline, 'world_bank/bound_rates', {}),
         (WorldBankTariffPipeline, 'world_bank/tariff', {}),
-        (WorldBankTariffTransformPipeline, None, {}),
+        (WorldBankTariffTransformPipeline, None, {'required_flag': 'transform'}),
     ],
     SPIREPipeline.data_source: [
         (SPIREBatchPipeline, 'dit/spire/batch', {}),
@@ -108,6 +108,9 @@ arg_to_pipeline_config_list = {
 @click.option('--all', is_flag=True, help='ingest datafile into the DB')
 @click.option('--force', is_flag=True, help='Force pipeline')
 @click.option(
+    '--transform', is_flag=True, help='Executes transform [World bank tariff pipelines ' 'only]'
+)
+@click.option(
     '--continue', is_flag=True, help='Continue transform [World bank tariff pipelines ' 'only]'
 )
 @click.option(
@@ -128,16 +131,18 @@ def datafiles_to_db_by_source(**kwargs):
         manager = PipelineManager(storage=get_source_folder(), dbi=app.dbi)
         for _arg, pipeline_info_list in arg_to_pipeline_config_list.items():
             arg = _arg.replace(".", "__")
-            if (kwargs['all'] and _arg) or kwargs[arg]:
+            if kwargs['all'] or kwargs[arg]:
                 for pipeline, sub_dir, options in pipeline_info_list:
-                    manager.pipeline_register(
-                        pipeline=pipeline,
-                        sub_directory=sub_dir,
-                        force=kwargs['force'],
-                        continue_transform=kwargs['continue'],
-                        products=kwargs['products'],
-                        **options,
-                    )
+                    required_flag = options.get('required_flag', None)
+                    if not required_flag or kwargs.get(required_flag, False):
+                        manager.pipeline_register(
+                            pipeline=pipeline,
+                            sub_directory=sub_dir,
+                            force=kwargs['force'],
+                            continue_transform=kwargs['continue'],
+                            products=kwargs['products'],
+                            **options,
+                        )
         manager.pipeline_process_all()
 
 
