@@ -108,13 +108,6 @@ class TestDataFileToDBBySource:
                         'continue_transform': False,
                         'force': False,
                         'products': None,
-                        'sub_directory': None,
-                        'pipeline': WorldBankTariffTransformPipeline,
-                    },
-                    {
-                        'continue_transform': False,
-                        'force': False,
-                        'products': None,
                         'sub_directory': 'dit/spire/application',
                         'pipeline': SPIREApplicationPipeline,
                     },
@@ -330,13 +323,6 @@ class TestDataFileToDBBySource:
                         'sub_directory': 'world_bank/tariff',
                         'pipeline': WorldBankTariffPipeline,
                     },
-                    {
-                        'continue_transform': False,
-                        'force': False,
-                        'products': None,
-                        'sub_directory': None,
-                        'pipeline': WorldBankTariffTransformPipeline,
-                    },
                 ],
                 True,
                 None,
@@ -370,7 +356,7 @@ class TestDataFileToDBBySource:
                 None,
             ),
             (
-                ['--world_bank.tariff', '--continue'],
+                ['--world_bank.tariff', '--continue', '--transform'],
                 [
                     {
                         'continue_transform': True,
@@ -401,6 +387,7 @@ class TestDataFileToDBBySource:
                         'pipeline': WorldBankTariffPipeline,
                     },
                     {
+                        'required_flag': 'transform',
                         'continue_transform': True,
                         'force': False,
                         'products': None,
@@ -412,7 +399,7 @@ class TestDataFileToDBBySource:
                 None,
             ),
             (
-                ['--world_bank.tariff', '--products', '1234,5623'],
+                ['--world_bank.tariff', '--products', '1234,5623', '--transform'],
                 [
                     {
                         'continue_transform': False,
@@ -443,6 +430,7 @@ class TestDataFileToDBBySource:
                         'pipeline': WorldBankTariffPipeline,
                     },
                     {
+                        'required_flag': 'transform',
                         'continue_transform': False,
                         'force': False,
                         'products': '1234,5623',
