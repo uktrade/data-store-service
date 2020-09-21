@@ -7,9 +7,11 @@ from flask.cli import with_appcontext
 
 from app.downloader.manager import Manager as DownloadManager
 from app.downloader.web.companies_house import CompaniesHouseAccounts
+from app.downloader.web.hmrc import HMRCExporters
 
 arg_to_downloader_info_list = {
-    'companies_house.accounts': (CompaniesHouseAccounts, 'companies_house/accounts/')
+    'companies_house.accounts': (CompaniesHouseAccounts, 'companies_house/accounts/'),
+    'hmrc.exporters': (HMRCExporters, 'hmrc/exporters/'),
 }
 
 
