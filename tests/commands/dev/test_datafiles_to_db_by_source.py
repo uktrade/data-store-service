@@ -39,6 +39,7 @@ from app.commands.dev.datafiles_to_db_by_source import (
     WorldBankTariffTransformPipeline,
 )
 from app.etl.organisation.companies_house import CompaniesHouseAccountsPipeline
+from app.etl.organisation.hmrc import HMRCExportersPipeline
 
 
 class TestDataFileToDBBySource:
@@ -288,6 +289,15 @@ class TestDataFileToDBBySource:
                         'sub_directory': 'companies_house/accounts/',
                         'pipeline': CompaniesHouseAccountsPipeline,
                     },
+                    {
+                        'continue_transform': False,
+                        'force': False,
+                        'products': None,
+                        'unpack': False,
+                        'trigger_dataflow_dag': True,
+                        'sub_directory': 'hmrc/exporters/',
+                        'pipeline': HMRCExportersPipeline,
+                    },
                 ],
                 True,
                 None,
@@ -452,6 +462,22 @@ class TestDataFileToDBBySource:
                         'trigger_dataflow_dag': True,
                         'sub_directory': 'companies_house/accounts/',
                         'pipeline': CompaniesHouseAccountsPipeline,
+                    },
+                ],
+                True,
+                None,
+            ),
+            (
+                ['--hmrc.exporters'],
+                [
+                    {
+                        'continue_transform': False,
+                        'force': False,
+                        'products': None,
+                        'unpack': False,
+                        'trigger_dataflow_dag': True,
+                        'sub_directory': 'hmrc/exporters/',
+                        'pipeline': HMRCExportersPipeline,
                     },
                 ],
                 True,

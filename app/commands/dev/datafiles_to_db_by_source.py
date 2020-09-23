@@ -12,6 +12,7 @@ from app.etl.organisation.dit import (
     DITEUCountryMembershipPipeline,
     DITReferencePostcodesPipeline,
 )
+from app.etl.organisation.hmrc import HMRCExportersPipeline
 from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
 from app.etl.organisation.spire import (
     SPIREApplicationAmendmentPipeline,
@@ -99,6 +100,9 @@ arg_to_pipeline_config_list = {
             'companies_house/accounts/',
             {'unpack': False, 'trigger_dataflow_dag': True},
         ),
+    ],
+    HMRCExportersPipeline.data_source: [
+        (HMRCExportersPipeline, 'hmrc/exporters/', {'unpack': False, 'trigger_dataflow_dag': True},)
     ],
 }
 
