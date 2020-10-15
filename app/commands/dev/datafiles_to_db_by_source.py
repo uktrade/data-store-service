@@ -54,7 +54,7 @@ arg_to_pipeline_config_list = {
     # except when multiple format versions are supported or
     # pipelines are dependent on other pipelines
     ONSPostcodeDirectoryPipeline.data_source: [
-        (ONSPostcodeDirectoryPipeline, 'ons/postcode_directory/', {})
+        (ONSPostcodeDirectoryPipeline, 'ons/postcode_directory/', {'unpack': False})
     ],
     DITReferencePostcodesPipeline.data_source: [
         (DITReferencePostcodesPipeline, 'dit/reference_postcodes', {})

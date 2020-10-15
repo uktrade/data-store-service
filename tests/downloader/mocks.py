@@ -4,6 +4,8 @@ from unittest.mock import MagicMock
 
 import requests
 
+from app.downloader.inspector import DataUrl, SeleniumOnlineInspector
+
 
 def storage_mock(s3_keys_returned=None):
     # patch s3 storage
@@ -44,3 +46,20 @@ def request_mock(mocker, url_reponse_dict):
 
     retrieved_json_mock = mocker.patch.object(requests, 'get', side_effect=return_data)
     return retrieved_json_mock
+
+
+def inspect_online_selenium_mock(mocker, url_reponse_dict):
+
+    mock = mocker.patch.object(SeleniumOnlineInspector, 'get_all_data_urls', autospec=True)
+    mock.inspected_urls = []
+
+    def get_all_data_urls(self):
+        mock.inspected_urls.append(self.url)
+        if self.url in url_reponse_dict.keys():
+            for target_url, target_date in url_reponse_dict[self.url]:
+                yield DataUrl(target_url, target_date)
+        else:
+            raise ValueError('No valid links found.')
+
+    mock.side_effect = get_all_data_urls
+    return mock

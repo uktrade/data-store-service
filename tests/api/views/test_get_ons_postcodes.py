@@ -1,6 +1,7 @@
 from tests.api.views import make_hawk_auth_request
 
 ONS_POSTCODE_FIELDS = [
+    'id',
     'pcd',
     'pcd2',
     'pcds',
@@ -51,6 +52,7 @@ ONS_POSTCODE_FIELDS = [
     'imd',
     'calncv',
     'stp',
+    'publication_date',
 ]
 
 
@@ -70,7 +72,8 @@ def test_get_ons_postcodes(app_with_hawk_user, app_with_mock_cache, add_ons_post
     client = app_with_hawk_user.test_client()
 
     expected_result = [None] * len(ONS_POSTCODE_FIELDS)
-    expected_result[2] = postcode
+    expected_result[0] = 1
+    expected_result[3] = postcode
 
     response = make_hawk_auth_request(client, '/api/v1/get-ons-postcodes/')
 
@@ -91,7 +94,8 @@ def test_get_ons_postcodes_next_url(app_with_hawk_user, app_with_mock_cache, add
     client = app_with_hawk_user.test_client()
 
     expected_result = [None] * len(ONS_POSTCODE_FIELDS)
-    expected_result[2] = postcode_1
+    expected_result[0] = 1
+    expected_result[3] = postcode_1
 
     response = make_hawk_auth_request(client, '/api/v1/get-ons-postcodes/')
     assert response.status_code == 200
@@ -113,7 +117,8 @@ def test_get_ons_postcodes_when_next_id_specified(
     client = app_with_hawk_user.test_client()
 
     expected_result = [None] * len(ONS_POSTCODE_FIELDS)
-    expected_result[2] = postcode_2
+    expected_result[0] = 2
+    expected_result[3] = postcode_2
 
     response = make_hawk_auth_request(client, '/api/v1/get-ons-postcodes/?next-id=2')
     assert response.status_code == 200

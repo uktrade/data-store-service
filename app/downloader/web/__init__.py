@@ -4,7 +4,7 @@ from abc import abstractmethod
 import requests
 
 from app.downloader.abstract_datasource import AbstractDataSource
-from app.downloader.inspector import OnlineInspector, StorageInspector
+from app.downloader.inspector import OnlineInspector, SeleniumOnlineInspector, StorageInspector
 
 
 class WebScrapingDataSource(AbstractDataSource):
@@ -59,6 +59,51 @@ class WebScrapingDataSource(AbstractDataSource):
 
     def update(self):
         new_url = self._get_new_online_data_url()
-
         if new_url:
             self._download_data_url(new_url)
+
+
+class ONSGeoPortalWebScrapingDataSource(WebScrapingDataSource):
+    @property
+    @abstractmethod
+    def download_link_xpath(self):
+        ...
+
+    @property
+    @abstractmethod
+    def download_link_date_format(self):
+        ...
+
+    @property
+    def _online_inspector(self):
+        return SeleniumOnlineInspector(
+            url=self.download_url,
+            download_link_regex=self.download_link_regex,
+            download_link_xpath=self.download_link_xpath,
+            file_date_format=self.download_link_date_format,
+        )
+
+    @property
+    def _storage_inspector(self):
+        return StorageInspector(
+            storage=self.storage,
+            file_regex=self.storage_file_regex,
+            file_date_format=self.storage_file_date_format,
+        )
+
+    def _download_data_url(self, data_url):
+        date_str = data_url.date.strftime(self.storage_file_date_format).upper()
+        file_name = self.storage_file_format.format(date=date_str)
+        download_url = self._get_download_url(data_url.url)
+        r = requests.get(download_url)
+        self.storage.write_file(file_name, r.content)
+
+    def _get_download_url(self, item_url):
+        inspector = SeleniumOnlineInspector(
+            url=item_url,
+            download_link_regex='(.*)',
+            download_link_xpath="//a[@id='simple-download-button']",
+            file_date_format=None,
+        )
+        download_urls = list(inspector.get_all_data_urls())
+        return download_urls[0].url
