@@ -58,3 +58,9 @@ An s3 bucket can be created using the Cloud Foundry command line tools, e.g.
 
 Reference: 
 https://docs.cloud.service.gov.uk/deploying_services/s3/#connect-to-an-s3-bucket-from-your-app
+
+## Running CLI commands
+
+This app exposes a number of CLI actions that can be used via the `flask` CLI:
+
+`FLASK_APP='data_engineering.common.application:get_or_create()' flask dev`

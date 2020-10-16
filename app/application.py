@@ -5,6 +5,8 @@ from data_engineering.common.sso.register import register_sso_component
 from flask_migrate import Migrate
 from sentry_sdk.integrations.flask import FlaskIntegration
 
+from app.commands import cmd_group
+
 config_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__), 'config'))
 
 
@@ -22,6 +24,8 @@ def register_app_components(flask_app):
 
     if os.environ.get('NO_BROWSER_CACHE'):
         no_browser_cache(flask_app)
+
+    flask_app.cli.add_command(cmd_group)
 
     return flask_app
 
