@@ -6,3 +6,5 @@ from app.etl.organisation.ons import ONSPostcodeDirectoryPipeline
 class OnsPostcodeListView(PipelinePaginatedListView):
     pipeline_column_types = ONSPostcodeDirectoryPipeline._l1_data_column_types
     model = ONSPostcodeDirectoryL1
+    camel_case_columns = False
+    include_id_column = True

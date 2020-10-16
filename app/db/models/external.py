@@ -88,6 +88,7 @@ class ONSPostcodeDirectoryL1(BaseModel):
     imd = _col(_text)  # Index of Multiple Deprivation (Numeric)
     calncv = _col(_text)  # Cancer Alliance E56
     stp = _col(_text)  # Sustainability and Transformation Partnership E54
+    publication_date = _col(_date)
 
 
 class DITReferencePostcodesL1(BaseModel):

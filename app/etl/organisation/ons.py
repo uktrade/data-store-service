@@ -1,9 +1,14 @@
+import datetime
+import re
+import zipfile
 from io import BytesIO
 
-from app.etl.pipeline_type.snapshot_data import L1SnapshotDataPipeline
+from datatools.io.fileinfo import FileInfo
+
+from app.etl.pipeline_type.incremental_data import L1IncrementalDataPipeline
 
 
-class ONSPostcodeDirectoryPipeline(L1SnapshotDataPipeline):
+class ONSPostcodeDirectoryPipeline(L1IncrementalDataPipeline):
     organisation = 'ons'
     dataset = 'postcode_directory'
 
@@ -60,12 +65,34 @@ class ONSPostcodeDirectoryPipeline(L1SnapshotDataPipeline):
         ('stp', 'text'),
     ]
 
+    publication_date = None
+
+    def process(self, file_info, drop_source=True, **kwargs):
+        file_regex = r'(.*?)/ONSPD_(?P<date>\w{3}_\d{4})\_UK.csv$'
+        zf = zipfile.ZipFile(file_info.data, mode='r')
+        members, file_found = zf.namelist(), False
+        for file_name in members:
+            file_match = re.match(file_regex, file_name)
+            if file_match:
+                file_found = True
+                file = zf.open(file_name)
+                datestr = file_match.group('date')
+                break
+        if not file_found:
+            raise ValueError('No valid CSV found in zip file.')
+        date = datetime.datetime.strptime(datestr, '%b_%Y').date()
+        self.publication_date = datetime.datetime.strftime(date, '%Y-%m-%d')
+        csv_file_info = FileInfo(file_info.name, file)
+        super().process(csv_file_info, drop_source, **kwargs)
+
     def _datafile_to_l0_temp(self, file_info):
-        csv_data_no_empty_quotes = BytesIO(file_info.data.read().replace(b'""', b''))
+        csv_data_no_empty_quotes_and_date_appended = BytesIO(
+            file_info.data.read().replace(b'""', b'')
+        )
         self.dbi.dsv_buffer_to_table(
-            csv_buffer=csv_data_no_empty_quotes,
+            csv_buffer=csv_data_no_empty_quotes_and_date_appended,
             fq_table_name=self._l0_temp_table,
-            columns=None,
+            columns=[c for c, _ in self._l0_data_column_types],
             has_header=True,
             sep=',',
             quote='"',
@@ -75,9 +102,13 @@ class ONSPostcodeDirectoryPipeline(L1SnapshotDataPipeline):
         _l0_data_column_types[:3]
         + [('dointr', 'date'), ('doterm', 'date')]
         + _l0_data_column_types[5:]
+        + [('publication_date', 'date')]
     )
 
-    _l0_l1_data_transformations = {
-        'dointr': "to_date(dointr, 'YYYYMM')",
-        'doterm': "to_date(doterm, 'YYYYMM')",
-    }
+    @property
+    def _l0_l1_data_transformations(self):
+        return {
+            'dointr': "to_date(dointr, 'YYYYMM')",
+            'doterm': "to_date(doterm, 'YYYYMM')",
+            'publication_date': f"to_date('{self.publication_date}', 'YYYY-MM-DD')",
+        }

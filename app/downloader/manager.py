@@ -22,5 +22,5 @@ class Manager:
             try:
                 logging.info(f'updating datasource {datasource.__class__.__name__}')
                 datasource.update()
-            except Exception as e:
-                print(e)
+            except Exception:
+                logging.error('update failed', exc_info=True)
