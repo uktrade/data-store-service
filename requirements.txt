@@ -6,7 +6,6 @@
 #
 alembic==1.4.3            # via flask-migrate
 appdirs==1.4.4            # via black
-appnope==0.1.0            # via ipython
 apscheduler==3.6.3        # via -r requirements.in
 attrs==19.3.0             # via black, jsonschema, pytest
 babel==2.8.0              # via flask-babelex
@@ -53,7 +52,6 @@ greenlet==0.4.17          # via gevent
 gunicorn[gevent]==20.0.4  # via -r requirements.in
 idna==2.8                 # via email-validator, requests
 ijson==3.1.1              # via tabulator
-importlib-metadata==1.7.0  # via catalogue, flake8, jsonschema, pluggy, pytest
 iniconfig==1.0.1          # via pytest
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.16.1           # via flask-shell-ipython
@@ -69,7 +67,7 @@ jsonschema==3.2.0         # via tableschema
 linear-tsv==1.1.0         # via tabulator
 lxml==3.8.0               # via -r requirements.in
 mako==1.1.3               # via alembic
-markupsafe==1.1.1         # via jinja2, mako, wtforms
+markupsafe==1.1.1         # via jinja2, mako
 mccabe==0.6.1             # via flake8
 mohawk==1.1.0             # via -r requirements.in, data-engineering-common
 more-itertools==8.2.0     # via pytest
@@ -115,7 +113,7 @@ requests==2.22.0          # via codecov, data-engineering-common, requests-oauth
 rfc3986==1.4.0            # via tableschema
 s3transfer==0.3.2         # via boto3
 selenium==3.141.0         # via -r requirements.in
-sentry_sdk[flask]==0.17.3  # via -r requirements.in
+sentry_sdk[flask]==0.19.0  # via -r requirements.in
 six==1.14.0               # via apscheduler, freezegun, isodate, jsonlines, jsonschema, linear-tsv, mohawk, packaging, pip-tools, pyrsistent, python-dateutil, sqlalchemy-utils, tableschema, tabulator, traitlets
 soupsieve==2.0.1          # via beautifulsoup4
 spacy==2.3.2              # via -r requirements.in
@@ -142,7 +140,6 @@ wcwidth==0.2.5            # via prompt-toolkit
 werkzeug==0.16.1          # via -r requirements.in, data-engineering-common, flask
 wtforms==2.2.1            # via flask-wtf
 xlrd==1.2.0               # via tabulator
-zipp==3.1.0               # via importlib-metadata
 zope.event==4.5.0         # via gevent
 zope.interface==5.1.2     # via gevent
 
