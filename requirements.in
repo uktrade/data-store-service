@@ -1,5 +1,5 @@
 APScheduler==3.*
-beautifulsoup4==4.9.1
+beautifulsoup4==4.9.3
 black==19.10b0
 codecov==2.1.9
 factory_boy==3.0.1
