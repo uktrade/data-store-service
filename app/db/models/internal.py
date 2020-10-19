@@ -136,6 +136,7 @@ class PipelineDataFile(BaseModel):
     state = _col(_text)
     error_message = _col(_text)
     uploaded_at = _col(_dt, default=lambda: datetime.datetime.utcnow())
+    started_processing_at = _col(_dt)
     processed_at = _col(_dt)
     column_types = _col(_array(_text))
     delimiter = _col(_text, nullable=False, server_default=DEFAULT_CSV_DELIMITER)
