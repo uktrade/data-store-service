@@ -1,10 +1,10 @@
 from io import BytesIO
 
-from app.etl.pipeline_type.snapshot_data import L0SnapshotDataPipeline
+from app.etl.pipeline_type.incremental_data import L0IncrementalDataPipeline
 from app.utils import trigger_dataflow_dag
 
 
-class DSVToTablePipeline(L0SnapshotDataPipeline):
+class DSVToTablePipeline(L0IncrementalDataPipeline):
     def __init__(
         self, dbi, organisation, dataset, data_column_types, separator=',', quote='"', **kwargs
     ):
@@ -23,7 +23,7 @@ class DSVToTablePipeline(L0SnapshotDataPipeline):
             has_header=True,
             sep=self.separator,
             quote=self.quote,
-            columns=None,
+            columns=[c for c, _ in self._l0_data_column_types],
         )
 
     def _format_column_names(self, column_types):

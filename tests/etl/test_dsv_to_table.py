@@ -53,6 +53,65 @@ class TestDSVToTablePipeline:
         ]
         assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l0_table, pipeline)
 
+    def test_pipeline_with_comtrade_csv_with_duplicate_rows(self, app_with_db):
+        pipeline = DSVToTablePipeline(
+            app_with_db.dbi,
+            organisation='comtrade',
+            dataset='country_code_and_iso',
+            data_column_types=[
+                ('ctyCode', 'int'),
+                ('cty Name English', 'text'),
+                ('cty Fullname English', 'text'),
+                ('Cty Abbreviation', 'text'),
+                ('Cty Comments', 'text'),
+                ('ISO2-digit Alpha', 'text'),
+                ('ISO3-digit Alpha', 'text'),
+                ('Start Valid Year', 'text'),
+                ('End Valid Year', 'text'),
+            ],
+        )
+        fi = FileInfo.from_path('tests/fixtures/generic_dsv/country_list_dups.csv')
+        pipeline.process(fi)
+
+        expected_rows = [
+            (0, 'World', 'World', 'World', 'World', 'WL', 'WLD', '1962', '2061'),
+            (4, 'Afghanistan', 'Afghanistan', 'Afghanistan', None, 'AF', 'AFG', '1962', '2061'),
+            (
+                899,
+                'Areas, nes',
+                'Areas, not elsewhere specified',
+                'Areas, nes',
+                None,
+                None,
+                None,
+                '1962',
+                '2061',
+            ),
+            (
+                918,
+                'European Union',
+                'European Union',
+                'European Union',
+                None,
+                'EU',
+                'EUR',
+                None,
+                None,
+            ),
+            (
+                918,
+                'European Union',
+                'European Union',
+                'European Union',
+                None,
+                'EU',
+                'EUR',
+                None,
+                None,
+            ),
+        ]
+        assert rows_equal_table(app_with_db.dbi, expected_rows, pipeline._l0_table, pipeline)
+
     def test_pipeline_with_ons_csv(self, app_with_db):
         pipeline = DSVToTablePipeline(
             app_with_db.dbi,
