@@ -1,3 +1,5 @@
+import datetime
+import logging
 import os.path
 import time
 from threading import Thread
@@ -8,6 +10,7 @@ from flask import copy_current_request_context, current_app as app
 from sqlalchemy.sql.functions import now
 
 from app.constants import DataUploaderFileState
+from app.db.models.internal import PipelineDataFile
 from app.etl.pipeline_type.dsv_to_table import DSVToTablePipeline
 from app.uploader.csv_parser import CSVParser
 from app.utils import check_dataflow_dag_progress
@@ -46,6 +49,9 @@ def process_pipeline_data_file(pipeline_data_file):
     column_types = pipeline_data_file.column_types
     delimiter = pipeline_data_file.delimiter
     quote = pipeline_data_file.quote
+
+    pipeline_data_file.started_processing_at = now()
+    pipeline_data_file.save()
 
     # move file to s3
     file_url = pipeline_data_file.data_file_url
@@ -135,3 +141,32 @@ def process_pipeline_data_file(pipeline_data_file):
         trigger_dag=(_trigger_dag, _trigger_dag_params),
     )
     return thread
+
+
+def mark_old_processing_data_files_as_failed(app):
+    one_day_ago = datetime.datetime.utcnow() - datetime.timedelta(hours=24)
+
+    logging.info("Checking for procesing pipelines running for more than 24 hours.")
+    with app.app_context():
+        for pipeline_data_file in PipelineDataFile.query.filter(
+            PipelineDataFile.state.in_(
+                (
+                    DataUploaderFileState.VERIFIED.value,
+                    DataUploaderFileState.PROCESSING_DSS.value,
+                    DataUploaderFileState.PROCESSING_DATAFLOW.value,
+                )
+            )
+        ):
+            if (
+                pipeline_data_file.started_processing_at is not None
+                and pipeline_data_file.started_processing_at <= one_day_ago
+            ):
+                logging.info(
+                    "Marking %s as failed (didn't complete within 24 hours)", pipeline_data_file
+                )
+                pipeline_data_file.state = DataUploaderFileState.FAILED.value
+                pipeline_data_file.error_message = (
+                    "Failed for an unknown reason. Pipeline was automatically marked as failed "
+                    "because it did not complete within 24 hours."
+                )
+                pipeline_data_file.save()
