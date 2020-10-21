@@ -1,21 +1,18 @@
 import click
 from apscheduler.schedulers.background import BlockingScheduler
-from flask import current_app
-from flask.cli import AppGroup, with_appcontext
+from data_engineering.common.application import get_or_create
+from flask.cli import AppGroup
 
 from app.uploader.utils import mark_old_processing_data_files_as_failed
 
 
 @click.command('start')
-@with_appcontext
 def start_scheduler():
     """Start the job scheduler"""
+    app = get_or_create()
     sched = BlockingScheduler(daemon=True)
     sched.add_job(
-        mark_old_processing_data_files_as_failed,
-        'interval',
-        kwargs=dict(app=current_app),
-        minutes=60,
+        mark_old_processing_data_files_as_failed, 'interval', minutes=60, kwargs=dict(app=app)
     )
     sched.start()
 
