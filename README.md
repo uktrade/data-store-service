@@ -58,3 +58,12 @@ An s3 bucket can be created using the Cloud Foundry command line tools, e.g.
 
 Reference: 
 https://docs.cloud.service.gov.uk/deploying_services/s3/#connect-to-an-s3-bucket-from-your-app
+
+## Running database migrations
+
+Database migrations currently are not run automatically on deployment because there is concern that they do not work well for the pipeline tables. Until this is resolved, migrations need to be run manually and consideration needs to be given to how this will affect deploying structural database changes.
+
+1) Deploy the migrations to the relevant environment.
+2) `cf v3-ssh data-store-service-<env>` - SSH into the instance
+3) `/tmp/lifecycle/shell` - active the app environment
+4) `./manage.py db upgrade` - run the migrations
