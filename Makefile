@@ -11,10 +11,13 @@ compile_assets:
 run_server: compile_assets
 	exec gunicorn 'data_engineering.common.application:get_or_create()' -b 0.0.0.0:${PORT} --config 'app/config/gunicorn_config.py'
 
-
 .PHONY: run_dev_server
 run_dev_server:
 	USE_DOTENV=1 FLASK_DEBUG=1 FLASK_APP='data_engineering.common.application:get_or_create()' flask run --host 0.0.0.0 --port ${PORT}
+
+.PHONY: run_scheduler
+run_scheduler:
+	USE_DOTENV=1 FLASK_APP='data_engineering.common.application:get_or_create()' flask scheduler start
 
 .PHONY: run_tests
 run_tests:

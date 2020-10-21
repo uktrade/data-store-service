@@ -1,12 +1,9 @@
 import os
 
 import sentry_sdk
-from apscheduler.schedulers.background import BackgroundScheduler
 from data_engineering.common.sso.register import register_sso_component
 from flask_migrate import Migrate
 from sentry_sdk.integrations.flask import FlaskIntegration
-
-from app.uploader.utils import mark_old_processing_data_files_as_failed
 
 config_location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__), 'config'))
 
@@ -25,12 +22,6 @@ def register_app_components(flask_app):
 
     if os.environ.get('NO_BROWSER_CACHE'):
         no_browser_cache(flask_app)
-
-    sched = BackgroundScheduler(daemon=True)
-    sched.add_job(
-        mark_old_processing_data_files_as_failed, 'interval', kwargs=dict(app=flask_app), minutes=60
-    )
-    sched.start()
 
     return flask_app
 
