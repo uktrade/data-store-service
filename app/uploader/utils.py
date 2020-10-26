@@ -158,8 +158,8 @@ def mark_old_processing_data_files_as_failed(app):
             )
         ):
             if (
-                pipeline_data_file.started_processing_at is not None
-                and pipeline_data_file.started_processing_at <= one_day_ago
+                pipeline_data_file.started_processing_at is None
+                or pipeline_data_file.started_processing_at <= one_day_ago
             ):
                 logging.info(
                     "Marking %s as failed (didn't complete within 24 hours)", pipeline_data_file
