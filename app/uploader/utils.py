@@ -42,6 +42,42 @@ def _move_file_to_s3(file_url, organisation, dataset, delimiter, quote):
     return file_info
 
 
+def check_for_reserved_column_names(pipeline_data_file, uploaded_columns):
+    pipeline = pipeline_data_file.pipeline
+
+    dsv_pipeline = DSVToTablePipeline(
+        dbi=app.dbi,
+        organisation=pipeline.organisation,
+        dataset=pipeline.dataset,
+        data_column_types=[],
+        quote=pipeline_data_file.quote,
+        separator=pipeline_data_file.delimiter,
+    )
+
+    reserved_l0_columns = set(x[0] for x in dsv_pipeline.l0_helper_columns)
+    reserved_l1_columns = set(x[0] for x in dsv_pipeline.l1_helper_columns)
+    reserved_columns = reserved_l0_columns.union(reserved_l1_columns)
+
+    conflicting_columns = uploaded_columns.intersection(reserved_columns)
+    if conflicting_columns:
+        joined_columns = ', '.join(map(lambda x: f'“{x}”', conflicting_columns))
+        error_message = f"Unable to process CSV file: {joined_columns} "
+
+        if len(conflicting_columns) > 1:
+            error_message += (
+                "in the uploaded file are reserved column names. "
+                "You must rename those columns in the data file."
+            )
+        else:
+            error_message += (
+                "in the uploaded file is a reserved column name. "
+                "You must rename that column in the data file."
+            )
+        return error_message
+
+    return None
+
+
 def process_pipeline_data_file(pipeline_data_file):
     pipeline = pipeline_data_file.pipeline
     organisation = pipeline.organisation

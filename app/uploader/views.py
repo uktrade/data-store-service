@@ -13,6 +13,7 @@ from app.db.models.internal import Pipeline, PipelineDataFile
 from app.uploader import forms
 from app.uploader.csv_parser import CSVParser
 from app.uploader.utils import (
+    check_for_reserved_column_names,
     delete_file,
     process_pipeline_data_file,
     upload_file,
@@ -163,11 +164,19 @@ def pipeline_data_verify(slug, file_id):
             )
         )
 
-    elif new_file_err is not None:
+    if new_file_err is None:
+        uploaded_columns = set(x[0] for x in new_file_contents)
+        error_message = check_for_reserved_column_names(pipeline_data_file, uploaded_columns)
+        if error_message:
+            new_file_contents = None
+            new_file_err = error_message
+
+    if new_file_err is not None:
         pipeline_data_file.state = DataUploaderFileState.FAILED.value
         pipeline_data_file.error_message = new_file_err
         pipeline_data_file.save()
         form.errors['non_field_errors'] = [new_file_err]
+
     return render_uploader_template(
         'pipeline_data_verify.html',
         pipeline=pipeline,
