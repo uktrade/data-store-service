@@ -311,6 +311,36 @@ def test_get_data_verify_error_view(
 
 @mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
 @mock.patch('app.uploader.views.delete_file')
+@mock.patch('app.uploader.csv_parser.tabulator.Stream')
+def test_submit_data_using_reserved_column_is_rejected_early(
+    mock_tabulator_stream, mock_delete_file, is_authenticated, app_with_db, captured_templates
+):
+    csv_string = 'id\n1\n3'
+    _mock_stream_return_values(mock_tabulator_stream, [csv_string])
+    data_file = PipelineDataFileFactory()
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    response, template_context = _test_view(
+        client, url, 'pipeline_data_verify.html', captured_templates,
+    )
+    html = response.get_data(as_text=True)
+    assert 'Try again' in html
+
+    form = template_context['form']
+    assert form.errors == {
+        'non_field_errors': [
+            (
+                "Unable to process CSV file: “id” in the uploaded file is a reserved column name. "
+                "You must rename that column in the data file."
+            )
+        ]
+    }
+
+
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+@mock.patch('app.uploader.views.delete_file')
 @mock.patch('app.uploader.utils.open')
 def test_submit_data_verify_proceed_blank(
     mock_open, mock_delete_file, is_authenticated, app_with_db, captured_templates
