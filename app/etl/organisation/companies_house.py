@@ -157,7 +157,7 @@ class XBRLParser:
                 _en('AverageNumberEmployeesDuringPeriod'),
                 _en('EmployeesTotal'),
             ],
-            float,
+            'float_with_colon',
         ),
     }
 
@@ -403,6 +403,9 @@ class XBRLParser:
         if type == float:
             sign = -1 if element.get('sign', '') == '-' else +1
             return str(sign * float(re.sub(r',', '', text)) * 10 ** int(element.get('scale', '0')))
+        if type == 'float_with_colon':
+            element.text = re.sub(r'.*: ', '', element.text)
+            return XBRLParser._get_value(element, float)
         if type == datetime.date:
             return dateutil.parser.parse(text).strftime('%Y-%m-%d')
         if type == bool:
