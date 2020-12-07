@@ -4,7 +4,6 @@ app:
   secret_key: $ENV{DSS_APP_SECRET_KEY, random_string_dss}
   database_url: $ENV{DSS_DATABASE_URL, postgresql://postgres@dss_postgres/postgres}
   pagination_size: $ENV{DSS_PAGINATION_SIZE, 1000}
-  chrome_driver_path: $ENV{DSS_CHROME_DRIVER_PATH, ./drivers/chromedriver-85-linux64}
   chrome_binary_location: $ENV{DSS_CHROME_BINARY_LOCATION, /home/vcap/deps/0/lib/chromium-browser/chromium-browser}
 sso:
   base_url: $ENV{AUTHBROKER_URL, https://sso.trade.gov.uk}
