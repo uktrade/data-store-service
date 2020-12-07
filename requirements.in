@@ -41,4 +41,5 @@ tableschema==1.19.3
 tabulator==1.52.3
 toolz==0.10.0
 watchdog==0.10.3
+webdriver-manager==3.2.2
 werkzeug==0.16.1

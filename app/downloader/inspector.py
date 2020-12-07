@@ -13,6 +13,7 @@ from selenium.common.exceptions import (
     TimeoutException,
 )
 from selenium.webdriver.support.wait import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 
 DataUrl = namedtuple('DataUrl', 'url date')
 
@@ -95,9 +96,9 @@ class SeleniumOnlineInspector(OnlineInspector):
             NoSuchElementException,
             StaleElementReferenceException,
         )
+
         driver = webdriver.Chrome(
-            executable_path=flask_app.config['app']['chrome_driver_path'],
-            chrome_options=chrome_options,
+            executable_path=ChromeDriverManager().install(), chrome_options=chrome_options
         )
         driver.get(self.url)
 
