@@ -14,6 +14,7 @@ from selenium.common.exceptions import (
 )
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.utils import ChromeType
 
 DataUrl = namedtuple('DataUrl', 'url date')
 
@@ -98,7 +99,8 @@ class SeleniumOnlineInspector(OnlineInspector):
         )
 
         driver = webdriver.Chrome(
-            executable_path=ChromeDriverManager().install(), chrome_options=chrome_options
+            executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(),
+            chrome_options=chrome_options,
         )
         driver.get(self.url)
 
