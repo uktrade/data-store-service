@@ -70,7 +70,7 @@ json-log-formatter==0.3.0  # via -r requirements.in, data-engineering-common
 jsonlines==1.2.0          # via tabulator
 jsonschema==3.2.0         # via tableschema
 linear-tsv==1.1.0         # via tabulator
-lxml==3.8.0               # via -r requirements.in
+lxml==4.6.2               # via -r requirements.in
 mako==1.1.3               # via alembic
 markupsafe==1.1.1         # via jinja2, mako
 mccabe==0.6.1             # via flake8
