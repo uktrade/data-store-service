@@ -17,7 +17,7 @@ pipeline {
       when {
           expression {
               milestone label: "release-staging"
-              input message: 'Deploy to staging?'
+              input message: 'Deploy to staging? Note: migrations are not automated. Have you run any required migrations?'
               return true
           }
           beforeAgent true
@@ -33,7 +33,7 @@ pipeline {
       when {
           expression {
               milestone label: "release-prod"
-              input message: 'Deploy to prod?'
+              input message: 'Deploy to production? Note: migrations are not automated. Have you run any required migrations?'
               return true
           }
           beforeAgent true
