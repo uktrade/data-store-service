@@ -77,6 +77,7 @@ class CSVParser:
                     'no headers found. The first line of the csv should '
                     'contain the column headers.'
                 )
+
             invalid_headings = list(filter(lambda x: not re.match("^[a-z][a-z0-9_]*$", x), headers))
             if invalid_headings:
                 joined_invalid_headings = '"' + '", "'.join(invalid_headings) + '"'
@@ -85,6 +86,7 @@ class CSVParser:
                     f"may only contain lowercase letters, numbers, and underscores. Invalid "
                     f"headers: {joined_invalid_headings}"
                 )
+
             if not sample or not contents:
                 raise csv.Error("no data found")
 
@@ -93,13 +95,18 @@ class CSVParser:
                 zip(cls.make_unique_headers(headers), column_types, list(map(list, zip(*sample))))
             )
             return sample, None
+
         except (TabulatorException, csv.Error) as e:
+            error_logger = app.logger.info if isinstance(e, csv.Error) else app.logger.error
             error_message = 'Unable to process CSV file: '
+
             if isinstance(e, EncodingError):
                 error_message += f'the CSV file could not be opened. (Technical details: {str(e)})'
             else:
                 error_message += str(e)
-            app.logger.error(error_message)
+
+            error_logger(error_message)
+
             return [], error_message
 
     @classmethod
