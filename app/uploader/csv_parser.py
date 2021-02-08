@@ -80,11 +80,17 @@ class CSVParser:
             invalid_headings = list(filter(lambda x: not re.match("^[a-z][a-z0-9_]*$", x), headers))
             if invalid_headings:
                 joined_invalid_headings = '"' + '", "'.join(invalid_headings) + '"'
-                raise csv.Error(
-                    f"column headers must start with a letter and "
-                    f"may only contain lowercase letters, numbers, and underscores. Invalid "
-                    f"headers: {joined_invalid_headings}"
+                error_message = (
+                    "Unable to process CSV file: column headers must start with a letter and "
+                    "may only contain lowercase letters, numbers, and underscores. "
+                    "Invalid headers: %s"
                 )
+                # Only log a generic message so that sentry can group the errors cleanly
+                app.logger.error(error_message, joined_invalid_headings)
+
+                # Enrich the error message with header info for better user experience
+                return [], error_message % joined_invalid_headings
+
             if not sample or not contents:
                 raise csv.Error("no data found")
 
@@ -93,6 +99,7 @@ class CSVParser:
                 zip(cls.make_unique_headers(headers), column_types, list(map(list, zip(*sample))))
             )
             return sample, None
+
         except (TabulatorException, csv.Error) as e:
             error_message = 'Unable to process CSV file: '
             if isinstance(e, EncodingError):
