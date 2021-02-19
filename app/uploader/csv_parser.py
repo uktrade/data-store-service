@@ -45,13 +45,7 @@ class CSVParser:
 
     @classmethod
     def get_csv_sample(
-        cls,
-        url,
-        delimiter=",",
-        quotechar='"',
-        number_of_lines_sample=4,
-        number_of_lines_infer=100000,
-        encoding=None,
+        cls, url, delimiter=",", quotechar='"', number_of_lines_sample=4, encoding=None
     ):
         bucket = app.config['s3']['bucket_url']
         full_url = os.path.join(bucket, url)
@@ -69,7 +63,7 @@ class CSVParser:
                 post_parse=[cls.check_and_clean_up_row],
             ) as csv_file:
                 sample = csv_file.sample
-                contents = csv_file.read(limit=number_of_lines_infer)
+                contents = csv_file.read(limit=app.config['app']['csv_sample_infer_lines'])
                 headers = csv_file.headers
 
             if not headers:

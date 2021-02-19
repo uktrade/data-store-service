@@ -5,6 +5,7 @@ app:
   database_url: $ENV{DSS_DATABASE_URL, postgresql://postgres@dss_postgres/postgres}
   pagination_size: $ENV{DSS_PAGINATION_SIZE, 1000}
   chrome_binary_location: $ENV{DSS_CHROME_BINARY_LOCATION, /home/vcap/deps/0/lib/chromium-browser/chromium-browser}
+  csv_sample_infer_lines: $ENV{CSV_SAMPLE_INFER_LINES, 100000}
 sso:
   base_url: $ENV{AUTHBROKER_URL, https://sso.trade.gov.uk}
   profile_path: $ENV{ACCESS_TOKEN_PATH, /api/v1/user/me/}
