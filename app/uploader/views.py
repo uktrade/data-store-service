@@ -251,6 +251,12 @@ def pipeline_data_uploaded(slug, file_id):
     data_workspace_schema_name = schema_parts[0]
     data_workspace_table_name = schema_parts[1]
     file_id = pipeline_data_file.id
+
+    if pipeline_data_file.state == DataUploaderFileState.FAILED.value:
+        return redirect(
+            url_for('uploader_views.pipeline_data_upload_failed', slug=slug, file_id=file_id)
+        )
+
     return render_uploader_template(
         'pipeline_data_uploaded.html',
         pipeline=pipeline,
@@ -291,3 +297,23 @@ def progress(file_id):
         response['progress'] = '100'
         response['info'] = 'Sorry, there is a problem with the service. Try again later.'
     return response
+
+
+@uploader_views.route('/data/<slug>/uploaded/<file_id>/failed/')
+@login_required
+def pipeline_data_upload_failed(slug, file_id):
+    pipeline = get_object_or_404(Pipeline, slug=slug)
+    pipeline_data_file = get_object_or_404(PipelineDataFile, pipeline=pipeline, id=file_id)
+    schema_parts = pipeline.pipeline_schema.split('.')
+    if len(schema_parts) != 2:
+        raise BadRequest("Invalid schema for this pipeline.")
+    data_workspace_schema_name = schema_parts[0]
+    data_workspace_table_name = schema_parts[1]
+    file_id = pipeline_data_file.id
+    return render_uploader_template(
+        'pipeline_data_upload_failed.html',
+        pipeline=pipeline,
+        file_id=file_id,
+        data_workspace_schema_name=data_workspace_schema_name,
+        data_workspace_table_name=data_workspace_table_name,
+    )

@@ -731,3 +731,44 @@ def _mock_stream_return_values(mock, csv_strings, sample_size=4):
             )
         )
     mock.side_effect = streams
+
+
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+@mock.patch('app.uploader.views.process_pipeline_data_file')
+def test_data_uploaded_view_immediately_redirects_to_failed_if_pipeline_failed(
+    is_authenticated, process_pipeline_data_file, app_with_db, captured_templates
+):
+    data_file = PipelineDataFileFactory.create(state=DataUploaderFileState.FAILED.value)
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_uploaded', slug=data_file.pipeline.slug, file_id=data_file.id
+    )
+    response = make_sso_request(client, url)
+    assert response.status_code == 302
+    assert response.location.endswith(
+        url_for(
+            'uploader_views.pipeline_data_upload_failed',
+            slug=data_file.pipeline.slug,
+            file_id=data_file.id,
+        )
+    )
+
+
+@mock.patch('data_engineering.common.sso.token.is_authenticated', return_value=True)
+@mock.patch('app.uploader.views.process_pipeline_data_file')
+def test_data_upload_failed_view_has_link_to_try_again(
+    is_authenticated, process_pipeline_data_file, app_with_db, captured_templates
+):
+    data_file = PipelineDataFileFactory.create(state=DataUploaderFileState.FAILED.value)
+    client = get_client(app_with_db)
+    url = url_for(
+        'uploader_views.pipeline_data_upload_failed',
+        slug=data_file.pipeline.slug,
+        file_id=data_file.id,
+    )
+    response = make_sso_request(client, url)
+    body = response.get_data(as_text=True)
+
+    assert response.status_code == 200
+    assert "Try again" in body
+    assert url_for('uploader_views.pipeline_data_upload', slug=data_file.pipeline.slug,) in body
