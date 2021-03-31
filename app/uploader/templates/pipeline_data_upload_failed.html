@@ -1,0 +1,18 @@
+{% extends 'data_store_service/base.html' %}
+{% block title %}Sorry, your upload failed - Data Store Service{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">Sorry, your upload failed</h1>
+      <p class="govuk-body">
+      Unfortunately, there has been a problem processing your file and the pipeline for
+      <strong>"{{ data_workspace_schema_name }}"."{{ data_workspace_table_name }}"</strong>
+      has failed. Please try again later.
+      </p>
+      <a class="govuk-button govuk-!-margin-top-6" href="{{ url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug) }}">
+        Try again
+      </a>
+    </div>
+  </div>
+{% endblock content %}
