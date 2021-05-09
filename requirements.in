@@ -29,7 +29,7 @@ pytest-cov==2.10.1
 pytest-mock==3.3.1
 pytest==6.0.1
 python-slugify==4.0.1
-pyyaml==5.3.1
+pyyaml==5.4
 redis==3.5.3
 requests-oauthlib==1.1.0
 selenium==3.141.0
