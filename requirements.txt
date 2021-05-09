@@ -170,13 +170,6 @@ idna==2.8
     #   requests
 ijson==3.1.1
     # via tabulator
-importlib-metadata==1.7.0
-    # via
-    #   catalogue
-    #   flake8
-    #   jsonschema
-    #   pluggy
-    #   pytest
 iniconfig==1.0.1
     # via pytest
 ipython-genutils==0.2.0
@@ -285,7 +278,7 @@ psycopg2==2.8.6
     #   data-engineering-common
 ptyprocess==0.6.0
     # via pexpect
-py==1.9.0
+py==1.10.0
     # via pytest
 pycodestyle==2.6.0
     # via
@@ -462,8 +455,6 @@ wtforms==2.2.1
     # via flask-wtf
 xlrd==1.2.0
     # via tabulator
-zipp==3.1.0
-    # via importlib-metadata
 zope.event==4.5.0
     # via gevent
 zope.interface==5.1.2
