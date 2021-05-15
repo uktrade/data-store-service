@@ -165,7 +165,7 @@ greenlet==1.1.0
     # via
     #   gevent
     #   sqlalchemy
-gunicorn[gevent]==20.0.4
+gunicorn[gevent]==20.1.0
     # via -r requirements.in
 idna==2.8
     # via
