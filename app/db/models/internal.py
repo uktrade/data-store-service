@@ -43,8 +43,6 @@ class DatafileRegistryModel(BaseModel):
     )
     updated_timestamp = _col('updated_timestamp', _dt, onupdate=lambda: datetime.datetime.utcnow())
 
-    __mapper_args__ = {'order_by': 'created_timestamp'}
-
     @classmethod
     def get_update_or_create(cls, source, file_name, state=None, error_message=None):
         if not file_name:
