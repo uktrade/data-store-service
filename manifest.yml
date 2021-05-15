@@ -6,3 +6,7 @@ applications:
     - https://github.com/cloudfoundry/apt-buildpack.git
     - nodejs_buildpack
     - python_buildpack
+  # The CI pipeline will override this, but it is suspected that these
+  # values are used during buildpack compile
+  disk_quota: 4G
+  memory: 4G
