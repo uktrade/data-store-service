@@ -6,7 +6,7 @@ factory_boy==3.0.1
 flake8-import-order==0.18.1
 flake8==3.9.2
 Flask-Migrate==2.5.3
-flask-oauthlib==0.9.5
+flask-oauthlib==0.9.6
 flask-security==3.0.0
 flask-shell-ipython==0.4.1
 flask-sqlalchemy==2.4.4
