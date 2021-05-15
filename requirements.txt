@@ -262,11 +262,13 @@ pathtools==0.1.2
     # via watchdog
 pathy==0.5.2
     # via spacy
+pep517==0.10.0
+    # via pip-tools
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pip-tools==5.3.1
+pip-tools==6.1.0
     # via -r requirements.in
 pluggy==0.13.1
     # via pytest
@@ -376,7 +378,6 @@ six==1.14.0
     #   linear-tsv
     #   mohawk
     #   packaging
-    #   pip-tools
     #   pyrsistent
     #   python-dateutil
     #   sqlalchemy-utils
@@ -423,6 +424,7 @@ thinc==8.0.3
 toml==0.10.2
     # via
     #   black
+    #   pep517
     #   pytest
 toolz==0.11.1
     # via -r requirements.in
