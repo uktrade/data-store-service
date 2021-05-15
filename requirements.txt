@@ -219,8 +219,6 @@ mohawk==1.1.0
     # via
     #   -r requirements.in
     #   data-engineering-common
-more-itertools==8.2.0
-    # via pytest
 murmurhash==1.0.2
     # via
     #   preshed
@@ -300,7 +298,7 @@ pytest-cov==2.10.1
     #   data-engineering-common
 pytest-mock==3.3.1
     # via -r requirements.in
-pytest==6.0.1
+pytest==6.2.4
     # via
     #   -r requirements.in
     #   data-engineering-common
