@@ -258,8 +258,6 @@ passlib==1.7.4
     # via flask-security
 pathspec==0.8.1
     # via black
-pathtools==0.1.2
-    # via watchdog
 pathy==0.5.2
     # via spacy
 pexpect==4.8.0
@@ -452,7 +450,7 @@ wasabi==0.8.2
     # via
     #   spacy
     #   thinc
-watchdog==0.10.3
+watchdog==2.1.1
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
