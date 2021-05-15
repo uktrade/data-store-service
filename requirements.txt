@@ -354,7 +354,7 @@ s3transfer==0.3.2
     # via boto3
 selenium==3.141.0
     # via -r requirements.in
-sentry_sdk[flask]==0.17.3
+sentry_sdk[flask]==1.1.0
     # via -r requirements.in
 six==1.14.0
     # via
