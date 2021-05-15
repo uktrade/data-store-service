@@ -19,7 +19,7 @@ babel==2.8.0
     # via flask-babelex
 backcall==0.2.0
     # via ipython
-beautifulsoup4==4.9.1
+beautifulsoup4==4.9.3
     # via -r requirements.in
 black==19.10b0
     # via
