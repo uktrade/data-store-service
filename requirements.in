@@ -1,7 +1,7 @@
 APScheduler==3.*
 beautifulsoup4==4.9.3
 black==21.5b1
-codecov==2.1.9
+codecov==2.1.11
 factory_boy==3.0.1
 flake8-import-order==0.18.1
 flake8==3.9.2
