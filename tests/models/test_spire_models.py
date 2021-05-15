@@ -23,7 +23,13 @@ def test_application_fk_constraint(app_with_db):
         SPIREApplicationFactory(batch=None)
 
 
-@pytest.mark.parametrize('case_type,raise_exception', (('HELLO', True), ('OIEL', False),))
+@pytest.mark.parametrize(
+    'case_type,raise_exception',
+    (
+        ('HELLO', True),
+        ('OIEL', False),
+    ),
+)
 def test_application_check_constraint_1(app_with_db, case_type, raise_exception):
     if raise_exception:
         with pytest.raises(IntegrityError):
@@ -63,7 +69,12 @@ def test_application_check_constraint_2(app_with_db, case_type, case_sub_type, r
 
 
 @pytest.mark.parametrize(
-    'withheld_status,raise_exception', (('HELLO', True), ('PENDING', False), ('WITHHELD', False),)
+    'withheld_status,raise_exception',
+    (
+        ('HELLO', True),
+        ('PENDING', False),
+        ('WITHHELD', False),
+    ),
 )
 def test_application_check_constraint_3(app_with_db, withheld_status, raise_exception):
     if raise_exception:
@@ -74,7 +85,12 @@ def test_application_check_constraint_3(app_with_db, withheld_status, raise_exce
 
 
 @pytest.mark.parametrize(
-    'status,raise_exception', (('HELLO', True), ('RELEASED', False), ('STAGING', False),)
+    'status,raise_exception',
+    (
+        ('HELLO', True),
+        ('RELEASED', False),
+        ('STAGING', False),
+    ),
 )
 def test_batch_check_constraint_1(app_with_db, status, raise_exception):
     if raise_exception:
@@ -103,7 +119,12 @@ def test_batch_check_constraint_2(app_with_db, batch_ref, start_date, end_date, 
 
 @pytest.mark.parametrize(
     'status,raise_exception',
-    (('HELLO', True), ('CURRENT', False), ('DELETED', False), ('ARCHIVED', False),),
+    (
+        ('HELLO', True),
+        ('CURRENT', False),
+        ('DELETED', False),
+        ('ARCHIVED', False),
+    ),
 )
 def test_footnotes_check_constraint(app_with_db, status, raise_exception):
     if raise_exception:
@@ -251,7 +272,12 @@ def test_incident_check_constraint_2(app_with_db, version_no, raise_exception):
 
 @pytest.mark.parametrize(
     'case_type,ogl_id,raise_exception',
-    (('GPL', None, False), ('OGEL', 1, False), ('OGEL', None, True), ('GPL', 1, True),),
+    (
+        ('GPL', None, False),
+        ('OGEL', 1, False),
+        ('OGEL', None, True),
+        ('GPL', 1, True),
+    ),
 )
 def test_incident_check_constraint_3(app_with_db, case_type, ogl_id, raise_exception):
     if raise_exception:
@@ -275,7 +301,12 @@ def test_incident_check_constraint_4(app_with_db, temporary_licence_flag, raise_
 
 @pytest.mark.parametrize(
     '_type,licence_id,raise_exception',
-    (('REFUSAL', None, False), ('REFUSAL', 1, True), (None, None, True), ('ISSUE', 1, False),),
+    (
+        ('REFUSAL', None, False),
+        ('REFUSAL', 1, True),
+        (None, None, True),
+        ('ISSUE', 1, False),
+    ),
 )
 def test_incident_check_constraint_5(app_with_db, _type, licence_id, raise_exception):
     if raise_exception:
@@ -287,7 +318,12 @@ def test_incident_check_constraint_5(app_with_db, _type, licence_id, raise_excep
 
 @pytest.mark.parametrize(
     '_type,else_id,raise_exception',
-    (('SUSPENSION', 1, False), ('SUSPENSION', None, True), (None, None, True), ('ISSUE', 1, True),),
+    (
+        ('SUSPENSION', 1, False),
+        ('SUSPENSION', None, True),
+        (None, None, True),
+        ('ISSUE', 1, True),
+    ),
 )
 def test_incident_check_constraint_6(app_with_db, _type, else_id, raise_exception):
     if raise_exception:
@@ -472,7 +508,12 @@ def test_media_footnote_detail_check_1(app_with_db, status_control, end_datetime
 
 
 @pytest.mark.parametrize(
-    'footnote_type,raise_exception', (('STANDARD', False), ('END_USER', False), ('HELLO', True),),
+    'footnote_type,raise_exception',
+    (
+        ('STANDARD', False),
+        ('END_USER', False),
+        ('HELLO', True),
+    ),
 )
 def test_media_footnote_detail_check_2(app_with_db, footnote_type, raise_exception):
     if raise_exception:
@@ -495,7 +536,12 @@ def test_return_check_constraint_1(app_with_db, elr_version, raise_exception):
 
 
 @pytest.mark.parametrize(
-    'status,raise_exception', (('HELLO', True), ('WITHDRAWN', False), ('ACTIVE', False),),
+    'status,raise_exception',
+    (
+        ('HELLO', True),
+        ('WITHDRAWN', False),
+        ('ACTIVE', False),
+    ),
 )
 def test_return_check_constraint_2(app_with_db, status, raise_exception):
     if raise_exception:
@@ -507,7 +553,13 @@ def test_return_check_constraint_2(app_with_db, status, raise_exception):
 
 @pytest.mark.parametrize(
     'status_control,raise_exception',
-    (('HELLO', True), ('A', False), ('P', False), ('C', False), ('D', True),),
+    (
+        ('HELLO', True),
+        ('A', False),
+        ('P', False),
+        ('C', False),
+        ('D', True),
+    ),
 )
 def test_return_check_constraint_3(app_with_db, status_control, raise_exception):
     if raise_exception:
@@ -581,7 +633,14 @@ def test_ultimate_end_user_check_constraint_1(app_with_db, version_no, raise_exc
 
 @pytest.mark.parametrize(
     'status_control,raise_exception',
-    (('HELLO', True), ('A', False), ('P', False), ('C', False), ('D', False), ('X', True),),
+    (
+        ('HELLO', True),
+        ('A', False),
+        ('P', False),
+        ('C', False),
+        ('D', False),
+        ('X', True),
+    ),
 )
 def test_ultimate_end_user_check_constraint_2(app_with_db, status_control, raise_exception):
     if raise_exception:

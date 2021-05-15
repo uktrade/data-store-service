@@ -16,10 +16,30 @@ class TestDownloadToS3BySource:
     @pytest.mark.parametrize(
         'args,datasource_register_call_count,process_called,expected_msg',
         (
-            (['--all'], 3, True, None,),
-            (['--companies_house.accounts'], 1, True, None,),
-            (['--hmrc.exporters'], 1, True, None,),
-            (['--ons.postcode_directory'], 1, True, None,),
+            (
+                ['--all'],
+                3,
+                True,
+                None,
+            ),
+            (
+                ['--companies_house.accounts'],
+                1,
+                True,
+                None,
+            ),
+            (
+                ['--hmrc.exporters'],
+                1,
+                True,
+                None,
+            ),
+            (
+                ['--ons.postcode_directory'],
+                1,
+                True,
+                None,
+            ),
             ([], None, False, 'Download datafiles to s3 bucket'),
         ),
     )

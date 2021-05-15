@@ -16,7 +16,11 @@ from app.constants import CSV_NULL_VALUES, DataUploaderDataTypes
 class CSVParser:
     @classmethod
     def get_csv_as_utf_8_byte_stream(
-        cls, full_url, delimiter=",", quotechar='"', encoding=None,
+        cls,
+        full_url,
+        delimiter=",",
+        quotechar='"',
+        encoding=None,
     ):
         try:
             with tabulator.Stream(
@@ -31,7 +35,10 @@ class CSVParser:
             ) as csv_file:
                 file_contents_utf_8 = BytesIO()
                 writer = unicodecsv.writer(
-                    file_contents_utf_8, encoding='utf-8', delimiter=delimiter, quotechar=quotechar,
+                    file_contents_utf_8,
+                    encoding='utf-8',
+                    delimiter=delimiter,
+                    quotechar=quotechar,
                 )
                 writer.writerow(csv_file.headers)
                 for row in csv_file.iter():
@@ -105,7 +112,7 @@ class CSVParser:
 
     @classmethod
     def check_and_clean_up_row(cls, extended_rows):
-        """ Check if row length is same as header and standardize null values as empty strings """
+        """Check if row length is same as header and standardize null values as empty strings"""
         for row_number, headers, row in extended_rows:
             if len(row) != len(headers):
                 raise csv.Error(
@@ -126,7 +133,7 @@ class CSVParser:
 
     @classmethod
     def make_unique_headers(cls, headers):
-        """ Headers with same name get a unique post fix number header_1, header_2, etc """
+        """Headers with same name get a unique post fix number header_1, header_2, etc"""
         if len(set(headers)) == len(headers):
             return headers
         post_fix_headers = []
@@ -143,7 +150,9 @@ class CSVParser:
         """Infers schema from CSV."""
         schema = Schema()
         schema.infer(
-            [csv_headers] + csv_contents, confidence=1, headers=1,
+            [csv_headers] + csv_contents,
+            confidence=1,
+            headers=1,
         )
         fields = schema.descriptor['fields']
         column_types = cls.get_postgres_column_datatypes(fields, 'type')

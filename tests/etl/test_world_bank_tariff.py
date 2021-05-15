@@ -130,7 +130,10 @@ eu_country_memberships += [
 class TestWorldBankTariffPipeline:
     @pytest.fixture(autouse=True, scope='function')
     def setup(
-        self, app_with_db, add_comtrade_country_code_and_iso, add_dit_eu_country_membership,
+        self,
+        app_with_db,
+        add_comtrade_country_code_and_iso,
+        add_dit_eu_country_membership,
     ):
         self.dbi = app_with_db.dbi
         self.dbi.execute_statement('drop table if exists "dit.baci"."L1" cascade;')
@@ -661,7 +664,8 @@ class TestWorldBankTariffPipeline:
         self, continue_transform, expected_rows, mocker, add_dit_baci
     ):
         patch_years(
-            mocker, ('2018', '2018'),
+            mocker,
+            ('2018', '2018'),
         )
         patch_required_countries(
             mocker,
@@ -683,7 +687,12 @@ class TestWorldBankTariffPipeline:
                 self.dbi, force=False, continue_transform=continue_transform
             )
             pipeline.process()
-            assert rows_equal_table(self.dbi, expected_rows, pipeline._l1_table, pipeline,)
+            assert rows_equal_table(
+                self.dbi,
+                expected_rows,
+                pipeline._l1_table,
+                pipeline,
+            )
 
     def partial_transform_data(self):
         pipeline = WorldBankTariffPipeline(self.dbi, force=True)
@@ -778,8 +787,12 @@ def patch_required_countries(mocker, countries):
 
 def patch_years(mocker, year_range):
     mocker.patch.object(
-        WorldBankTariffTransformPipeline, 'cutoff_year', year_range[0],
+        WorldBankTariffTransformPipeline,
+        'cutoff_year',
+        year_range[0],
     )
     mocker.patch.object(
-        WorldBankTariffTransformPipeline, 'final_year', year_range[1],
+        WorldBankTariffTransformPipeline,
+        'final_year',
+        year_range[1],
     )

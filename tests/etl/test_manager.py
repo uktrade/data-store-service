@@ -22,14 +22,22 @@ class FakePipeline:
 
 class TestETLManager:
     @pytest.mark.parametrize(
-        'pipeline,expected_result', (('Hello', 'Hello'), (FakePipeline(2), '2'),),
+        'pipeline,expected_result',
+        (
+            ('Hello', 'Hello'),
+            (FakePipeline(2), '2'),
+        ),
     )
     def test_to_pipeline_id(self, pipeline, expected_result):
         manager = Manager()
         assert manager._to_pipeline_id(pipeline) == expected_result
 
     @pytest.mark.parametrize(
-        'pipeline,expected_result', (('Hello', 'Hello'), (FakePipeline(2), '2'),),
+        'pipeline,expected_result',
+        (
+            ('Hello', 'Hello'),
+            (FakePipeline(2), '2'),
+        ),
     )
     def test_pipeline_get(self, pipeline, expected_result):
         manager = Manager()
@@ -38,7 +46,8 @@ class TestETLManager:
         assert manager.pipeline_get(pipeline) == fake_pipeline
 
     @pytest.mark.parametrize(
-        'pipeline', ('Hello', FakePipeline('2')),
+        'pipeline',
+        ('Hello', FakePipeline('2')),
     )
     def test_pipeline_remove(self, pipeline):
         manager = Manager()

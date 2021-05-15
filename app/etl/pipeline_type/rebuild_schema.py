@@ -31,5 +31,5 @@ class RebuildSchemaPipeline(DataPipeline):
     @classproperty
     @abstractmethod
     def sql_alchemy_model(cls):
-        ''' data model for this table '''
+        '''data model for this table'''
         ...

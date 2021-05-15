@@ -103,12 +103,18 @@ class SPIREBatchFactory(BaseFactory):
     @factory.lazy_attribute
     def release_date(self):
         if self.approve_date and self.end_date:
-            return factory.Faker('date_time_between', start_date=self.approve_date,).generate({})
+            return factory.Faker(
+                'date_time_between',
+                start_date=self.approve_date,
+            ).generate({})
 
     @factory.lazy_attribute
     def staging_date(self):
         if self.approve_date and self.end_date:
-            return factory.Faker('date_time_between', start_date=self.approve_date,).generate({})
+            return factory.Faker(
+                'date_time_between',
+                start_date=self.approve_date,
+            ).generate({})
 
     class Meta:
         model = SPIREBatch
@@ -143,11 +149,13 @@ class SPIREApplicationFactory(BaseFactory):
     def case_sub_type(self):
         if self.case_type == 'SIEL':
             return factory.Faker(
-                'random_element', elements=['PERMANENT', 'TEMPORARY', 'TRANSHIPMENT'],
+                'random_element',
+                elements=['PERMANENT', 'TEMPORARY', 'TRANSHIPMENT'],
             ).generate({})
         if self.case_type == 'OIEL':
             return factory.Faker(
-                'random_element', elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
+                'random_element',
+                elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
             ).generate({})
 
     class Meta:
@@ -163,7 +171,10 @@ class SPIREApplicationCountryFactory(BaseFactory):
 
     @factory.lazy_attribute
     def report_date(self):
-        return factory.Faker('date_time_between', start_date=self.start_date,).generate({})
+        return factory.Faker(
+            'date_time_between',
+            start_date=self.start_date,
+        ).generate({})
 
     @factory.lazy_attribute
     def country_id(self):
@@ -439,11 +450,13 @@ class SPIREIncidentFactory(BaseFactory):
     def case_sub_type(self):
         if self.case_type == 'SIEL':
             return factory.Faker(
-                'random_element', elements=['PERMANENT', 'TEMPORARY', 'TRANSHIPMENT'],
+                'random_element',
+                elements=['PERMANENT', 'TEMPORARY', 'TRANSHIPMENT'],
             ).generate({})
         if self.case_type == 'OIEL':
             return factory.Faker(
-                'random_element', elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
+                'random_element',
+                elements=['CRYPTO', 'MEDIA', 'DEALER', 'MIL_DUAL', 'UKCONTSHELF'],
             ).generate({})
 
     class Meta:

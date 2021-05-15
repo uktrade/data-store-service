@@ -21,7 +21,8 @@ def add_ons_postcode(app):
                 'pcds': record.get('postcode'),
             }
             ONSPostcodeDirectoryL1.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -36,7 +37,8 @@ def add_dit_reference_postcodes(app):
                 'local_authority_district_code': record.get('local_authority_district_code'),
             }
             DITReferencePostcodesL1.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -59,7 +61,8 @@ def add_comtrade_country_code_and_iso(app):
                 'end_valid_year': record.get('end_valid_year'),
             }
             ComtradeCountryCodeAndISOL1.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -77,7 +80,8 @@ def add_dit_eu_country_membership(app):
                 'tariff_code': record.get('tariff_code'),
             }
             DITEUCountryMembershipL1.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -95,7 +99,8 @@ def add_world_bank_raw_bound_rates(app):
                 'total_number_of_lines': record.get('total_number_of_lines'),
             }
             WorldBankBoundRateL0.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -111,7 +116,8 @@ def add_world_bank_bound_rates(app):
                 'bound_rate': record.get('bound_rate'),
             }
             WorldBankBoundRateL1.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -137,7 +143,8 @@ def add_world_bank_tariff(app):
                 'world_average': record.get('world_average'),
             }
             WorldBankTariffTransformL1.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -157,7 +164,8 @@ def add_world_bank_raw_tariff(app):
                 'number_of_total_lines': record.get('number_of_total_lines'),
             }
             WorldBankTariffL0.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method
@@ -176,7 +184,8 @@ def add_dit_baci(app):
                 'quantity': record.get('quantity'),
             }
             DITBACIL1.get_or_create(
-                id=record.get('id', None), defaults=defaults,
+                id=record.get('id', None),
+                defaults=defaults,
             )
 
     return _method

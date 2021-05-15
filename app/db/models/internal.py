@@ -59,7 +59,9 @@ class DatafileRegistryModel(BaseModel):
             'error_message': error_message,
         }
         clean_datafile, created = DatafileRegistryModel.get_or_create(
-            source=source, file_name=file_name, defaults=defaults,
+            source=source,
+            file_name=file_name,
+            defaults=defaults,
         )
         if not created:
             update_state = state is not None

@@ -141,7 +141,10 @@ def schema_upgrades():
         sa.Column('withheld_status', sa.Text(), nullable=True),
         sa.Column('batch_id', sa.Integer(), nullable=False),
         sa.Column('ela_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batches.id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batches.id'],
+        ),
         sa.PrimaryKeyConstraint('ela_grp_id'),
         schema=quoted_name('spire', quote=True),
     )
@@ -149,7 +152,10 @@ def schema_upgrades():
         'country_group_entries',
         sa.Column('cg_id', sa.Integer(), nullable=False),
         sa.Column('country_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['cg_id'], ['spire.country_groups.id'],),
+        sa.ForeignKeyConstraint(
+            ['cg_id'],
+            ['spire.country_groups.id'],
+        ),
         sa.PrimaryKeyConstraint('cg_id', 'country_id'),
         schema=quoted_name('spire', quote=True),
     )
@@ -164,7 +170,10 @@ def schema_upgrades():
         sa.Column('display_text', sa.Text(), nullable=False),
         sa.Column('single_footnote_text', sa.Text(), nullable=False),
         sa.Column('joint_footnote_text', sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(['mf_id'], ['spire.media_footnotes.id'],),
+        sa.ForeignKeyConstraint(
+            ['mf_id'],
+            ['spire.media_footnotes.id'],
+        ),
         sa.PrimaryKeyConstraint('id'),
         schema=quoted_name('spire', quote=True),
     )
@@ -184,7 +193,10 @@ def schema_upgrades():
         sa.Column('usage_count', sa.Integer(), nullable=True),
         sa.Column('end_user_type', sa.Text(), nullable=True),
         sa.Column('eco_comment', sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batches.id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batches.id'],
+        ),
         sa.PrimaryKeyConstraint('elr_id', 'elr_version'),
         schema=quoted_name('spire', quote=True),
     )
@@ -198,7 +210,10 @@ def schema_upgrades():
         sa.Column('amendment_closed_date', sa.DateTime(), nullable=False),
         sa.Column('withheld_status', sa.Text(), nullable=True),
         sa.Column('batch_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['ela_grp_id'], ['spire.applications.ela_grp_id'],),
+        sa.ForeignKeyConstraint(
+            ['ela_grp_id'],
+            ['spire.applications.ela_grp_id'],
+        ),
         sa.PrimaryKeyConstraint('ela_grp_id', 'ela_id'),
         schema=quoted_name('spire', quote=True),
     )
@@ -209,8 +224,14 @@ def schema_upgrades():
         sa.Column('report_date', sa.DateTime(), nullable=False),
         sa.Column('start_date', sa.DateTime(), nullable=False),
         sa.Column('batch_id', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batches.id'],),
-        sa.ForeignKeyConstraint(['ela_grp_id'], ['spire.applications.ela_grp_id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batches.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['ela_grp_id'],
+            ['spire.applications.ela_grp_id'],
+        ),
         sa.PrimaryKeyConstraint('ela_grp_id', 'country_id'),
         schema=quoted_name('spire', quote=True),
     )
@@ -229,10 +250,22 @@ def schema_upgrades():
         sa.Column('mfd_id', sa.Integer(), nullable=True),
         sa.Column('mf_grp_id', sa.Integer(), nullable=True),
         sa.Column('mf_free_text', sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batches.id'],),
-        sa.ForeignKeyConstraint(['ela_grp_id'], ['spire.applications.ela_grp_id'],),
-        sa.ForeignKeyConstraint(['fn_id'], ['spire.footnotes.id'],),
-        sa.ForeignKeyConstraint(['mfd_id'], ['spire.media_footnote_details.id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batches.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['ela_grp_id'],
+            ['spire.applications.ela_grp_id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['fn_id'],
+            ['spire.footnotes.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['mfd_id'],
+            ['spire.media_footnote_details.id'],
+        ),
         sa.PrimaryKeyConstraint('fne_id', 'version_no'),
         schema=quoted_name('spire', quote=True),
     )
@@ -250,9 +283,18 @@ def schema_upgrades():
         sa.Column('version_no', sa.Integer(), nullable=False),
         sa.Column('batch_id', sa.Integer(), nullable=False),
         sa.Column('status_control', sa.Text(), nullable=False),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batches.id'],),
-        sa.ForeignKeyConstraint(['ela_grp_id'], ['spire.applications.ela_grp_id'],),
-        sa.ForeignKeyConstraint(['source_country_grp_id'], ['spire.country_groups.id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batches.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['ela_grp_id'],
+            ['spire.applications.ela_grp_id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['source_country_grp_id'],
+            ['spire.country_groups.id'],
+        ),
         sa.PrimaryKeyConstraint('id'),
         schema=quoted_name('spire', quote=True),
     )
@@ -280,8 +322,14 @@ def schema_upgrades():
         sa.Column('status_control', sa.Text(), nullable=False),
         sa.Column('else_id', sa.Integer(), nullable=True),
         sa.Column('stakeholders_confirmed', sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batches.id'],),
-        sa.ForeignKeyConstraint(['ela_grp_id'], ['spire.applications.ela_grp_id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batches.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['ela_grp_id'],
+            ['spire.applications.ela_grp_id'],
+        ),
         sa.PrimaryKeyConstraint('inc_id', 'version_no'),
         schema=quoted_name('spire', quote=True),
     )
@@ -296,8 +344,14 @@ def schema_upgrades():
         sa.Column('version_no', sa.Integer(), nullable=False),
         sa.Column('batch_id', sa.Integer(), nullable=False),
         sa.Column('status_control', sa.Text(), nullable=False),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batches.id'],),
-        sa.ForeignKeyConstraint(['ela_grp_id'], ['spire.applications.ela_grp_id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batches.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['ela_grp_id'],
+            ['spire.applications.ela_grp_id'],
+        ),
         sa.PrimaryKeyConstraint('tp_id', 'version_no'),
         schema=quoted_name('spire', quote=True),
     )
@@ -312,8 +366,14 @@ def schema_upgrades():
         sa.Column('batch_id', sa.Integer(), nullable=False),
         sa.Column('sh_id', sa.Integer(), nullable=True),
         sa.Column('ultimate_end_user_flag', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batches.id'],),
-        sa.ForeignKeyConstraint(['ela_grp_id'], ['spire.applications.ela_grp_id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batches.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['ela_grp_id'],
+            ['spire.applications.ela_grp_id'],
+        ),
         sa.PrimaryKeyConstraint('ueu_id', 'version_no'),
         schema=quoted_name('spire', quote=True),
     )
@@ -322,8 +382,14 @@ def schema_upgrades():
         sa.Column('gi_id', sa.Integer(), nullable=False),
         sa.Column('rating', sa.Text(), nullable=False),
         sa.Column('value', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['gi_id'], ['spire.goods_incidents.id'],),
-        sa.ForeignKeyConstraint(['rating'], ['spire.ref_report_ratings.rating'],),
+        sa.ForeignKeyConstraint(
+            ['gi_id'],
+            ['spire.goods_incidents.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['rating'],
+            ['spire.ref_report_ratings.rating'],
+        ),
         sa.PrimaryKeyConstraint('gi_id', 'rating'),
         schema=quoted_name('spire', quote=True),
     )
@@ -331,7 +397,10 @@ def schema_upgrades():
         'reasons_for_refusal',
         sa.Column('gi_id', sa.Integer(), nullable=False),
         sa.Column('reason_for_refusal', sa.Text(), nullable=False),
-        sa.ForeignKeyConstraint(['gi_id'], ['spire.goods_incidents.id'],),
+        sa.ForeignKeyConstraint(
+            ['gi_id'],
+            ['spire.goods_incidents.id'],
+        ),
         sa.PrimaryKeyConstraint('gi_id', 'reason_for_refusal'),
         schema=quoted_name('spire', quote=True),
     )

@@ -55,7 +55,10 @@ def schema_upgrades():
         sa.Column('usage_count', sa.Integer(), nullable=True),
         sa.Column('end_user_type', sa.Text(), nullable=True),
         sa.Column('eco_comment', sa.Text(), nullable=True),
-        sa.ForeignKeyConstraint(['batch_id'], ['spire.batch.id'],),
+        sa.ForeignKeyConstraint(
+            ['batch_id'],
+            ['spire.batch.id'],
+        ),
         sa.PrimaryKeyConstraint('elr_id', 'elr_version'),
         schema=quoted_name('spire', quote=True),
     )

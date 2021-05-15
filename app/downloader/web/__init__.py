@@ -30,7 +30,7 @@ class WebScrapingDataSource(AbstractDataSource):
         )
 
     def _get_new_online_data_url(self):
-        """ Get new DataUrl if new one is available.
+        """Get new DataUrl if new one is available.
 
         Returns:
             DataUrl:
@@ -50,7 +50,7 @@ class WebScrapingDataSource(AbstractDataSource):
             return online_data_url
 
     def _download_data_url(self, data_url):
-        """ Downloads and stores the data specified by data_url """
+        """Downloads and stores the data specified by data_url"""
         date_str = data_url.date.strftime(self.file_date_format)
         file_name = self.storage_file_format.format(date=date_str)
 

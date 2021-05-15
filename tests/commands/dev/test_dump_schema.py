@@ -13,7 +13,12 @@ from app.commands.dev.dump_schema import (
 
 class TestDumpSchemaCommand:
     @pytest.mark.parametrize(
-        'cmd_args,exit_code', (([], 0), (['public'], 2), (['--schema', 'public'], 2),),
+        'cmd_args,exit_code',
+        (
+            ([], 0),
+            (['public'], 2),
+            (['--schema', 'public'], 2),
+        ),
     )
     def test_dump_schema_without_invalid_options(self, app_with_db, cmd_args, exit_code):
         runner = app_with_db.test_cli_runner()

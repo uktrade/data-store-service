@@ -47,7 +47,10 @@ def schema_upgrades():
         sa.Column('deleted', sa.Boolean(), nullable=True),
         sa.Column('uploaded_at', sa.DateTime(), nullable=True),
         sa.Column('processed_at', sa.DateTime(), nullable=True),
-        sa.ForeignKeyConstraint(['pipeline_id'], ['public.pipeline.id'],),
+        sa.ForeignKeyConstraint(
+            ['pipeline_id'],
+            ['public.pipeline.id'],
+        ),
         sa.PrimaryKeyConstraint('id'),
     )
     # ### end Alembic commands ###

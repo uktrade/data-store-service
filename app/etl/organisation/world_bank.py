@@ -227,7 +227,11 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
             code = str(product[0])
             p.apply_async(
                 self._clean_and_transform_tariffs,
-                (code, connection_str, WorldBankBoundRatesPipeline(self.dbi)._l1_table,),
+                (
+                    code,
+                    connection_str,
+                    WorldBankBoundRatesPipeline(self.dbi)._l1_table,
+                ),
             )
         p.close()
         p.join()
@@ -614,9 +618,9 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     @timeit
     def _create_country_dictionary_view(self):
         """
-            Comtrade country list with adjusted iso3 codes
+        Comtrade country list with adjusted iso3 codes
 
-            Used by (spine_view, eu_countries_view)
+        Used by (spine_view, eu_countries_view)
         """
         comtrade_country_code_and_iso = ComtradeCountryCodeAndISOPipeline(self.dbi)
         stmt = f"""
@@ -642,13 +646,13 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     @timeit
     def _create_spine_view(self):
         """
-            Create spine as cross product of product, year, reporter and partner
-            combinations from tariff data and Comtrade Countries joined on required
-            country and filtered on
-                - only containing required country pairs
-                - reporter must be different from partner
+        Create spine as cross product of product, year, reporter and partner
+        combinations from tariff data and Comtrade Countries joined on required
+        country and filtered on
+            - only containing required country pairs
+            - reporter must be different from partner
 
-            Used by (eu_reporter_rates_view, tariffs_with_eu_reporter_rates)
+        Used by (eu_reporter_rates_view, tariffs_with_eu_reporter_rates)
         """
         stmt = f"""
         create materialized view if not exists {self._fq(self.spine_vn)} as (
@@ -686,10 +690,10 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     @timeit
     def _create_all_tariffs_view(self):
         """
-            Create tariff view with different types as columns. Switch to use
-            iso3 instead of iso_number for partner/reporter
+        Create tariff view with different types as columns. Switch to use
+        iso3 instead of iso_number for partner/reporter
 
-            Used by (eu_reporter_rates_view, tariffs_with_eu_reporter_rates)
+        Used by (eu_reporter_rates_view, tariffs_with_eu_reporter_rates)
 
         """
         stmt = f"""
@@ -733,11 +737,11 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     @timeit
     def _create_eu_countries_view(self):
         """
-            Eu country list filtered on
-                - only containing required country pairs
-                - tariff_code is EUN
+        Eu country list filtered on
+            - only containing required country pairs
+            - tariff_code is EUN
 
-            Used by (eu_reporter_rates)
+        Used by (eu_reporter_rates)
         """
         dit_eu_country_membership = DITEUCountryMembershipPipeline(self.dbi)
         stmt = f"""
@@ -763,15 +767,15 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     @timeit
     def _create_eu_reporter_rates_view(self):
         """
-            All tariffs where
-                - reporter is EU (918)
-                - partner is part of spine
-            expanded to include all eu countries
-                - EU-EU rates set to 0 if no app rate present
+        All tariffs where
+            - reporter is EU (918)
+            - partner is part of spine
+        expanded to include all eu countries
+            - EU-EU rates set to 0 if no app rate present
 
-            Only a reporter can be 918 and a corresponding partner can only be non-eu
+        Only a reporter can be 918 and a corresponding partner can only be non-eu
 
-            Used by (tariffs_with_eu_reporter_rates)
+        Used by (tariffs_with_eu_reporter_rates)
         """
         stmt = f"""
         create materialized view if not exists {self._fq(self.eu_reporter_rates_vn)} as (
@@ -830,10 +834,10 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     @timeit
     def _create_tariffs_with_eu_reporter_rates_view(self):
         """
-            All required tariffs including the eu reported rates
-            and if partner/reporter is EUN
+        All required tariffs including the eu reported rates
+        and if partner/reporter is EUN
 
-            Used by (eu_partner_rates, product_tariffs)
+        Used by (eu_partner_rates, product_tariffs)
         """
         stmt = f"""
         create materialized view if not exists
@@ -883,9 +887,9 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     @timeit
     def _create_eu_partner_rates_view(self):
         """
-            Calculates the average EU partner rate
+        Calculates the average EU partner rate
 
-            Used by (product_tariffs)
+        Used by (product_tariffs)
         """
         stmt = f"""
         create materialized view if not exists {self._fq(self.eu_partner_rates_vn)} as (
@@ -909,9 +913,9 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
     @timeit
     def _create_tariffs_with_world_partner_rates_view(self):
         """
-            Required tariffs with expanded world partner rates
+        Required tariffs with expanded world partner rates
 
-            Used by (product_tariffs)
+        Used by (product_tariffs)
         """
         stmt = f"""
         create materialized view if not exists

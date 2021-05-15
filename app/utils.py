@@ -6,7 +6,10 @@ from mohawk import Sender
 
 
 def hawk_api_request(
-    url, method, credentials, body=None,
+    url,
+    method,
+    credentials,
+    body=None,
 ):
     if body:
         body = json.dumps(body)
@@ -21,7 +24,12 @@ def hawk_api_request(
     headers = {"Authorization": auth_header}
     if body:
         headers["Content-Type"] = "application/json"
-    response = requests.request(method, url, data=body, headers=headers,)
+    response = requests.request(
+        method,
+        url,
+        data=body,
+        headers=headers,
+    )
 
     response.raise_for_status()
     response_json = response.json()
@@ -38,7 +46,11 @@ def trigger_dataflow_dag(schema, table):
 def check_dataflow_dag_progress(run_id):
     base_url, dag_id, dataflow_hawk_creds = _get_dataflow_api_params()
     dataflow_source_url = f"{base_url}/api/experimental/dags/{dag_id}/dag_runs"
-    return hawk_api_request(f'{dataflow_source_url}/{run_id}', "GET", dataflow_hawk_creds,)
+    return hawk_api_request(
+        f'{dataflow_source_url}/{run_id}',
+        "GET",
+        dataflow_hawk_creds,
+    )
 
 
 def _get_dataflow_api_params():
