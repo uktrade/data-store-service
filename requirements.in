@@ -14,9 +14,9 @@ flask-wtf==0.14.3
 flask==1.1.1
 freezegun==1.1.0
 fuzzywuzzy==0.18.0
-git+https://github.com/uktrade/data-engineering-common.git@v1.2.4
+git+https://github.com/uktrade/data-engineering-common.git
 git+https://github.com/uktrade/dt08-data-tools.git
-gunicorn[gevent]==20.*
+gunicorn[gevent]
 json-log-formatter==0.3.0
 lxml==4.6.3
 mohawk==1.1.0
@@ -35,8 +35,8 @@ requests-oauthlib==1.1.0
 selenium==3.141.0
 sentry_sdk[flask]==1.1.0
 spacy==3.0.6
-sqlalchemy-utils==0.36.8
-sqlalchemy==1.3.19
+sqlalchemy-utils
+sqlalchemy
 tableschema==1.19.3
 tabulator==1.52.3
 toolz==0.11.1

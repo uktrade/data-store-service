@@ -11,11 +11,11 @@ def test_get_table_structure(app_with_hawk_user, app_with_mock_cache):
             {'name': 'id', 'type': 'INTEGER'},
             {'name': 'batch_ref', 'type': 'TEXT'},
             {'name': 'status', 'type': 'TEXT'},
-            {'name': 'start_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
-            {'name': 'end_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
-            {'name': 'approve_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
-            {'name': 'release_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
-            {'name': 'staging_date', 'type': 'TIMESTAMP WITHOUT TIME ZONE'},
+            {'name': 'start_date', 'type': 'TIMESTAMP'},
+            {'name': 'end_date', 'type': 'TIMESTAMP'},
+            {'name': 'approve_date', 'type': 'TIMESTAMP'},
+            {'name': 'release_date', 'type': 'TIMESTAMP'},
+            {'name': 'staging_date', 'type': 'TIMESTAMP'},
         ],
     }
 
