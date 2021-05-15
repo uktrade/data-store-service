@@ -334,7 +334,7 @@ pytz==2020.1
     #   babel
     #   pandas
     #   tzlocal
-pyyaml==5.4
+pyyaml==5.4.1
     # via
     #   -r requirements.in
     #   data-engineering-common
