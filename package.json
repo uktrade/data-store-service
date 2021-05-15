@@ -22,7 +22,7 @@
    },
    "homepage": "https://github.com/uktrade/data-store-service#readme",
    "dependencies": {
-      "css-loader": "^4.0.0",
+      "css-loader": "^5.2.4",
       "file-loader": "^6.0.0",
       "govuk-frontend": "^3.7.0",
       "node-sass": "^4.14.1",
