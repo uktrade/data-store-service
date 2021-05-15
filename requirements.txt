@@ -288,7 +288,7 @@ pycountry==20.7.3
     # via -r requirements.in
 pyflakes==2.2.0
     # via flake8
-pygments==2.7.1
+pygments==2.7.4
     # via ipython
 pyparsing==2.4.6
     # via packaging
