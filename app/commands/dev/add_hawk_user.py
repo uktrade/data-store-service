@@ -7,13 +7,19 @@ from flask.cli import with_appcontext
 @with_appcontext
 @click.option('--client_id', type=str, help="a unique id for the client")
 @click.option(
-    '--client_key', type=str, help="secret key only known by the client and server",
+    '--client_key',
+    type=str,
+    help="secret key only known by the client and server",
 )
 @click.option(
-    '--client_scope', type=str, help="comma separated list of endpoints",
+    '--client_scope',
+    type=str,
+    help="comma separated list of endpoints",
 )
 @click.option(
-    '--description', type=str, help="describe the usage of these credentials",
+    '--description',
+    type=str,
+    help="describe the usage of these credentials",
 )
 def add_hawk_user(client_id, client_key, client_scope, description):
     """

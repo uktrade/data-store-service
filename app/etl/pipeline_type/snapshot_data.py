@@ -5,7 +5,7 @@ from app.utils import trigger_dataflow_dag
 
 
 class L0SnapshotDataPipeline(LDataPipeline):
-    """ Abstract class for standard pipelines that ingest data snapshots
+    """Abstract class for standard pipelines that ingest data snapshots
 
     This class implements the abstract process method of a CleanDataPipeline as:
         1) parse file_info object into L0.temp (_datafile_to_l0_temp)
@@ -41,8 +41,8 @@ class L0SnapshotDataPipeline(LDataPipeline):
     @property
     @abstractmethod
     def _l0_data_column_types(self):
-        """ returns list of tuples containing l0 column names and
-            their sql type [(l0_column_1_name, sql_type), ...]
+        """returns list of tuples containing l0 column names and
+        their sql type [(l0_column_1_name, sql_type), ...]
         """
         ...
 
@@ -87,13 +87,12 @@ class L0SnapshotDataPipeline(LDataPipeline):
     # DATA TO L0.temp
     @abstractmethod
     def _datafile_to_l0_temp(self, file_info):
-        """ Parses file_info object and populates the _l0_temp_table """
+        """Parses file_info object and populates the _l0_temp_table"""
         ...
 
     @property
     def _l0_hash_column_indices(self):
-        """ The column indices used for calculating the md5 hash to identify identical rows
-        """
+        """The column indices used for calculating the md5 hash to identify identical rows"""
         return range(len(self._l0_data_column_types))
 
     # L0.temp TO L0
@@ -148,7 +147,7 @@ class L0SnapshotDataPipeline(LDataPipeline):
 
 
 class L1SnapshotDataPipeline(L0SnapshotDataPipeline):
-    """ Abstract class for standard pipelines that ingest data snapshots
+    """Abstract class for standard pipelines that ingest data snapshots
 
     This class implements the abstract process method of a CleanDataPipeline as:
         1) parse file_info object into L0.temp (_datafile_to_l0_temp)
@@ -168,8 +167,8 @@ class L1SnapshotDataPipeline(L0SnapshotDataPipeline):
     @property
     @abstractmethod
     def _l1_data_column_types(self):
-        """ returns list of tuples containing l1 column names and
-            their sql type [(l1_column_1_name, sql_type), ...]
+        """returns list of tuples containing l1 column names and
+        their sql type [(l1_column_1_name, sql_type), ...]
         """
         ...
 
@@ -198,16 +197,16 @@ class L1SnapshotDataPipeline(L0SnapshotDataPipeline):
     @abstractmethod
     def _l0_l1_data_transformations(self):
         """
-            returns dict of transformations {l1_column: transformation(l0_column), ...}
-            to convert L0 table to L1 table. The transformations must comply with
-            postgres sql syntax. If no l1 column key/value supplied, the l0 value
-            will be copied as is.
+        returns dict of transformations {l1_column: transformation(l0_column), ...}
+        to convert L0 table to L1 table. The transformations must comply with
+        postgres sql syntax. If no l1 column key/value supplied, the l0 value
+        will be copied as is.
         """
         ...
 
     @property
     def _l0_l1_transformations(self):
-        """ Include transformation that references the L0 record """
+        """Include transformation that references the L0 record"""
         transformations = {'data_source_row_id': 'id'}
         transformations.update(self._l0_l1_data_transformations)
         return transformations

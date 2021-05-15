@@ -102,7 +102,11 @@ arg_to_pipeline_config_list = {
         ),
     ],
     HMRCExportersPipeline.data_source: [
-        (HMRCExportersPipeline, 'hmrc/exporters/', {'unpack': False, 'trigger_dataflow_dag': True},)
+        (
+            HMRCExportersPipeline,
+            'hmrc/exporters/',
+            {'unpack': False, 'trigger_dataflow_dag': True},
+        )
     ],
 }
 

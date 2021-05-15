@@ -19,8 +19,7 @@ class DSSDatafileProvider(DatafileProvider):
 
 
 class Manager:
-    """ Manages several clean pipelines and one storage instance
-    """
+    """Manages several clean pipelines and one storage instance"""
 
     def __init__(self, storage=None, dbi=None):
         self.storage = self._cast_to_storage(storage)
@@ -34,7 +33,7 @@ class Manager:
 
     @classmethod
     def _cast_to_storage(cls, storage):
-        """ Intelligently cast storage to a storage instance.
+        """Intelligently cast storage to a storage instance.
 
         Concretely this means a string is interpreted as a path from
         which a storage instance will be created. Otherwise the object
@@ -78,7 +77,8 @@ class Manager:
                 )
         else:
             data_changed = self._update_registry_and_process(
-                pipeline=pipeline, progress_bar=progress_bar,
+                pipeline=pipeline,
+                progress_bar=progress_bar,
             )
         if data_changed and pipeline_config.trigger_dataflow_dag:
             pipeline.trigger_dataflow_dag()
@@ -93,7 +93,9 @@ class Manager:
         data_changed = False
         try:
             entry, _ = DatafileRegistryModel.get_update_or_create(
-                source=pipeline.id, file_name=orig_file_name, state=DatafileState.PROCESSING.value,
+                source=pipeline.id,
+                file_name=orig_file_name,
+                state=DatafileState.PROCESSING.value,
             )
             pipeline.process(file_info)
             data_changed = True
@@ -114,7 +116,7 @@ class Manager:
             self.pipeline_process(pipeline_id, progress_bar=progress)
 
     def pipeline_register(self, pipeline, sub_directory=None, pipeline_id=None, **kwargs):
-        """ Register a clean pipeline for the manager to use
+        """Register a clean pipeline for the manager to use
 
         Args:
             pipeline: pipeline class
@@ -144,7 +146,7 @@ class Manager:
         )
 
     def pipeline_remove(self, pipeline):
-        """ Remove this pipeline.
+        """Remove this pipeline.
 
         Args:
             pipeline: str or CleanDataPipeline instance

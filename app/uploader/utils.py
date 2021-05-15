@@ -31,7 +31,9 @@ def _move_file_to_s3(file_url, organisation, dataset, delimiter, quote):
     file_name = file_url.split('/')[-1]
     full_url = os.path.join(bucket, file_url)
     utf_8_byte_stream = CSVParser.get_csv_as_utf_8_byte_stream(
-        full_url=full_url, delimiter=delimiter, quotechar=quote,
+        full_url=full_url,
+        delimiter=delimiter,
+        quotechar=quote,
     )
     file_info = FileInfo(file_url, utf_8_byte_stream)
     storage = StorageFactory.create(bucket)
@@ -91,12 +93,20 @@ def process_pipeline_data_file(pipeline_data_file):
 
     # move file to s3
     file_url = pipeline_data_file.data_file_url
-    file_info = _move_file_to_s3(file_url, organisation, dataset, delimiter, quote,)
+    file_info = _move_file_to_s3(
+        file_url,
+        organisation,
+        dataset,
+        delimiter,
+        quote,
+    )
 
     # create pipeline
     class PipelineThread(Thread):
         def __init__(
-            self, process_pipeline, trigger_dag,
+            self,
+            process_pipeline,
+            trigger_dag,
         ):
             self.process_pipeline = process_pipeline
             self.trigger_dag = trigger_dag
@@ -117,7 +127,9 @@ def process_pipeline_data_file(pipeline_data_file):
 
     @copy_current_request_context
     def _process_pipeline(
-        pipeline, pipeline_data_file, file_info,
+        pipeline,
+        pipeline_data_file,
+        file_info,
     ):
         try:
             pipeline_data_file = app.db.session.merge(pipeline_data_file)
@@ -139,7 +151,8 @@ def process_pipeline_data_file(pipeline_data_file):
 
     @copy_current_request_context
     def _trigger_dag(
-        pipeline, pipeline_data_file,
+        pipeline,
+        pipeline_data_file,
     ):
         try:
             pipeline_data_file.state = DataUploaderFileState.PROCESSING_DATAFLOW.value

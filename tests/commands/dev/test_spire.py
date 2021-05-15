@@ -32,7 +32,8 @@ from app.db.models.external import (
 
 class TestPopulateSpireCommand:
     @pytest.mark.parametrize(
-        'batch_size,min_batch_size', ((1, 1), (10, 2)),
+        'batch_size,min_batch_size',
+        ((1, 1), (10, 2)),
     )
     def test_populate_spire_schema(self, app_with_db, batch_size, min_batch_size):
         runner = app_with_db.test_cli_runner()

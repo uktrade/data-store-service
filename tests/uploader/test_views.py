@@ -56,7 +56,10 @@ def test_get_select_pipeline_view_with_no_pipelines(
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_select')
     response, template_context = _test_view(
-        client, url, 'pipeline_select.html', captured_templates,
+        client,
+        url,
+        'pipeline_select.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Add new dataset' in html
@@ -70,7 +73,10 @@ def test_get_select_pipeline_view_with_pipelines(is_authenticated, app_with_db, 
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_select')
     response, template_context = _test_view(
-        client, url, 'pipeline_select.html', captured_templates,
+        client,
+        url,
+        'pipeline_select.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Add new dataset' in html
@@ -87,7 +93,10 @@ def test_select_pipeline_view_radios_have_distinct_ids(
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_select')
     response, template_context = _test_view(
-        client, url, 'pipeline_select.html', captured_templates,
+        client,
+        url,
+        'pipeline_select.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert (
@@ -121,7 +130,10 @@ def test_get_pipeline_create_view(is_authenticated, app_with_db, captured_templa
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_create')
     response, template_context = _test_view(
-        client, url, 'pipeline_create.html', captured_templates,
+        client,
+        url,
+        'pipeline_create.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Create pipeline' in html
@@ -217,7 +229,10 @@ def test_get_pipeline_created_view(is_authenticated, app_with_db, captured_templ
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_created', slug=pipeline.slug)
     response, template_context = _test_view(
-        client, url, 'pipeline_created.html', captured_templates,
+        client,
+        url,
+        'pipeline_created.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Dataset pipeline created' in html
@@ -244,7 +259,10 @@ def test_get_data_uploaded_view(
         'uploader_views.pipeline_data_uploaded', slug=data_file.pipeline.slug, file_id=data_file.id
     )
     response, template_context = _test_view(
-        client, url, 'pipeline_data_uploaded.html', captured_templates,
+        client,
+        url,
+        'pipeline_data_uploaded.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Data now being processed' in html
@@ -256,7 +274,10 @@ def test_get_data_upload_view(is_authenticated, app_with_db, captured_templates)
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
     response, template_context = _test_view(
-        client, url, 'pipeline_data_upload.html', captured_templates,
+        client,
+        url,
+        'pipeline_data_upload.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Upload data' in html
@@ -274,7 +295,10 @@ def test_get_data_verify_view(
         'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
     )
     response, template_context = _test_view(
-        client, url, 'pipeline_data_verify.html', captured_templates,
+        client,
+        url,
+        'pipeline_data_verify.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Data successfully uploaded' in html
@@ -293,7 +317,10 @@ def test_get_data_verify_error_view(
         'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
     )
     response, template_context = _test_view(
-        client, url, 'pipeline_data_verify.html', captured_templates,
+        client,
+        url,
+        'pipeline_data_verify.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Try again' in html
@@ -323,7 +350,10 @@ def test_submit_data_using_reserved_column_is_rejected_early(
         'uploader_views.pipeline_data_verify', slug=data_file.pipeline.slug, file_id=data_file.id
     )
     response, template_context = _test_view(
-        client, url, 'pipeline_data_verify.html', captured_templates,
+        client,
+        url,
+        'pipeline_data_verify.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Try again' in html
@@ -576,7 +606,10 @@ def test_get_data_upload_view_existing_versions(is_authenticated, app_with_db, c
     client = get_client(app_with_db)
     url = url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug)
     response, template_context = _test_view(
-        client, url, 'pipeline_data_upload.html', captured_templates,
+        client,
+        url,
+        'pipeline_data_upload.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
 
@@ -617,7 +650,10 @@ def test_get_restore_version_view(
         'uploader_views.pipeline_restore_version', slug=pipeline.slug, file_id=data_file_2.id
     )
     response, template_context = _test_view(
-        client, url, 'pipeline_restore_version.html', captured_templates,
+        client,
+        url,
+        'pipeline_restore_version.html',
+        captured_templates,
     )
     html = response.get_data(as_text=True)
     assert 'Latest version' in html  # data_file_1
@@ -771,4 +807,10 @@ def test_data_upload_failed_view_has_link_to_try_again(
 
     assert response.status_code == 200
     assert "Try again" in body
-    assert url_for('uploader_views.pipeline_data_upload', slug=data_file.pipeline.slug,) in body
+    assert (
+        url_for(
+            'uploader_views.pipeline_data_upload',
+            slug=data_file.pipeline.slug,
+        )
+        in body
+    )

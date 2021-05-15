@@ -71,8 +71,14 @@ def schema_upgrades():
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=True),
         sa.Column('role_id', sa.Integer(), nullable=True),
-        sa.ForeignKeyConstraint(['role_id'], ['admin.roles.id'],),
-        sa.ForeignKeyConstraint(['user_id'], ['admin.users.id'],),
+        sa.ForeignKeyConstraint(
+            ['role_id'],
+            ['admin.roles.id'],
+        ),
+        sa.ForeignKeyConstraint(
+            ['user_id'],
+            ['admin.users.id'],
+        ),
         sa.PrimaryKeyConstraint('id'),
         schema=quoted_name('admin', quote=True),
     )

@@ -32,10 +32,16 @@ from tests.fixtures.factories import (
 @click.command('populate_spire_schema')
 @with_appcontext
 @click.option(
-    '--batch_size', type=int, help='Optimum number of rows per object', default=10,
+    '--batch_size',
+    type=int,
+    help='Optimum number of rows per object',
+    default=10,
 )
 @click.option(
-    '--min_batch_size', type=int, help='Minimum amount of rows per object', default=10,
+    '--min_batch_size',
+    type=int,
+    help='Minimum amount of rows per object',
+    default=10,
 )
 def populate_spire_schema(min_batch_size, batch_size):
     """

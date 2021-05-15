@@ -106,7 +106,10 @@ def pipeline_data_upload(slug):
         )
 
     return render_uploader_template(
-        'pipeline_data_upload.html', pipeline=pipeline, form=form, heading='Upload data',
+        'pipeline_data_upload.html',
+        pipeline=pipeline,
+        form=form,
+        heading='Upload data',
     )
 
 
@@ -196,7 +199,12 @@ def pipeline_restore_version(slug, file_id):
     form = forms.RestoreVersionForm()
     is_form_valid = form.validate_on_submit()
     if is_form_valid and form.proceed.data != YES:
-        return redirect(url_for('uploader_views.pipeline_data_upload', slug=pipeline.slug,))
+        return redirect(
+            url_for(
+                'uploader_views.pipeline_data_upload',
+                slug=pipeline.slug,
+            )
+        )
 
     data_file_latest = pipeline.latest_version
     file_contents_latest, _ = CSVParser.get_csv_sample(

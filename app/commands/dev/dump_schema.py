@@ -39,7 +39,9 @@ def dump_table(db_uri, folder, schema, table):
 @click.command('dump_schema')
 @with_appcontext
 @click.option(
-    '--schema', type=click.Choice([SPIRE_SCHEMA_NAME]), help='Schema to dump to csv',
+    '--schema',
+    type=click.Choice([SPIRE_SCHEMA_NAME]),
+    help='Schema to dump to csv',
 )
 def dump_schema(schema):
     """

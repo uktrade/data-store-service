@@ -15,16 +15,22 @@ from app.db.models import get_schemas
     help='Create database using database name specified in (local) config',
 )
 @click.option(
-    '--drop', is_flag=True, help='Drop database using database name specified in (local) config',
+    '--drop',
+    is_flag=True,
+    help='Drop database using database name specified in (local) config',
 )
 @click.option(
     '--create_tables', '--upgrade', '--run_migrations', is_flag=True, help='Create database tables'
 )
 @click.option(
-    '--drop_tables', is_flag=True, help='Drop database tables',
+    '--drop_tables',
+    is_flag=True,
+    help='Drop database tables',
 )
 @click.option(
-    '--recreate_tables', is_flag=True, help='Drop and recreate database tables',
+    '--recreate_tables',
+    is_flag=True,
+    help='Drop and recreate database tables',
 )
 def db(create, drop, drop_tables, create_tables, recreate_tables):
     """

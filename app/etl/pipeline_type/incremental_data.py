@@ -5,7 +5,7 @@ from app.utils import trigger_dataflow_dag
 
 
 class L0IncrementalDataPipeline(LDataPipeline):
-    """ Abstract class for standard pipelines that ingests data incrementally
+    """Abstract class for standard pipelines that ingests data incrementally
     (i.e. not snapshot data)
 
     This class implements the abstract process method of a CleanDataPipeline as:
@@ -36,8 +36,8 @@ class L0IncrementalDataPipeline(LDataPipeline):
     @property
     @abstractmethod
     def _l0_data_column_types(self):
-        """ returns list of tuples containing l0 column names and their sql
-            type [(l0_column_1_name, sql_type), ...]
+        """returns list of tuples containing l0 column names and their sql
+        type [(l0_column_1_name, sql_type), ...]
         """
         ...
 
@@ -99,7 +99,7 @@ class L0IncrementalDataPipeline(LDataPipeline):
 
 
 class L1IncrementalDataPipeline(L0IncrementalDataPipeline):
-    """ Abstract class for standard pipelines that ingests data incrementally
+    """Abstract class for standard pipelines that ingests data incrementally
     (i.e. not snapshot data)
 
     This class implements the abstract process method of a CleanDataPipeline as:
@@ -125,8 +125,8 @@ class L1IncrementalDataPipeline(L0IncrementalDataPipeline):
     @property
     @abstractmethod
     def _l1_data_column_types(self):
-        """ returns list of tuples containing l1 column names and their sql
-            type [(l1_column_1_name, sql_type), ...]
+        """returns list of tuples containing l1 column names and their sql
+        type [(l1_column_1_name, sql_type), ...]
         """
         ...
 
@@ -158,15 +158,15 @@ class L1IncrementalDataPipeline(L0IncrementalDataPipeline):
     @abstractmethod
     def _l0_l1_data_transformations(self):
         """
-            returns dict of transformations {l1_column: transformation(l0_column), ...}
-            to convert L0 table to L1 table. The transformations must comply with postgres
-            sql syntax. If no l1 column key/value supplied, the l0 value will be copied as is.
+        returns dict of transformations {l1_column: transformation(l0_column), ...}
+        to convert L0 table to L1 table. The transformations must comply with postgres
+        sql syntax. If no l1 column key/value supplied, the l0 value will be copied as is.
         """
         ...
 
     @property
     def _l0_l1_transformations(self):
-        """ Include transformation for id and a data_source_row_id that references the L0 record """
+        """Include transformation for id and a data_source_row_id that references the L0 record"""
         transformations = {'id': f"nextval('{self._l1_sequence}')", 'data_source_row_id': 'id'}
         transformations.update(self._l0_l1_data_transformations)
         return transformations

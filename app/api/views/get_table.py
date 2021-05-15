@@ -18,7 +18,7 @@ def _get_columns(schema, table_name):
 
 
 def table_valid(view_func):
-    """ Decorator that checks the table exists in the schema provided
+    """Decorator that checks the table exists in the schema provided
     and that the schema is not in the excluded list of schemas.
     """
 

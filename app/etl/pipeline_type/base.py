@@ -16,7 +16,7 @@ class classproperty(object):
 
 
 class DataPipeline(metaclass=ABCMeta):
-    """ Abstract class for Data Pipelines.
+    """Abstract class for Data Pipelines.
 
     The main entry point and usage of this class is the
     process method. Everything else can be overridden and
@@ -87,18 +87,18 @@ class DataPipeline(metaclass=ABCMeta):
     @classproperty
     @abstractmethod
     def dataset(cls):
-        """ String [a-zA-Z0-9._-]+ (no quotation marks) """
+        """String [a-zA-Z0-9._-]+ (no quotation marks)"""
 
     @classproperty
     @abstractmethod
     def organisation(cls):
-        """ String [a-zA-Z0-9._-]+ (no quotation marks) """
+        """String [a-zA-Z0-9._-]+ (no quotation marks)"""
 
     subdataset, format_version = None, None
 
     @abstractmethod
     def process(self, fileinfo, **kwargs):
-        """ Takes a datatools.io.fileinfo.FileInfo object """
+        """Takes a datatools.io.fileinfo.FileInfo object"""
         ...
 
     @classproperty

@@ -52,7 +52,10 @@ class CompaniesHouseAccountsPipeline(L0IncrementalDataPipeline):
         ('administrative_expenses', 'numeric'),
         ('raw_materials_consumables', 'numeric'),
         ('staff_costs', 'numeric'),
-        ('depreciation_other_amounts_written_off_tangible_intangible_fixed_assets', 'numeric',),
+        (
+            'depreciation_other_amounts_written_off_tangible_intangible_fixed_assets',
+            'numeric',
+        ),
         ('other_operating_charges_format2', 'numeric'),
         ('operating_profit_loss', 'numeric'),
         ('profit_loss_on_ordinary_activities_before_tax', 'numeric'),
@@ -124,7 +127,10 @@ class XBRLParser:
     #   financial attribute in XBRL tree (until a value is found)
     #   attribute_type: type used to parse the attribute value
     GENERAL_XPATH_MAPPINGS = {
-        'balance_sheet_date': ([_av('BalanceSheetDate'), _en('BalanceSheetDate')], datetime.date,),
+        'balance_sheet_date': (
+            [_av('BalanceSheetDate'), _en('BalanceSheetDate')],
+            datetime.date,
+        ),
         'companies_house_registered_number': (
             [_av('UKCompaniesHouseRegisteredNumber'), _en('CompaniesHouseRegisteredNumber')],
             str,
@@ -190,7 +196,10 @@ class XBRLParser:
             ],
             float,
         ),
-        'net_current_assets_liabilities': ([_en_av('NetCurrentAssetsLiabilities')], float,),
+        'net_current_assets_liabilities': (
+            [_en_av('NetCurrentAssetsLiabilities')],
+            float,
+        ),
         'total_assets_less_current_liabilities': (
             [_en_av('TotalAssetsLessCurrentLiabilities')],
             float,
@@ -275,7 +284,10 @@ class XBRLParser:
             ],
             float,
         ),
-        'profit_loss_for_period': ([_en_av('ProfitLoss'), _en_av('ProfitLossForPeriod')], float,),
+        'profit_loss_for_period': (
+            [_en_av('ProfitLoss'), _en_av('ProfitLossForPeriod')],
+            float,
+        ),
     }
 
     # columns names used to store the companies financial attributes
