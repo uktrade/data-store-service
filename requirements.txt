@@ -8,7 +8,7 @@ alembic==1.4.3
     # via flask-migrate
 appdirs==1.4.4
     # via black
-apscheduler==3.6.3
+apscheduler==3.7.0
     # via -r requirements.in
 attrs==19.3.0
     # via
