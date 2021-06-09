@@ -33,11 +33,11 @@ blis==0.4.1
     # via
     #   spacy
     #   thinc
-boto3==1.11.10
+boto3==1.17.90
     # via
     #   tabulator
     #   uktrade-data-tools
-botocore==1.14.10
+botocore==1.20.90
     # via
     #   boto3
     #   s3transfer
@@ -48,12 +48,12 @@ catalogue==2.0.4
     #   spacy
     #   srsly
     #   thinc
-certifi==2019.11.28
+certifi==2021.5.30
     # via
     #   data-engineering-common
     #   requests
     #   sentry-sdk
-chardet==3.0.4
+chardet==4.0.0
     # via
     #   requests
     #   tabulator
@@ -91,8 +91,6 @@ decorator==4.4.1
     #   traitlets
 dnspython==1.16.0
     # via email-validator
-docutils==0.15.2
-    # via botocore
 email-validator==1.1.1
     # via data-engineering-common
 et-xmlfile==1.0.1
@@ -167,7 +165,7 @@ greenlet==1.1.0
     #   sqlalchemy
 gunicorn[gevent]==20.0.4
     # via -r requirements.in
-idna==2.8
+idna==2.10
     # via
     #   email-validator
     #   requests
@@ -195,7 +193,7 @@ jinja2==2.11.3
     #   flask
     #   flask-babelex
     #   spacy
-jmespath==0.9.4
+jmespath==0.10.0
     # via
     #   boto3
     #   botocore
@@ -349,7 +347,7 @@ requests-oauthlib==1.1.0
     #   -r requirements.in
     #   data-engineering-common
     #   flask-oauthlib
-requests==2.22.0
+requests==2.25.1
     # via
     #   codecov
     #   data-engineering-common
@@ -361,7 +359,7 @@ requests==2.22.0
     #   webdriver-manager
 rfc3986==1.4.0
     # via tableschema
-s3transfer==0.3.2
+s3transfer==0.4.2
     # via boto3
 selenium==3.141.0
     # via -r requirements.in
@@ -442,7 +440,7 @@ unicodecsv==0.14.1
     # via
     #   tableschema
     #   tabulator
-urllib3==1.25.8
+urllib3==1.26.5
     # via
     #   botocore
     #   requests
