@@ -71,7 +71,7 @@ jobs:
 
   test-compile:
     docker:
-      - image: circleci/node
+      - image: circleci/node:14.16.1
  
     steps:
       - checkout
