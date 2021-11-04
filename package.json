@@ -4,7 +4,7 @@
    "description": "The data store service aims to store data from external sources that changes infrequently.",
    "main": "index.js",
    "engines": {
-      "node": "14.16.1"
+      "node": "14.17.6"
    },
    "directories": {
       "test": "tests"
