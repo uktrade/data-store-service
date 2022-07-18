@@ -18,7 +18,7 @@ git+https://github.com/uktrade/data-engineering-common.git
 git+https://github.com/uktrade/dt08-data-tools.git
 gunicorn[gevent]
 json-log-formatter==0.3.0
-lxml==4.6.5
+lxml
 mohawk==1.1.0
 numpy==1.*
 pandas==1.1.1
