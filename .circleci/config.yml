@@ -31,7 +31,7 @@ job_defaults: &job_defaults
     - restore_cache:
          name: Restore pip cache
          keys:
-           - dss-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+           - dss-<< parameters.python_image >>-{{ checksum "requirements.txt" }}-v5
          paths:
            - ~/cache/pip
 
@@ -41,7 +41,7 @@ job_defaults: &job_defaults
 
     - save_cache:
         name: Save pip cache
-        key: dss-<< parameters.python_image >>-{{ checksum "requirements.txt" }}
+        key: dss-<< parameters.python_image >>-{{ checksum "requirements.txt" }}-v5
         paths:
           - ~/cache/pip
 
@@ -102,6 +102,6 @@ workflows:
     jobs:
       - build:
           publish_coverage: true
-          python_image: python:3.8
+          python_image: python:3.9
           postgres_image: postgres:10.5
       - test-compile

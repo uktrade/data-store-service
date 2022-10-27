@@ -3,8 +3,8 @@ import re
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed
 from wtforms import FileField, SelectField, StringField
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.validators import DataRequired, StopValidation
+from wtforms.validators import DataRequired, StopValidation, ValidationError
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from app.constants import NO, YES
 from app.db.models.internal import Pipeline
@@ -43,9 +43,7 @@ class PipelineForm(FlaskForm):
             organisation=self.format(self.organisation.data), dataset=self.format(self.dataset.data)
         ).first()
         if pipeline is not None:
-            self.errors['non_field_errors'] = [
-                'Pipeline for organisation and dataset already exists'
-            ]
+            self.form_errors.append('Pipeline for organisation and dataset already exists')
             self.organisation.errors.append('Please update')
             self.dataset.errors.append('Please update')
             return False
@@ -74,8 +72,8 @@ class ValidateContentsSelectField(SelectField):
     def pre_validate(self, form):
         try:
             super().pre_validate(form)
-        except ValueError:
-            raise ValueError("Confirm or reject the data file contents")
+        except ValidationError:
+            raise StopValidation("Confirm or reject the data file contents")
 
 
 class VerifyDataFileForm(FlaskForm):

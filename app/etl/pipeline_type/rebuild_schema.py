@@ -17,7 +17,7 @@ class RebuildSchemaPipeline(DataPipeline):
         headers = next(csv_reader)
         if self.csv_to_model_mapping is not None:
             headers = [self.csv_to_model_mapping[header] for header in headers]
-        session = self.dbi.db.create_scoped_session()
+        session = self.dbi.db.session
         objects = []
         for row in csv_reader:
             kwargs = {}

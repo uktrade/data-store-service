@@ -178,7 +178,7 @@ def pipeline_data_verify(slug, file_id):
         pipeline_data_file.state = DataUploaderFileState.FAILED.value
         pipeline_data_file.error_message = new_file_err
         pipeline_data_file.save()
-        form.errors['non_field_errors'] = [new_file_err]
+        form.form_errors.append(new_file_err)
 
     return render_uploader_template(
         'pipeline_data_verify.html',
