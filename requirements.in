@@ -6,7 +6,6 @@ factory_boy
 flake8-import-order
 flake8
 Flask-Migrate
-flask-security
 flask-shell-ipython
 flask-sqlalchemy
 flask-wtf
