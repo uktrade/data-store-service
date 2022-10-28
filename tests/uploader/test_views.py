@@ -204,7 +204,11 @@ def test_submit_form_with_bad_names_on_pipeline_create_view(
         ({'dataset': 'test_dataset_1'}, {'organisation': ['This field is required.']}),
         (
             {'organisation': 'test_organisation', 'dataset': 'test_dataset'},
-            {'non_field_errors': ['Pipeline for organisation and dataset already exists']},
+            {
+                None: ['Pipeline for organisation and dataset already exists'],
+                'dataset': ['Please update'],
+                'organisation': ['Please update'],
+            },
         ),
     ),
 )
@@ -220,6 +224,7 @@ def test_submit_form_pipeline_create_view_errors(
     assert 'Dataset pipeline created' not in html
     template, template_context = captured_templates.pop()
     form = template_context['form']
+    print(form)
     assert form.errors == expected_error
 
 
@@ -327,7 +332,7 @@ def test_get_data_verify_error_view(
 
     form = template_context['form']
     assert form.errors == {
-        'non_field_errors': [
+        None: [
             (
                 "Unable to process CSV file: the CSV file could not be opened. "
                 "(Technical details: invalid encoding)"
@@ -360,7 +365,7 @@ def test_submit_data_using_reserved_column_is_rejected_early(
 
     form = template_context['form']
     assert form.errors == {
-        'non_field_errors': [
+        None: [
             (
                 "Unable to process CSV file: “id” in the uploaded file is a reserved column name. "
                 "You must rename that column in the data file."
