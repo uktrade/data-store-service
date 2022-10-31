@@ -8,5 +8,5 @@ applications:
     - python_buildpack
   # The CI pipeline will override this, but it is suspected that these
   # values are used during buildpack compile
-  disk_quota: 4G
+  disk_quota: 6G
   memory: 16G
