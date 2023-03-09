@@ -8,6 +8,8 @@ alembic==1.4.3
     # via flask-migrate
 apscheduler==3.6.3
     # via -r requirements.in
+asttokens==2.2.1
+    # via stack-data
 attrs==19.3.0
     # via
     #   jsonschema
@@ -88,9 +90,7 @@ cymem==2.0.7
 data-engineering-common @ git+https://github.com/uktrade/data-engineering-common.git
     # via -r requirements.in
 decorator==4.4.1
-    # via
-    #   ipython
-    #   traitlets
+    # via ipython
 dnspython==1.16.0
     # via email-validator
 email-validator==1.1.1
@@ -99,6 +99,8 @@ email-validator==1.1.1
     #   flask-security-too
 et-xmlfile==1.0.1
     # via openpyxl
+executing==1.2.0
+    # via stack-data
 factory-boy==3.0.1
     # via -r requirements.in
 faker==4.14.0
@@ -164,10 +166,8 @@ ijson==3.1.1
     # via tabulator
 iniconfig==1.0.1
     # via pytest
-ipython==7.31.1
+ipython==8.10.0
     # via flask-shell-ipython
-ipython-genutils==0.2.0
-    # via traitlets
 isodate==0.6.0
     # via tableschema
 itsdangerous==2.1.2
@@ -268,7 +268,7 @@ preshed==3.0.2
     # via
     #   spacy
     #   thinc
-prompt-toolkit==3.0.8
+prompt-toolkit==3.0.38
     # via ipython
 psycopg2==2.8.6
     # via
@@ -276,6 +276,8 @@ psycopg2==2.8.6
     #   data-engineering-common
 ptyprocess==0.6.0
     # via pexpect
+pure-eval==0.2.2
+    # via stack-data
 pycodestyle==2.7.0
     # via
     #   flake8
@@ -360,6 +362,7 @@ sentry-sdk[flask]==1.1.0
 six==1.14.0
     # via
     #   apscheduler
+    #   asttokens
     #   isodate
     #   jsonlines
     #   jsonschema
@@ -372,7 +375,6 @@ six==1.14.0
     #   sqlalchemy-utils
     #   tableschema
     #   tabulator
-    #   traitlets
 smart-open==5.2.1
     # via pathy
 soupsieve==2.0.1
@@ -401,6 +403,8 @@ srsly==2.4.5
     #   confection
     #   spacy
     #   thinc
+stack-data==0.6.2
+    # via ipython
 tableschema==1.19.3
     # via -r requirements.in
 tabulator==1.52.3
@@ -417,7 +421,7 @@ toolz==0.11.1
     # via -r requirements.in
 tqdm==4.42.0
     # via spacy
-traitlets==4.3.3
+traitlets==5.9.0
     # via
     #   ipython
     #   matplotlib-inline
