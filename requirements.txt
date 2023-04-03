@@ -10,6 +10,8 @@ apscheduler==3.6.3
     # via -r requirements.in
 asttokens==2.2.1
     # via stack-data
+async-timeout==4.0.2
+    # via redis
 attrs==19.3.0
     # via
     #   jsonschema
@@ -334,7 +336,7 @@ pyyaml==5.4
     # via
     #   -r requirements.in
     #   data-engineering-common
-redis==4.5.3
+redis==4.5.4
     # via
     #   -r requirements.in
     #   data-engineering-common
