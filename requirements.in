@@ -1,7 +1,6 @@
 APScheduler
 beautifulsoup4
 black
-codecov
 factory_boy
 flake8-import-order
 flake8
