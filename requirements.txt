@@ -291,7 +291,7 @@ pydantic==1.7.4
     #   thinc
 pyflakes==2.3.1
     # via flake8
-pygments==2.7.4
+pygments==2.15.0
     # via ipython
 pyparsing==2.4.6
     # via packaging
