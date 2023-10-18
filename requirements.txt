@@ -48,7 +48,7 @@ catalogue==2.0.8
     #   spacy
     #   srsly
     #   thinc
-certifi==2023.07.22
+certifi==2023.7.22
     # via
     #   data-engineering-common
     #   requests
@@ -434,7 +434,7 @@ unicodecsv==0.14.1
     # via
     #   tableschema
     #   tabulator
-urllib3==1.26.15
+urllib3==1.26.18
     # via
     #   botocore
     #   requests
