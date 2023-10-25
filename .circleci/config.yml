@@ -102,6 +102,6 @@ workflows:
     jobs:
       - build:
           publish_coverage: true
-          python_image: python:3.9
+          python_image: python:3.11
           postgres_image: postgres:10.5
       - test-compile
