@@ -10,3 +10,4 @@ applications:
   # values are used during buildpack compile
   disk_quota: 6G
   memory: 16G
+  stack: cflinuxfs4
