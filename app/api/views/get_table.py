@@ -27,7 +27,7 @@ def table_valid(view_func):
         schema = kwargs['schema']
         table_name = kwargs['table_name']
 
-        table_exists = flask_app.db.engine.has_table(table_name, schema)
+        table_exists = Inspector.from_engine(flask_app.db.engine).has_table(table_name, schema)
         if not table_exists or schema in [
             'pg_toast',
             'pg_temp_1',

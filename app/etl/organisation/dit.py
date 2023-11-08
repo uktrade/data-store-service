@@ -1,5 +1,7 @@
 from io import BytesIO
 
+from sqlalchemy import text
+
 from app.etl.pipeline_type.incremental_data import L1IncrementalDataPipeline
 from app.etl.pipeline_type.snapshot_data import L1SnapshotDataPipeline
 
@@ -153,7 +155,7 @@ class DITEUCountryMembershipPipeline(L1SnapshotDataPipeline):
                     WHERE datafile_created = '{datafile_name}') AS sq
             JOIN LATERAL json_each_text(sq.line) ON (key ~ '^[1-2]+');
         """
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
 
 class DITReferencePostcodesPipeline(L1SnapshotDataPipeline):

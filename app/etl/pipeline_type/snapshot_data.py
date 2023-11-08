@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from sqlalchemy import text
+
 from app.etl.pipeline_type.base import LDataPipeline
 from app.utils import trigger_dataflow_dag
 
@@ -82,7 +84,7 @@ class L0SnapshotDataPipeline(LDataPipeline):
             f", UNIQUE({','.join(unique_column_names)})" if unique_column_names else None
         )
         stmt = f"CREATE TABLE IF NOT EXISTS {table_name} ({columns}{unique_constraint or ''})"
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
     # DATA TO L0.temp
     @abstractmethod
@@ -124,7 +126,7 @@ class L0SnapshotDataPipeline(LDataPipeline):
             ON CONFLICT ({data_hash})
             DO UPDATE SET datafile_updated = '{datafile_name}'
         """
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
     def _delete_from_l0(self, file_name):
         delete = f"""
@@ -140,7 +142,7 @@ class L0SnapshotDataPipeline(LDataPipeline):
                         where dl0.id = l0.id
                     )
                 """
-        self.dbi.execute_statement(delete)
+        self.dbi.execute_statement(text(delete))
 
     def trigger_dataflow_dag(self):
         return trigger_dataflow_dag(self.schema, self.L0_TABLE)
@@ -226,7 +228,7 @@ class L1SnapshotDataPipeline(L0SnapshotDataPipeline):
             WHERE datafile_created = '{datafile_name}'
             ON CONFLICT (data_source_row_id) DO NOTHING
         """
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
     def _delete_from_l1(self, file_name):
         delete = f"""
@@ -250,7 +252,7 @@ class L1SnapshotDataPipeline(L0SnapshotDataPipeline):
                 where dl1.l1_id = l1.id
             )
         """
-        self.dbi.execute_statement(delete)
+        self.dbi.execute_statement(text(delete))
 
     def trigger_dataflow_dag(self):
         return trigger_dataflow_dag(self.schema, self.L1_TABLE)
