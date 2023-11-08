@@ -8,9 +8,8 @@ The backend is built in Python using the Flask framework. Authentication impleme
 
 ### Docker installation
 1. Copy `.envs/docker.env` to `.env`
-2. `docker-compose build`
-3. `docker-compose up`
-4. Go to http://localhost:5050/healthcheck
+2. `docker compose up --build`
+3. Go to http://localhost:5050/healthcheck
 
 Running postgres in docker now requires a mandatory environment variable called POSTGRES_PASSWORD. This must be added to your .env file.
 
