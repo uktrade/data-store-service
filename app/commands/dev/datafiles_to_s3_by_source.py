@@ -11,7 +11,7 @@ from app.downloader.web.hmrc import HMRCExporters
 from app.downloader.web.ons import ONSPostcodeDirectory
 
 arg_to_downloader_info_list = {
-    'companies_house.accounts': (CompaniesHouseAccounts, 'companies_house/accounts/'),
+    'companies_house.accounts_legacy': (CompaniesHouseAccounts, 'companies_house/accounts/'),
     'hmrc.exporters': (HMRCExporters, 'hmrc/exporters/'),
     'ons.postcode_directory': (ONSPostcodeDirectory, 'ons/postcode_directory/'),
 }

@@ -18,7 +18,7 @@ from app.etl.pipeline_type.incremental_data import L0IncrementalDataPipeline
 class CompaniesHouseAccountsPipeline(L0IncrementalDataPipeline):
 
     organisation = 'companies_house'
-    dataset = 'accounts'
+    dataset = 'accounts_legacy'
 
     _l0_data_column_types = [
         ('run_code', 'text'),

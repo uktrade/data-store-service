@@ -454,7 +454,7 @@ class TestDataFileToDBBySource:
                 None,
             ),
             (
-                ['--companies_house.accounts', '--force'],
+                ['--companies_house.accounts_legacy', '--force'],
                 [
                     {
                         'continue_transform': False,
