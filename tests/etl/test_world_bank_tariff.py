@@ -3,6 +3,7 @@ from unittest import mock
 import pytest
 from data_engineering.common.tests.conftest import create_tables
 from datatools.io.fileinfo import FileInfo
+from sqlalchemy import text
 
 from app.etl.organisation.world_bank import (
     WorldBankTariffPipeline,
@@ -136,7 +137,7 @@ class TestWorldBankTariffPipeline:
         add_dit_eu_country_membership,
     ):
         self.dbi = app_with_db.dbi
-        self.dbi.execute_statement('drop table if exists "dit.baci"."L1" cascade;')
+        self.dbi.execute_statement(text('drop table if exists "dit.baci"."L1" cascade;'))
         create_tables(app_with_db)
         add_comtrade_country_code_and_iso(comtrade_countries)
         add_dit_eu_country_membership(eu_country_memberships)
@@ -776,7 +777,7 @@ def patch_required_countries(mocker, countries):
             from required_countries
         )
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     mocker.patch.object(
         WorldBankTariffTransformPipeline,

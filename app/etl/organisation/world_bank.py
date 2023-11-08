@@ -4,6 +4,7 @@ from multiprocessing.pool import ThreadPool as Pool
 
 import psycopg2
 from flask import current_app as flask_app
+from sqlalchemy import text
 from tqdm import tqdm
 
 from app.etl.organisation.comtrade import ComtradeCountryCodeAndISOPipeline
@@ -75,7 +76,7 @@ class WorldBankBoundRatesPipeline(L1SnapshotDataPipeline):
             ORDER BY {grouping}, RIGHT(nomen_code,1)::int DESC
             ON CONFLICT (data_source_row_id) DO NOTHING
         """
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
 
 class WorldBankTariffPipeline(L1IncrementalDataPipeline):
@@ -170,7 +171,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
                 CREATE INDEX IF NOT EXISTS "{self.L1_TABLE}.temp_{field}_idx"
                 ON {self._l1_temp_table} USING hash ({field});
             """
-            self.dbi.execute_statement(stmt, raise_if_fail=True)
+            self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     def finish_processing(self):
         # swap tables to minimize api downtime
@@ -613,7 +614,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
             from required_countries
         )
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     @timeit
     def _create_country_dictionary_view(self):
@@ -641,7 +642,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
             )
         )
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     @timeit
     def _create_spine_view(self):
@@ -685,7 +686,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
             where reporter != partner
         )
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     @timeit
     def _create_all_tariffs_view(self):
@@ -732,7 +733,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
             full join mfn_tariffs t2 using (product, year, reporter, partner) -- only 0 partner
         )
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     @timeit
     def _create_eu_countries_view(self):
@@ -762,7 +763,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
             order by t2.iso_number, t1.year
         )
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     @timeit
     def _create_eu_reporter_rates_view(self):
@@ -829,7 +830,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
             using (product, year, partner)
         )
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     @timeit
     def _create_tariffs_with_eu_reporter_rates_view(self):
@@ -882,7 +883,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
         CREATE INDEX
             ON {self._fq(self.tariffs_with_eu_reporter_rates_vn)} (product);
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     @timeit
     def _create_eu_partner_rates_view(self):
@@ -908,7 +909,7 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
         CREATE INDEX
             ON {self._fq(self.eu_partner_rates_vn)} (product);
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)
 
     @timeit
     def _create_tariffs_with_world_partner_rates_view(self):
@@ -944,4 +945,4 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
         CREATE INDEX
             ON {self._fq(self.tariffs_with_world_partner_rates_vn)} (product);
         """
-        self.dbi.execute_statement(stmt, raise_if_fail=True)
+        self.dbi.execute_statement(text(stmt), raise_if_fail=True)

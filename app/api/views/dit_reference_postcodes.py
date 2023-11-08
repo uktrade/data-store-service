@@ -33,9 +33,9 @@ class DitReferencePostcodeView(View):
                 [field for field, _ in DITReferencePostcodesPipeline._l1_data_column_types]
             )}
             from {DITReferencePostcodesL1.get_fq_table_name()}
-            where lower(replace(postcode, ' ', '')) = %s
+            where lower(replace(postcode, ' ', '')) = :postcode
             limit 1
         '''
-        df = flask_app.dbi.execute_query(sql_query, data=[postcode], df=True)
+        df = flask_app.dbi.execute_query(sql_query, data={'postcode': postcode}, df=True)
         web_dict = to_web_dict(df, orientation)
         return flask_app.make_response(web_dict)

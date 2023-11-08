@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from sqlalchemy import text
+
 from app.etl.pipeline_type.base import LDataPipeline
 from app.utils import trigger_dataflow_dag
 
@@ -66,13 +68,13 @@ class L0IncrementalDataPipeline(LDataPipeline):
             self.dbi.drop_table(table_name)
         columns = ','.join(f'{c} {t}' for c, t in column_types)
         stmt = f'CREATE TABLE IF NOT EXISTS {table_name} ({columns})'
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
     def _create_sequence(self, sequence_name, drop_existing=False):
         if drop_existing:
             self.dbi.drop_sequence(sequence_name)
         stmt = f'CREATE SEQUENCE IF NOT EXISTS {sequence_name}'
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
     # append L0.temp TO L0
     def append_l0_temp_to_l0(self, datafile_name):
@@ -92,7 +94,7 @@ class L0IncrementalDataPipeline(LDataPipeline):
                 {selection}
             FROM {self._l0_temp_table}
         """
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
     def trigger_dataflow_dag(self):
         return trigger_dataflow_dag(self.schema, self.L0_TABLE)
@@ -184,7 +186,7 @@ class L1IncrementalDataPipeline(L0IncrementalDataPipeline):
                 {selection}
             FROM {self._l0_temp_table}
         """
-        self.dbi.execute_statement(stmt)
+        self.dbi.execute_statement(text(stmt))
 
     def trigger_dataflow_dag(self):
         return trigger_dataflow_dag(self.schema, self.L1_TABLE)

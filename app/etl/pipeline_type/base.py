@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from collections import namedtuple
 
 from flask import current_app as flask_app
+from sqlalchemy import text
 
 
 class classproperty(object):
@@ -56,7 +57,7 @@ class DataPipeline(metaclass=ABCMeta):
             )
         else:
             self.dbi.execute_statement(
-                "SET statement_timeout TO '20h' "
+                text("SET statement_timeout TO '20h' ")
             )  # If a query takes longer over 20hours, stop it!
             if self.organisation and self.dataset:
                 self._create_schema_if_not_exists(self.schema)
