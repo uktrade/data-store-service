@@ -97,7 +97,7 @@ arg_to_pipeline_config_list = {
     CompaniesHouseAccountsPipeline.data_source: [
         (
             CompaniesHouseAccountsPipeline,
-            'companies_house/accounts/',
+            'companies_house/accounts_legacy/',
             {'unpack': False, 'trigger_dataflow_dag': True},
         ),
     ],
