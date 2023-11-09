@@ -287,7 +287,7 @@ class TestDataFileToDBBySource:
                         'products': None,
                         'unpack': False,
                         'trigger_dataflow_dag': True,
-                        'sub_directory': 'companies_house/accounts/',
+                        'sub_directory': 'companies_house/accounts_legacy/',
                         'pipeline': CompaniesHouseAccountsPipeline,
                     },
                     {
@@ -462,7 +462,7 @@ class TestDataFileToDBBySource:
                         'products': None,
                         'unpack': False,
                         'trigger_dataflow_dag': True,
-                        'sub_directory': 'companies_house/accounts/',
+                        'sub_directory': 'companies_house/accounts_legacy/',
                         'pipeline': CompaniesHouseAccountsPipeline,
                     },
                 ],
