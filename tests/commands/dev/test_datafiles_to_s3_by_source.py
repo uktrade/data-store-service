@@ -23,7 +23,7 @@ class TestDownloadToS3BySource:
                 None,
             ),
             (
-                ['--companies_house.accounts'],
+                ['--companies_house.accounts_legacy'],
                 1,
                 True,
                 None,

@@ -207,7 +207,7 @@ def test_trigger_dataflow_dag(mock_api_request, mocker, app):
         {'id': 'test_id', 'key': 'test_key', 'algorithm': 'sha256'},
         {
             'conf': {
-                'data_uploader_schema_name': 'companies_house.accounts',
+                'data_uploader_schema_name': 'companies_house.accounts_legacy',
                 'data_uploader_table_name': 'L0',
             }
         },
