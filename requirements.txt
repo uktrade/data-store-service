@@ -462,7 +462,7 @@ wcwidth==0.2.5
     # via prompt-toolkit
 webdriver-manager==3.2.2
     # via -r requirements.in
-werkzeug==2.2.3
+werkzeug==3.0.1
     # via
     #   -r requirements.in
     #   data-engineering-common
