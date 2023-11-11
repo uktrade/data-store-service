@@ -28,6 +28,7 @@ sequenceDiagram
       DSS ->>+ DSS S3: Fetch file contents
       DSS S3 -->>- DSS: File contents
       DSS ->>+ DSS DB: INSERT file contents
+      DSS ->>+ DSS DB: INSERT file into operations.datafile_registry
     end
 
     DSS ->> data-flow: trigger pipeline
