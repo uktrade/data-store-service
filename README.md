@@ -3,6 +3,43 @@ The data store service aims to store data from external sources that changes inf
 
 This data is then pushed to data workspaces for analysts to use.
 
+## Integration with data-flow and Data Workspace's datasets database
+
+Data is ingested into Data Workspace's datasets database every night, triggered by a job in Jenkins, leveraging data-flow. Say to pull data from a source:
+
+```mermaid
+sequenceDiagram
+    Jenkins ->> DSS: cf run-task
+    activate DSS
+    DSS ->>+ Source: Return list of all files
+    Source -->>- DSS: list of all files
+    DSS ->>+ DSS Bucket: Return list of all files
+    DSS Bucket -->>- DSS: list of all files
+    loop Each file not in the DSS bucket
+      DSS ->>+ Source: Fetch file contents
+      Source -->>- DSS: File contents
+      DSS ->>+ DSS Bucket: PUT file contents
+    end
+
+    DSS ->>+ DSS DB: SELECT processed files <br>from operations.datafile_registry
+    DSS DB -->>- DSS: list of processed files
+
+    loop Each unprocessed file
+      DSS ->>+ DSS Bucket: Fetch file contents
+      DSS Bucket -->>- DSS: File contents
+      DSS ->>+ DSS DB: INSERT file contents
+    end
+
+    DSS ->> data-flow: trigger pipeline
+    loop Pages of data
+       data-flow ->> DSS: fetch page of data
+       DSS -->> data-flow: page of data
+       data-fow ->> datasets db: INSERT datasets db (eventually)
+    end
+
+    deactivate DSS
+```
+
 ## Installation
 The backend is built in Python using the Flask framework. Authentication implemented using Hawk and OAUTH2(SSO) authentication. The majority of the functionality is through API calls but a light front end is provided for documentation and dashboarding. This front end uses React and d3 and uses the webpack javascript module bundler. 
 
