@@ -36,14 +36,13 @@ sequenceDiagram
        DSS -->> data-flow: page of data
        data-flow ->> data-flow S3: save page
     end
+    deactivate DSS
 
-   loop For each page of data
+    loop For each page of data
        data-flow ->> data-flow S3: fetch page of data
        data-flow S3 -->> data-flow: page of data
        data-flow ->> datasets db: INSERT page
-    end
-
-    deactivate DSS
+     end
 ```
 
 ## Installation
