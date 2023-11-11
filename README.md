@@ -5,7 +5,7 @@ This data is then pushed to data workspaces for analysts to use.
 
 ## Integration with data-flow and Data Workspace's datasets database
 
-Data is ingested into Data Workspace's datasets database every night, triggered by a job in Jenkins, leveraging data-flow. Say to pull data from a source:
+Data is ingested into Data Workspace's datasets database every night, triggered by a job in Jenkins, leveraging data-flow. The following sequence diagram shows the high level steps involved for each source.
 
 ```mermaid
 sequenceDiagram
@@ -15,7 +15,7 @@ sequenceDiagram
     Source -->>- DSS: list of all files
     DSS ->>+ DSS Bucket: Return list of all files
     DSS Bucket -->>- DSS: list of all files
-    loop Each file not in the DSS bucket
+    loop For each file not in the DSS bucket
       DSS ->>+ Source: Fetch file contents
       Source -->>- DSS: File contents
       DSS ->>+ DSS Bucket: PUT file contents
@@ -24,17 +24,23 @@ sequenceDiagram
     DSS ->>+ DSS DB: SELECT processed files <br>from operations.datafile_registry
     DSS DB -->>- DSS: list of processed files
 
-    loop Each unprocessed file
+    loop For each unprocessed file
       DSS ->>+ DSS Bucket: Fetch file contents
       DSS Bucket -->>- DSS: File contents
       DSS ->>+ DSS DB: INSERT file contents
     end
 
     DSS ->> data-flow: trigger pipeline
-    loop Pages of data
+    loop For each page of data
        data-flow ->> DSS: fetch page of data
        DSS -->> data-flow: page of data
-       data-fow ->> datasets db: INSERT datasets db (eventually)
+       data-flow ->> data-flow S3: save page
+    end
+
+   loop For each page of data
+       data-flow ->> data-flow S3: fetch page of data
+       data-flow S3 -->> data-flow: page of data
+       data-flow ->> datasets db: INSERT page
     end
 
     deactivate DSS
