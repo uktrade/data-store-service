@@ -18,25 +18,29 @@ sequenceDiagram
 
     Jenkins ->> DSS task: cf run-task
     activate DSS task
-    DSS task ->>+ Source: Return list of all files
-    Source -->>- DSS task: list of all files
-    DSS task ->>+ DSS S3: Return list of all files
-    DSS S3 -->>- DSS task: list of all files
+    activate DSS S3
+
+    DSS task ->> Source: Return list of all files
+    Source -->> DSS task: list of all files
+    DSS task ->> DSS S3: Return list of all files
+    DSS S3 -->> DSS task: list of all files
     loop For each file not in DSS S3
-      DSS task ->>+ Source: Fetch file contents
-      Source -->>- DSS task: File contents
-      DSS task ->>+ DSS S3: PUT file contents
+      DSS task ->> Source: Fetch file contents
+      Source -->> DSS task: File contents
+      DSS task ->> DSS S3: PUT file contents
     end
 
-    DSS task ->>+ DSS DB: SELECT processed files <br>from operations.datafile_registry
-    DSS DB -->>- DSS task: list of processed files
+    activate DSS DB
+    DSS task ->> DSS DB: SELECT processed files <br>from operations.datafile_registry
+    DSS DB -->> DSS task: list of processed files
 
     loop For each unprocessed file
-      DSS task ->>+ DSS S3: Fetch file contents
-      DSS S3 -->>- DSS task: File contents
-      DSS task ->>+ DSS DB: INSERT file contents
-      DSS task ->>+ DSS DB: INSERT file into operations.datafile_registry
+      DSS task ->> DSS S3: Fetch file contents
+      DSS S3 -->> DSS task: File contents
+      DSS task ->> DSS DB: INSERT file contents
+      DSS task ->> DSS DB: INSERT file into operations.datafile_registry
     end
+    deactivate DSS S3
 
     DSS task ->> data-flow: trigger pipeline
     deactivate DSS task
@@ -46,9 +50,12 @@ sequenceDiagram
 
     loop For each page of data
        data-flow ->> DSS API: fetch page of data
+       DSS API ->> DSS DB: fetch page of data
+       DSS DB -->> DSS API: page of data
        DSS API -->> data-flow: page of data
        data-flow ->> data-flow S3: save page
     end
+    deactivate DSS DB
     deactivate DSS API
 
     loop For each page of data
