@@ -15,7 +15,7 @@ sequenceDiagram
     Source -->>- DSS: list of all files
     DSS ->>+ DSS S3: Return list of all files
     DSS S3 -->>- DSS: list of all files
-    loop For each file not in the DSS S3
+    loop For each file not in DSS S3
       DSS ->>+ Source: Fetch file contents
       Source -->>- DSS: File contents
       DSS ->>+ DSS S3: PUT file contents
