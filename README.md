@@ -13,24 +13,27 @@ sequenceDiagram
     activate DSS
     DSS ->>+ Source: Return list of all files
     Source -->>- DSS: list of all files
-    DSS ->>+ DSS Bucket: Return list of all files
-    DSS Bucket -->>- DSS: list of all files
-    loop For each file not in the DSS bucket
+    DSS ->>+ DSS S3: Return list of all files
+    DSS S3 -->>- DSS: list of all files
+    loop For each file not in the DSS S3
       DSS ->>+ Source: Fetch file contents
       Source -->>- DSS: File contents
-      DSS ->>+ DSS Bucket: PUT file contents
+      DSS ->>+ DSS S3: PUT file contents
     end
 
     DSS ->>+ DSS DB: SELECT processed files <br>from operations.datafile_registry
     DSS DB -->>- DSS: list of processed files
 
     loop For each unprocessed file
-      DSS ->>+ DSS Bucket: Fetch file contents
-      DSS Bucket -->>- DSS: File contents
+      DSS ->>+ DSS S3: Fetch file contents
+      DSS S3 -->>- DSS: File contents
       DSS ->>+ DSS DB: INSERT file contents
     end
 
     DSS ->> data-flow: trigger pipeline
+    activate data-flow
+    activate data-flow S3
+
     loop For each page of data
        data-flow ->> DSS: fetch page of data
        DSS -->> data-flow: page of data
@@ -42,7 +45,10 @@ sequenceDiagram
        data-flow ->> data-flow S3: fetch page of data
        data-flow S3 -->> data-flow: page of data
        data-flow ->> datasets db: INSERT page
-     end
+    end
+
+    deactivate data-flow
+    deactivate data-flow S3
 ```
 
 ## Installation
