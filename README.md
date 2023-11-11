@@ -63,11 +63,10 @@ sequenceDiagram
     loop For each page of data
        data-flow ->> data-flow S3: fetch page of data
        data-flow S3 -->> data-flow: page of data
+       deactivate data-flow S3
        data-flow ->> datasets db: INSERT page
+       deactivate data-flow
     end
-
-    deactivate data-flow
-    deactivate data-flow S3
 ```
 
 ## Installation
