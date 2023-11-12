@@ -11,7 +11,7 @@ and exposes it via a HAWK authenticated API that is used by
 - External clients
 
 
-## data-flow and Data Workspace's datasets database
+## External sources into Data Workspace's datasets database
 
 Triggered by a job in Jenkins every night, data is pulled from external sources into the Data Store Service, and via data-flow is ingested into the Data Workspace's datasets database. The following sequence diagram shows the high level steps involved for each source.
 
