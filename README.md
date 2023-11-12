@@ -1,11 +1,11 @@
 # Data Store Service
 
-The Data Store Service stores data that changes infrequently. It takes data from:
+The Data Store Service stores data that changes infrequently. It takes data from
 
 - A variety of external sources that expose data via HTTP
 - CSV upload through a web interface
 
-The data is then exposed via a HAWK authenticated API that is used by
+and exposes it via a HAWK authenticated API that is used by
 
 - A data-flow pipeline, DSSGenericPipeline, that ingests the data into the Data Workspace datasets database
 - External clients
