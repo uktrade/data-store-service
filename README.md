@@ -5,7 +5,7 @@ The Data Store Service (DSS) stores and exposes data. It takes data from
 - A variety of external sources that expose data via HTTP
 - CSV upload through a web interface
 
-stores it, and exposes it via a HAWK authenticated API that is used by
+stores it in an S3 bucket and PostgreSQL database, and exposes it via a HAWK authenticated API that is used by
 
 - A data-flow pipeline, DSSGenericPipeline, that ingests the data into the Data Workspace datasets database
 - External clients
