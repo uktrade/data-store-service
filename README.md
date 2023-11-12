@@ -13,7 +13,9 @@ and exposes it via a HAWK authenticated API that is used by
 
 ## Architecture
 
-The backend is built in Python using the Flask framework. Authentication implemented using Hawk and OAUTH2(SSO) authentication. The majority of the functionality is through API calls but a light front end is provided for documentation and dashboarding. This front end uses React and d3 and uses the webpack javascript module bundler. 
+The backend is built in Python using [Flask](https://flask.palletsprojects.com/en/3.0.x/). Functionality is exposed via a JSON API for data access, and via an HTML and Javascript front end for uploading CSV files. The API uses HAWK authentication, and the front end uses OAuth 2.0 (SSO) authentication. The front end is built using webpack.
+
+Backend processes are triggered from Jenkins as CloudFoundry tasks. There is a background `scheduler` process built in that is currently not used.
 
 
 ## Data Flows
