@@ -142,9 +142,10 @@ or to run the tests for a specific directory, run
 docker exec -it data-dss_web-1 make run_tests TEST=<tests/test_directory>
 ```
 
+
 ## Configuration
 
-Environment variables are typically not used directly in the code, but via [app/config/defaults.yml](app/config/defaults.yml), exposed via the `flask_app.config` object.
+Configuration is done by environment variables, but these are typically not used directly, but via [app/config/defaults.yml](app/config/defaults.yml), exposed via the `flask_app.config` object.
 
 When developing locally, environment variables can be placed in the `.env` file. 
 
