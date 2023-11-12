@@ -140,17 +140,7 @@ docker exec -it data-dss_web-1 make run_tests TEST=<tests/test_directory>
 
 ## Configuration
 
-### When using docker-compose
-Place environment variables in .env file.
-
-### When using host machine
-Config variables can be specified in a few ways and are loaded using the following order of priority:
-
-1. Look for variable in existing System environment variables
-2. If not found in step 1, look for variable in `.env` (this only works if USE_DOTENV is set to 1, see .envs/sample.env for an example file)
-3. If not found in step 2, look for variable in `local_testing.yml` (this only works if TESTING is set to 1)
-4. If not found in step 3, look for variable in `local.yml` (this only works if TESTING is set to 0)
-5. If not found in step 4, look for variable in `default.yml`
+When developing locally, environment variables can be placed in the .env file. These are then typically not used directly in the code, but via [app/config/defaults.yml](app/config/defaults.yml).
 
 
 ## Running database migrations
