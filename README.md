@@ -1,7 +1,14 @@
-# Data store service
-The data store service aims to store data from external sources that changes infrequently.
+# Data Store Service
 
-This data is then pushed to data workspaces for analysts to use.
+The Data Store Service stores data that changes infrequently. It takes data from:
+
+- A variety of external sources that expose data via HTTP
+- CSV upload through a web interface
+
+The data is then exposed via a HAWK authenticated API that is used by
+
+- External clients
+- A data-flow pipeline, DSSGenericPipeline, that ingests the data into Data Workspace
 
 ## Integration with data-flow and Data Workspace's datasets database
 
