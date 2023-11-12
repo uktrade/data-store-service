@@ -67,6 +67,8 @@ sequenceDiagram
        data-flow ->> datasets db: INSERT page
        deactivate data-flow
     end
+
+    Note over data-flow, data-flow S3: data-flow has more<br>components than this - <br>this is a simplified view
 ```
 
 ## Installation
