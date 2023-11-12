@@ -10,6 +10,9 @@ stores it, and exposes it via a HAWK authenticated API that is used by
 - A data-flow pipeline, DSSGenericPipeline, that ingests the data into the Data Workspace datasets database
 - External clients
 
+The DSS was historically used for infrequently changing data, but it is suitable for data that changes up to about once a day.
+
+
 ### Contents
 
 - [Architecture](#architecture)
