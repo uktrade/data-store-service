@@ -22,7 +22,7 @@ and exposes it via a HAWK authenticated API that is used by
 
 ## Architecture
 
-The backend is built in Python using [Flask](https://flask.palletsprojects.com/en/3.0.x/). Functionality is exposed via a JSON API for data access, and via an HTML and Javascript front end for uploading CSV files. The API uses HAWK authentication, and the front end uses OAuth 2.0 (SSO) authentication. The front end is built using webpack.
+The backend is built in Python using [data-engineering-common](https://github.com/uktrade/data-engineering-common), that itself uses [Flask](https://flask.palletsprojects.com/en/3.0.x/). Functionality is exposed via a JSON API for data access, and via an HTML and Javascript front end for uploading CSV files. The API uses HAWK authentication, and the front end uses OAuth 2.0 (SSO) authentication. The front end is built using webpack.
 
 Backend processes are triggered from Jenkins as CloudFoundry tasks. There is a background `scheduler` process built in that is currently not used.
 
