@@ -159,7 +159,7 @@ Database migrations currently are not run automatically on deployment because th
 2. SSH into the instance.
 
    ```shell
-   cf v3-ssh data-store-service-<env>
+   cf ssh data-store-service-<env>
    ```
 
 4. Activate the app environment.
