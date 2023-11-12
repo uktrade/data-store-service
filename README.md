@@ -10,6 +10,14 @@ and exposes it via a HAWK authenticated API that is used by
 - A data-flow pipeline, DSSGenericPipeline, that ingests the data into the Data Workspace datasets database
 - External clients
 
+### Contents
+
+- [Architecture](#architecture)
+- [Data flows](#data-flows)
+- [Running locally](#running-locally)
+- [Configuration](#configuration)
+- [Running database migrations](#running-database-migrations)
+
 
 ## Architecture
 
@@ -18,7 +26,7 @@ The backend is built in Python using [Flask](https://flask.palletsprojects.com/e
 Backend processes are triggered from Jenkins as CloudFoundry tasks. There is a background `scheduler` process built in that is currently not used.
 
 
-## Data Flows
+## Data flows
 
 > Only the one data flow is currently documented
 
