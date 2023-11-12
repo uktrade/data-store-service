@@ -79,29 +79,48 @@ sequenceDiagram
     Note over data-flow, data-flow S3: data-flow has more<br>components than this - <br>this is a simplified view
 ```
 
-## Installation
+## Architecture
+
 The backend is built in Python using the Flask framework. Authentication implemented using Hawk and OAUTH2(SSO) authentication. The majority of the functionality is through API calls but a light front end is provided for documentation and dashboarding. This front end uses React and d3 and uses the webpack javascript module bundler. 
 
-### Docker installation
-1. Copy `.envs/docker.env` to `.env`
-2. `docker compose up --build`
-3. Go to http://localhost:5050/healthcheck
+## Running locally
 
+To run the Data Store Service locally
 
-### Docker run tests
-1. `docker exec -it data_dss_web_1 make run_tests`
+1. Clone this repository
 
-### Running tests locally
+   ```shell
+   git clone git@github.com:uktrade/data-store-service.git
+   cd data-store-service
+   ```
 
-`make run_tests_local`
+2. Copy `.envs/docker.env` to `.env`
 
-### to run tests for a specific directory, do,
+   ```shell
+   cp .envs/docker.env .env
+   ```
 
-`make run_tests_local TEST=<tests/test_directory>`
+3. Start the Data Store Service
 
-### Running tests the same way as circle ci:
+   ```shell
+   docker compose up --build
+   ```
 
-`make run_tests`
+4. Go to http://localhost:5050/healthcheck
+
+## Running tests
+
+Once the Data Store Service is running locally, to run all the tests run
+
+```shell
+docker exec -it data-dss_web-1 make run_tests
+```
+
+or to run the tests for a specific directory, run
+
+```shell
+docker exec -it data-dss_web-1 make run_tests TEST=<tests/test_directory>
+```
 
 ## Config
 
