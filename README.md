@@ -127,7 +127,7 @@ or to run the tests for a specific directory, run
 docker exec -it data-dss_web-1 make run_tests TEST=<tests/test_directory>
 ```
 
-## Config
+## Configuration
 
 ### When using docker-compose
 Place environment variables in .env file.
