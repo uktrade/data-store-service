@@ -137,10 +137,6 @@ Config variables can be specified in a few ways and are loaded using the followi
 5. If not found in step 4, look for variable in `default.yml`
 
 
-## Example dataset
-ONS Postcode directory: http://geoportal.statistics.gov.uk/datasets/ons-postcode-directory-november-2019
-
-
 ## Running database migrations
 
 Database migrations currently are not run automatically on deployment because there is concern that they do not work well for the pipeline tables. Until this is resolved, migrations need to be run manually and consideration needs to be given to how this will affect deploying structural database changes.
