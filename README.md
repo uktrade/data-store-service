@@ -15,6 +15,7 @@ and exposes it via a HAWK authenticated API that is used by
 - [Architecture](#architecture)
 - [Data flows](#data-flows)
 - [Running locally](#running-locally)
+- [Running tests](#running-tests)
 - [Configuration](#configuration)
 - [Running database migrations](#running-database-migrations)
 
