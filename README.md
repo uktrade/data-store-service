@@ -10,6 +10,12 @@ and exposes it via a HAWK authenticated API that is used by
 - A data-flow pipeline, DSSGenericPipeline, that ingests the data into the Data Workspace datasets database
 - External clients
 
+
+## Architecture
+
+The backend is built in Python using the Flask framework. Authentication implemented using Hawk and OAUTH2(SSO) authentication. The majority of the functionality is through API calls but a light front end is provided for documentation and dashboarding. This front end uses React and d3 and uses the webpack javascript module bundler. 
+
+
 ## Data Flows
 
 ### External sources into the Data Workspace datasets database
@@ -79,10 +85,6 @@ sequenceDiagram
 
     Note over data-flow, data-flow S3: data-flow has more<br>components than this - <br>this is a simplified view
 ```
-
-## Architecture
-
-The backend is built in Python using the Flask framework. Authentication implemented using Hawk and OAUTH2(SSO) authentication. The majority of the functionality is through API calls but a light front end is provided for documentation and dashboarding. This front end uses React and d3 and uses the webpack javascript module bundler. 
 
 ## Running locally
 
