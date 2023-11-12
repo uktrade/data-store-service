@@ -87,7 +87,6 @@ The backend is built in Python using the Flask framework. Authentication impleme
 2. `docker compose up --build`
 3. Go to http://localhost:5050/healthcheck
 
-Running postgres in docker now requires a mandatory environment variable called POSTGRES_PASSWORD. This must be added to your .env file.
 
 ### Docker run tests
 1. `docker exec -it data_dss_web_1 make run_tests`
