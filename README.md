@@ -29,7 +29,7 @@ Backend processes are triggered from Jenkins as CloudFoundry tasks. There is a b
 
 ## Data flows
 
-There are 3 data flows in use:
+There are 3 data flows that the Data Store Service affords:
 
 - External sources to external clients
 - External sources into the Data Workspace datasets database
