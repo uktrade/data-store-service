@@ -1,6 +1,6 @@
 # Data Store Service
 
-The Data Store Service stores takes data from
+The Data Store Service stores and exposes data. It takes data from
 
 - A variety of external sources that expose data via HTTP
 - CSV upload through a web interface
