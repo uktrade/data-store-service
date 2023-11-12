@@ -154,7 +154,22 @@ When developing locally, environment variables can be placed in the `.env` file.
 
 Database migrations currently are not run automatically on deployment because there is concern that they do not work well for the pipeline tables. Until this is resolved, migrations need to be run manually and consideration needs to be given to how this will affect deploying structural database changes.
 
-1) Deploy the migrations to the relevant environment.
-2) `cf v3-ssh data-store-service-<env>` - SSH into the instance
-3) `/tmp/lifecycle/shell` - active the app environment
-4) `./manage.py db upgrade` - run the migrations
+1. Deploy the migrations to the relevant environment. This can usually be done in Jenkins.
+
+2. SSH into the instance.
+
+   ```shell
+   cf v3-ssh data-store-service-<env>
+   ```
+
+4. Activate the app environment.
+
+   ```shell
+   /tmp/lifecycle/shell
+   ```
+
+5. Run the migrations.
+
+   ```shell
+   ./manage.py db upgrade
+   ```
