@@ -7,8 +7,9 @@ The Data Store Service stores data that changes infrequently. It takes data from
 
 The data is then exposed via a HAWK authenticated API that is used by
 
-- External clients
 - A data-flow pipeline, DSSGenericPipeline, that ingests the data into the Data Workspace datasets database
+- External clients
+
 
 ## data-flow and Data Workspace's datasets database
 
