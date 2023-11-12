@@ -8,9 +8,9 @@ The Data Store Service stores data that changes infrequently. It takes data from
 The data is then exposed via a HAWK authenticated API that is used by
 
 - External clients
-- A data-flow pipeline, DSSGenericPipeline, that ingests the data into Data Workspace
+- A data-flow pipeline, DSSGenericPipeline, that ingests the data into the Data Workspace datasets database
 
-## Integration with data-flow and Data Workspace's datasets database
+## data-flow and Data Workspace's datasets database
 
 Data is ingested into Data Workspace's datasets database every night, triggered by a job in Jenkins, leveraging data-flow. The following sequence diagram shows the high level steps involved for each source.
 
