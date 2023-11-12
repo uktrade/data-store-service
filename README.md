@@ -12,7 +12,7 @@ The data is then exposed via a HAWK authenticated API that is used by
 
 ## data-flow and Data Workspace's datasets database
 
-Data is ingested into Data Workspace's datasets database every night, triggered by a job in Jenkins, leveraging data-flow. The following sequence diagram shows the high level steps involved for each source.
+Triggered by a job in Jenkins every night, data is pulled from external sources into the Data Store Service, and via data-flow is ingested into the Data Workspace's datasets database. The following sequence diagram shows the high level steps involved for each source.
 
 ```mermaid
 sequenceDiagram
