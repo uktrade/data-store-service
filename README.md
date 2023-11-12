@@ -29,11 +29,15 @@ Backend processes are triggered from Jenkins as CloudFoundry tasks. There is a b
 
 ## Data flows
 
-> Only the one data flow is currently documented
+There are 3 data flows in use:
 
-### External sources into the Data Workspace datasets database
+- External sources to external clients
+- External sources into the Data Workspace datasets database
+- CSV uploads into the Data Workspace datasets database
 
-Triggered by a job in Jenkins every night, data is pulled from external sources into the Data Store Service, and via data-flow is ingested into the Data Workspace datasets database. The following sequence diagram shows the high level steps involved for each source.
+> It is technically possible for CSV uploads to be accessible to external clients, but this is not currently used
+
+The most complex of these is the flow from external sources into the Data Workspace datasets database. These are triggered by a job in Jenkins every night, data is pulled from external sources into the Data Store Service, and via data-flow is ingested into the Data Workspace datasets database. The following sequence diagram shows the high level steps involved for each source.
 
 ```mermaid
 sequenceDiagram
