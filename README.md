@@ -52,7 +52,7 @@ sequenceDiagram
       DSS task ->> DSS DB: INSERT file into operations.datafile_registry
     end
 
-    DSS task ->> data-flow: trigger pipeline
+    DSS task ->> data-flow: trigger DSSGenericPipeline pipeline
     deactivate DSS task
     activate data-flow
 
