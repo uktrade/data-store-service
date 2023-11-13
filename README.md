@@ -22,6 +22,7 @@ The DSS was historically used for infrequently changing data, but it is now used
 - [Configuration](#configuration)
 - [Running database migrations](#running-database-migrations)
 
+---
 
 ## Architecture
 
