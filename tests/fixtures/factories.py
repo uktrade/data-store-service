@@ -104,16 +104,12 @@ class SPIREBatchFactory(BaseFactory):
     @factory.lazy_attribute
     def release_date(self):
         if self.approve_date and self.end_date:
-            return fake.date_time_between(
-                start_date=self.approve_date
-            )
+            return fake.date_time_between(start_date=self.approve_date)
 
     @factory.lazy_attribute
     def staging_date(self):
         if self.approve_date and self.end_date:
-            return fake.date_time_between(
-                start_date=self.approve_date
-            )
+            return fake.date_time_between(start_date=self.approve_date)
 
     class Meta:
         model = SPIREBatch
