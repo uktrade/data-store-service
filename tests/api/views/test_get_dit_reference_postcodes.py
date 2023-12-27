@@ -13,7 +13,6 @@ def test_get_dit_reference_postcodes_when_no_data(app_with_hawk_user, app_with_m
 def test_get_dit_reference_postcodes(
     app_with_hawk_user, app_with_mock_cache, add_dit_reference_postcodes
 ):
-
     postcodes = [
         {'postcode': 'AB10 1AA', 'local_authority_district_code': 'asdf'},
     ]

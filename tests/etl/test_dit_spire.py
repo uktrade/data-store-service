@@ -31,7 +31,6 @@ from app.etl.organisation.spire import (
 
 class TestProcess:
     def test_spire_pipelines(self, app_with_db):
-
         pipeline_datafile_mapping = [
             (SPIREBatchPipeline, 'tests/fixtures/dit/spire/batches.csv'),
             (SPIRECountryGroupPipeline, 'tests/fixtures/dit/spire/country_groups.csv'),

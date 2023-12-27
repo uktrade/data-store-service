@@ -15,9 +15,7 @@ PipelineConfig = namedtuple(
 
 
 class DSSDatafileProvider(DatafileProvider):
-    ignore_filename_patterns = [
-        '[Content_Types].xml'
-    ] + DatafileProvider.ignore_filename_patterns
+    ignore_filename_patterns = ['[Content_Types].xml'] + DatafileProvider.ignore_filename_patterns
 
 
 class Manager:
@@ -61,8 +59,8 @@ class Manager:
         if pipeline_config.sub_directory:
             storage = self.storage.get_sub_storage(pipeline_config.sub_directory)
             dfp = DSSDatafileProvider(storage)
-            processed_and_ignored_files = (
-                DatafileRegistryModel.get_processed_or_ignored_datafiles(pipeline_id)
+            processed_and_ignored_files = DatafileRegistryModel.get_processed_or_ignored_datafiles(
+                pipeline_id
             )
             for file_name in dfp.get_file_names():
                 if (
@@ -70,9 +68,7 @@ class Manager:
                     and pipeline_config.force is False
                 ):
                     continue
-                file_info = next(
-                    dfp.read_files(file_name, unpack=pipeline_config.unpack)
-                )
+                file_info = next(dfp.read_files(file_name, unpack=pipeline_config.unpack))
                 data_changed = self._update_registry_and_process(
                     pipeline=pipeline,
                     orig_file_name=file_name,
@@ -119,9 +115,7 @@ class Manager:
             progress.set_description(pipeline_id)
             self.pipeline_process(pipeline_id, progress_bar=progress)
 
-    def pipeline_register(
-        self, pipeline, sub_directory=None, pipeline_id=None, **kwargs
-    ):
+    def pipeline_register(self, pipeline, sub_directory=None, pipeline_id=None, **kwargs):
         """Register a clean pipeline for the manager to use
 
         Args:

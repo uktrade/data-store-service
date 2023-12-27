@@ -253,7 +253,6 @@ class WorldBankTariffTransformPipeline(L1IncrementalDataPipeline):
         where = ""
         where_clauses = []
         if self.options.continue_transform or self.options.products:
-
             if self.options.continue_transform:
                 where_clauses.append(
                     f"product not in (select distinct product from {self._l1_temp_table})"
