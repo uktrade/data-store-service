@@ -34,8 +34,8 @@ class PipelineForm(FlaskForm):
     def format(self, field):
         return field.lower().replace('.', '_')
 
-    def validate(self):
-        rv = FlaskForm.validate(self)
+    def validate(self, extra_validators=None):
+        rv = FlaskForm.validate(self, extra_validators=extra_validators)
         if not rv:
             return False
 
