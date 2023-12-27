@@ -31,9 +31,7 @@ class OnlineInspector:
         return max(data_urls, key=lambda du: du.date)
 
     def get_all_data_urls(self):
-        with urllib.request.urlopen(
-            self.url, context=ssl._create_unverified_context()
-        ) as response:
+        with urllib.request.urlopen(self.url, context=ssl._create_unverified_context()) as response:
             html = response.read()
         soup = BeautifulSoup(html, 'html.parser')
         found = False
@@ -87,9 +85,7 @@ class StorageInspector:
 
 
 class SeleniumOnlineInspector(OnlineInspector):
-    def __init__(
-        self, url, download_link_regex, download_link_xpath, file_date_format='%Y-%m-%d'
-    ):
+    def __init__(self, url, download_link_regex, download_link_xpath, file_date_format='%Y-%m-%d'):
         self.download_link_xpath = download_link_xpath
         super().__init__(url, download_link_regex, file_date_format)
 
@@ -97,27 +93,21 @@ class SeleniumOnlineInspector(OnlineInspector):
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
-        chrome_options.binary_location = flask_app.config['app'][
-            'chrome_binary_location'
-        ]
+        chrome_options.binary_location = flask_app.config['app']['chrome_binary_location']
         ignored_exceptions = (
             NoSuchElementException,
             StaleElementReferenceException,
         )
 
         driver = webdriver.Chrome(
-            executable_path=ChromeDriverManager(
-                chrome_type=ChromeType.CHROMIUM
-            ).install(),
+            executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install(),
             chrome_options=chrome_options,
         )
         driver.get(self.url)
 
         found = False
         try:
-            elements = WebDriverWait(
-                driver, 10, ignored_exceptions=ignored_exceptions
-            ).until(
+            elements = WebDriverWait(driver, 10, ignored_exceptions=ignored_exceptions).until(
                 lambda driver: driver.find_elements_by_xpath(self.download_link_xpath)
             )
             for element in elements:
