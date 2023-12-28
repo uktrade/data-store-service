@@ -1,6 +1,7 @@
 import random
 
 import factory
+import factory.fuzzy
 import faker
 from flask import current_app as app
 from sqlalchemy.orm.scoping import scoped_session
@@ -541,8 +542,8 @@ class SPIREUltimateEndUserFactory(BaseFactory):
 
 
 class PipelineFactory(BaseFactory):
-    organisation = fake.word()
-    dataset = fake.word()
+    organisation = factory.fuzzy.FuzzyText(length=10)
+    dataset = factory.fuzzy.FuzzyText(length=10)
 
     class Meta:
         model = Pipeline
