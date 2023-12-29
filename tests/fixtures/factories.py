@@ -87,7 +87,7 @@ class SPIREBatchFactory(BaseFactory):
 
     @factory.lazy_attribute
     def batch_ref(self):
-        batch_ref = str(factory.fuzzy.FuzzyInteger(1, 50)).fuzz()
+        batch_ref = str(factory.fuzzy.FuzzyInteger(1, 50).fuzz())
         if not random.randint(0, 3):
             return f'C{batch_ref}'
         return batch_ref
