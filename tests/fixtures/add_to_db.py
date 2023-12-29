@@ -159,7 +159,7 @@ def add_world_bank_raw_tariff(app):
                 'reporter': record.get('reporter'),
                 'partner': record.get('partner'),
                 'year': record.get('year'),
-                'simple_average': record.get('simple_average'),
+                'simple_average': float(record.get('simple_average')),
                 'duty_type': record.get('duty_type'),
                 'number_of_total_lines': record.get('number_of_total_lines'),
             }

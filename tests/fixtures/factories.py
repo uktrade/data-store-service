@@ -87,7 +87,7 @@ class SPIREBatchFactory(BaseFactory):
 
     @factory.lazy_attribute
     def batch_ref(self):
-        batch_ref = str(fake.random_int(min=1, max=50))
+        batch_ref = str(factory.fuzzy.FuzzyInteger(1, 50))
         if not random.randint(0, 3):
             return f'C{batch_ref}'
         return batch_ref
@@ -129,11 +129,11 @@ class SPIREApplicationFactory(BaseFactory):
             'TA_SIEL',
         ],
     )
-    initial_processing_time = fake.random_int()
+    initial_processing_time = factory.fuzzy.FuzzyInteger(1)
     case_closed_date = fake.date_this_century()
     withheld_status = fake.random_element(elements=['PENDING', 'WITHHELD', None])
     batch = factory.SubFactory(SPIREBatchFactory)
-    ela_id = fake.random_int(min=1, max=50)
+    ela_id = factory.fuzzy.FuzzyInteger(1, 50)
 
     @factory.lazy_attribute
     def case_sub_type(self):
@@ -185,11 +185,11 @@ class SPIREApplicationAmendmentFactory(BaseFactory):
         ],
     )
     case_sub_type = fake.color_name()
-    case_processing_time = fake.random_int()
+    case_processing_time = factory.fuzzy.FuzzyInteger(1)
     amendment_closed_date = fake.date_this_century()
     application = factory.SubFactory(SPIREApplicationFactory)
     withheld_status = fake.random_element(elements=['PENDING', 'WITHHELD'])
-    batch_id = fake.random_int(min=1, max=50)
+    batch_id = factory.fuzzy.FuzzyInteger(1, 50)
 
     @factory.lazy_attribute
     def ela_id(self):
@@ -204,7 +204,7 @@ class SPIREGoodsIncidentFactory(BaseFactory):
     status_control = fake.random_element(elements=['A', 'C'])
     type = fake.random_element(elements=['ISSUE', 'REFUSAL', 'REVOKE', 'SURRENDER'])
     batch = factory.SubFactory(SPIREBatchFactory)
-    version_no = fake.random_int(min=0, max=3)
+    version_no = factory.fuzzy.FuzzyInteger(0, 3)
     inc_id = fake.random_element(elements=list(range(1, 200)))
     goods_item_id = fake.random_element(elements=list(range(1, 200)))
     dest_country_id = fake.random_element(elements=list(range(1, 200)))
@@ -292,11 +292,11 @@ class SPIREEndUserFactory(BaseFactory):
     ela_grp_id = fake.random_number(digits=6, fix_len=True)
     end_user_type = fake.random_element(elements=['COM', 'IND', None, 'GOV', 'OTHER'])
     status_control = fake.random_element(elements=['A', 'C'])
-    version_number = fake.random_int(min=1, max=3)
-    country_id = fake.random_int(min=1, max=200)
-    end_user_count = fake.random_int(min=1, max=4)
+    version_number = factory.fuzzy.FuzzyInteger(1, 3)
+    country_id = factory.fuzzy.FuzzyInteger(1, 200)
+    end_user_count = factory.fuzzy.FuzzyInteger(1, 4)
     start_date = fake.date_time_between(start_date='-2y', end_date='-1y')
-    batch_id = fake.random_int(min=1, max=50)
+    batch_id = factory.fuzzy.FuzzyInteger(1, 50)
 
     @factory.lazy_attribute
     def eu_id(self):
@@ -335,11 +335,11 @@ class SPIREFootnoteEntryFactory(BaseFactory):
 
     media_footnote_detail = None
 
-    goods_item_id = fake.random_int(min=1, max=200)
+    goods_item_id = factory.fuzzy.FuzzyInteger(1, 200)
     country_id = None
     fnr_id = None
     start_date = fake.date_time_between(start_date='-2y', end_date='-1y')
-    version_no = fake.random_int(min=1, max=3)
+    version_no = factory.fuzzy.FuzzyInteger(1, 3)
     status_control = fake.random_element(elements=['A', 'C'])
 
     @factory.lazy_attribute
@@ -368,7 +368,7 @@ class SPIREFootnoteEntryFactory(BaseFactory):
 class SPIREMediaFootnoteCountryFactory(BaseFactory):
     ela_grp_id = fake.random_number(digits=6, fix_len=True)
     mf_grp_id = fake.random_element(elements=[1, 2, 3])
-    country_id = fake.random_int(min=1, max=200)
+    country_id = factory.fuzzy.FuzzyInteger(1, 200)
     country_name = fake.word()
     status_control = fake.random_element(elements=['C', None])
     start_datetime = fake.date_time_between(start_date='-2y', end_date='-1y')
@@ -414,30 +414,30 @@ class SPIREIncidentFactory(BaseFactory):
     )
     report_date = fake.date_time_between(start_date='-2y', end_date='-1y')
     status_control = fake.random_element(elements=['A', 'C'])
-    version_no = fake.random_int(min=0, max=3)
-    temporary_licence_flag = fake.random_int(min=0, max=1)
-    licence_conversion_flag = fake.random_int(min=0, max=1)
-    incorporation_flag = fake.random_int(min=0, max=1)
-    mil_flag = fake.random_int(min=0, max=1)
-    other_flag = fake.random_int(min=0, max=1)
-    torture_flag = fake.random_int(min=0, max=1)
+    version_no = factory.fuzzy.FuzzyInteger(0, 3)
+    temporary_licence_flag = factory.fuzzy.FuzzyInteger(0, 1)
+    licence_conversion_flag = factory.fuzzy.FuzzyInteger(0, 1)
+    incorporation_flag = factory.fuzzy.FuzzyInteger(0, 1)
+    mil_flag = factory.fuzzy.FuzzyInteger(0, 1)
+    other_flag = factory.fuzzy.FuzzyInteger(0, 1)
+    torture_flag = factory.fuzzy.FuzzyInteger(0, 1)
 
     @factory.lazy_attribute
     def ogl_id(self):
         if self.case_type == 'OGEL':
-            return fake.random_int(min=1, max=100)
+            return factory.fuzzy.FuzzyInteger(1, 100)
         return
 
     @factory.lazy_attribute
     def else_id(self):
         if self.type == 'SUSPENSION':
-            return fake.random_int(min=1, max=100)
+            return factory.fuzzy.FuzzyInteger(1, 100)
         return
 
     @factory.lazy_attribute
     def licence_id(self):
         if self.type != 'REFUSAL':
-            return fake.random_int(min=1, max=99999)
+            return factory.fuzzy.FuzzyInteger(1, 99999)
         return
 
     @factory.lazy_attribute
@@ -466,7 +466,7 @@ class SPIREIncidentFactory(BaseFactory):
 class SPIREOglTypeFactory(BaseFactory):
     title = fake.sentence(nb_words=4)
     start_datetime = fake.date_time_between(start_date='-2y', end_date='-1y')
-    display_order = fake.random_int(min=100, max=999)
+    display_order = factory.fuzzy.FuzzyInteger(100, 999)
     f680_flag = fake.random_element(elements=['Y', 'N', None])
 
     @factory.lazy_attribute
@@ -481,14 +481,14 @@ class SPIREOglTypeFactory(BaseFactory):
 
 class SPIREReturnFactory(BaseFactory):
     batch = factory.SubFactory(SPIREBatchFactory)
-    elr_version = fake.random_int(min=1, max=50)
+    elr_version = factory.fuzzy.FuzzyInteger(1, 50)
     end_user_type = fake.random_element(elements=['COM', 'IND', None, 'GOV', 'OTHER'])
     status = fake.random_element(elements=['ACTIVE', 'WITHDRAWN'])
     created_datetime = fake.date_time_between(start_date='-2y', end_date='-1y')
     status_control = fake.random_element(elements=['A', 'C', 'P'])
     licence_type = fake.random_element(elements=['OGEL', 'OIEL', 'OITCL'])
-    el_id = fake.random_int(min=1, max=99999)
-    usage_count = fake.random_int(min=0, max=1)
+    el_id = factory.fuzzy.FuzzyInteger(1, 99999)
+    usage_count = factory.fuzzy.FuzzyInteger(0, 1)
 
     @factory.lazy_attribute
     def elr_id(self):
@@ -497,7 +497,7 @@ class SPIREReturnFactory(BaseFactory):
     @factory.lazy_attribute
     def ogl_id(self):
         if self.licence_type == 'OGEL':
-            return fake.random_int(min=1, max=100)
+            return factory.fuzzy.FuzzyInteger(1, 100)
         return
 
     class Meta:
@@ -509,9 +509,9 @@ class SPIREThirdPartyFactory(BaseFactory):
         SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
     )
     batch = factory.SubFactory(SPIREBatchFactory)
-    country_id = fake.random_int(min=1, max=200)
+    country_id = factory.fuzzy.FuzzyInteger(1, 200)
     start_date = fake.date_time_between(start_date='-2y', end_date='-1y')
-    version_no = fake.random_int(min=0, max=3)
+    version_no = factory.fuzzy.FuzzyInteger(0, 3)
     status_control = fake.random_element(elements=['A', 'C', 'P', 'D'])
     ultimate_end_user_flag = fake.random_element(elements=[0, 1, None])
 
@@ -528,10 +528,10 @@ class SPIREUltimateEndUserFactory(BaseFactory):
         SPIREApplicationFactory, batch=factory.SelfAttribute('..batch')
     )
     batch = factory.SubFactory(SPIREBatchFactory)
-    country_id = fake.random_int(min=1, max=200)
+    country_id = factory.fuzzy.FuzzyInteger(1, 200)
     status_control = fake.random_element(elements=['A', 'C', 'P', 'D'])
     start_date = fake.date_time_between(start_date='-2y', end_date='-1y')
-    version_no = fake.random_int(min=0, max=3)
+    version_no = factory.fuzzy.FuzzyInteger(0, 3)
 
     @factory.lazy_attribute
     def ueu_id(self):
