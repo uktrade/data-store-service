@@ -87,7 +87,7 @@ class SPIREBatchFactory(BaseFactory):
 
     @factory.lazy_attribute
     def batch_ref(self):
-        batch_ref = str(factory.fuzzy.FuzzyInteger(1, 50))
+        batch_ref = str(factory.fuzzy.FuzzyInteger(1, 50)).fuzz()
         if not random.randint(0, 3):
             return f'C{batch_ref}'
         return batch_ref
@@ -425,19 +425,19 @@ class SPIREIncidentFactory(BaseFactory):
     @factory.lazy_attribute
     def ogl_id(self):
         if self.case_type == 'OGEL':
-            return factory.fuzzy.FuzzyInteger(1, 100)
+            return factory.fuzzy.FuzzyInteger(1, 100).fuzz()
         return
 
     @factory.lazy_attribute
     def else_id(self):
         if self.type == 'SUSPENSION':
-            return factory.fuzzy.FuzzyInteger(1, 100)
+            return factory.fuzzy.FuzzyInteger(1, 100).fuzz()
         return
 
     @factory.lazy_attribute
     def licence_id(self):
         if self.type != 'REFUSAL':
-            return factory.fuzzy.FuzzyInteger(1, 99999)
+            return factory.fuzzy.FuzzyInteger(1, 99999).fuzz()
         return
 
     @factory.lazy_attribute
@@ -497,7 +497,7 @@ class SPIREReturnFactory(BaseFactory):
     @factory.lazy_attribute
     def ogl_id(self):
         if self.licence_type == 'OGEL':
-            return factory.fuzzy.FuzzyInteger(1, 100)
+            return factory.fuzzy.FuzzyInteger(1, 100).fuzz()
         return
 
     class Meta:
