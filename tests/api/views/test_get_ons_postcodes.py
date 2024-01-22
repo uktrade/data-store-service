@@ -65,7 +65,6 @@ def test_get_ons_postcodes_when_no_data(app_with_hawk_user, app_with_mock_cache)
 
 
 def test_get_ons_postcodes(app_with_hawk_user, app_with_mock_cache, add_ons_postcode):
-
     postcode = 'AB1 1BA'
 
     add_ons_postcode([{'postcode': postcode}])

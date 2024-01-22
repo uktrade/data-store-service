@@ -11,7 +11,6 @@ html_string = b"""
 
 
 def test_hmrc_new_data_available(mocker):
-
     # Mocking
     download_file_mock = request_mock(mocker, {'*': b'some data'})
     s3_storage_mock = storage_mock(s3_keys_returned=['source/hmrc/exporters/exporters1702.zip'])
@@ -42,7 +41,6 @@ def test_hmrc_new_data_available(mocker):
 
 
 def test_hmrc_no_new_data(mocker):
-
     # Mocking
     download_file_mock = request_mock(mocker, {'*': b'some data'})
     s3_storage_mock = storage_mock(s3_keys_returned=['source/hmrc/exporters/exporters1703.zip'])

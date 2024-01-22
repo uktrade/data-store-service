@@ -16,7 +16,6 @@ class DitReferencePostcodeListView(PipelinePaginatedListView):
 
 
 class DitReferencePostcodeView(View):
-
     decorators = [json_error, ac.authentication_required, ac.authorization_required]
 
     pipeline = DITReferencePostcodesPipeline

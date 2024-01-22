@@ -45,7 +45,6 @@ selenium_url_response_dict = {
 
 
 def test_ons_postcode_directory_new_data_available(mocker):
-
     # Mocking
     download_file_mock = request_mock(mocker, download_url_response_dict)
     get_data_files_html_mock = inspect_online_selenium_mock(mocker, selenium_url_response_dict)
@@ -71,7 +70,6 @@ def test_ons_postcode_directory_new_data_available(mocker):
 
 
 def test_ons_postcode_no_new_data(mocker):
-
     # Mocking
     download_file_mock = request_mock(mocker, download_url_response_dict)
     get_data_files_html_mock = inspect_online_selenium_mock(mocker, selenium_url_response_dict)

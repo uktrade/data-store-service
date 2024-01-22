@@ -14,7 +14,8 @@ job_defaults: &job_defaults
 
   environment:
     FLASK_ENV: test
-    DSS_DATABASE_URL: postgresql://postgres@localhost/
+    DSS_DATABASE_URL: postgresql://postgres@localhost/postgres
+    DATABASE_URL: postgresql://postgres@localhost/postgres
     ABC_CLIENT_ID: dss_client_id
     ABC_CLIENT_SECRET: dss_client_secret
     APP_SECRET_KEY: dss_app_secret
@@ -102,6 +103,6 @@ workflows:
     jobs:
       - build:
           publish_coverage: true
-          python_image: python:3.9
+          python_image: python:3.10
           postgres_image: postgres:10.5
       - test-compile

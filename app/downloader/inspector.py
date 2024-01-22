@@ -14,7 +14,8 @@ from selenium.common.exceptions import (
 )
 from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.utils import ChromeType
+from webdriver_manager.core.os_manager import ChromeType
+
 
 DataUrl = namedtuple('DataUrl', 'url date')
 

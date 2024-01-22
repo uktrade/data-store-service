@@ -28,7 +28,6 @@ def mock_sql_alchemy_model():
 
 class TestProcess:
     def test_creation_of_model_objects(self, app_with_db, mock_sql_alchemy_model):
-
         dbi = mock.Mock()
         fieldnames = ['a', 'b']
         rows = [[0, 1], [2, 3]]
@@ -45,7 +44,6 @@ class TestProcess:
         assert calls == expected
 
     def test_mapping(self, app_with_db, mock_sql_alchemy_model):
-
         dbi = mock.Mock()
         fieldnames = ['a', 'b']
         rows = [[0, 1], [2, 3]]
@@ -63,7 +61,6 @@ class TestProcess:
         assert calls == expected
 
     def test_null_values_converted_to_none(self, app_with_db, mock_sql_alchemy_model):
-
         dbi = mock.Mock()
         fieldnames = ['a', 'b']
         rows = [

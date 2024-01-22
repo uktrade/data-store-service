@@ -12,7 +12,6 @@ accounts_html_string = b"""
 
 
 def test_ch_accounts_new_data_available(mocker):
-
     # Mocking
     download_file_mock = request_mock(mocker, {'*': b'some data'})
     s3_storage_mock = storage_mock(['Accounts_Bulk_Data-2017-06-17.zip'])
@@ -37,7 +36,6 @@ def test_ch_accounts_new_data_available(mocker):
 
 
 def test_ch_accounts_no_new_data(mocker):
-
     # Mocking
     download_file_mock = request_mock(mocker, {'*': b'some data'})
     s3_storage_mock = storage_mock(['Accounts_Bulk_Data-2017-06-20.zip'])

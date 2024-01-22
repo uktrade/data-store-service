@@ -38,6 +38,7 @@ tableschema
 tabulator
 toolz
 watchdog
-webdriver-manager
+webdriver_manager
 werkzeug
 WTForms-SQLAlchemy
+faker

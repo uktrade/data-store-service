@@ -16,7 +16,6 @@ from app.etl.pipeline_type.incremental_data import L0IncrementalDataPipeline
 
 
 class CompaniesHouseAccountsPipeline(L0IncrementalDataPipeline):
-
     organisation = 'companies_house'
     dataset = 'accounts_legacy'
 
@@ -95,7 +94,6 @@ class CompaniesHouseAccountsPipeline(L0IncrementalDataPipeline):
 
 
 class XBRLParser:
-
     # XPATH helpers
     # XML element syntax: <ns:name attribute='value'>content</ns:name>
     @staticmethod

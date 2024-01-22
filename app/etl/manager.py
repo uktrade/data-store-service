@@ -27,7 +27,7 @@ class Manager:
         self._pipelines = OrderedDict()
 
     def _to_pipeline_id(self, pipeline):
-        if type(pipeline) == str:
+        if isinstance(pipeline, str):
             return pipeline
         return pipeline.id
 
@@ -44,7 +44,7 @@ class Manager:
         Returns:
             datatools.io.Storage instance
         """
-        if type(storage) == str:
+        if isinstance(storage, str):
             return StorageFactory.create(storage)
         return storage
 

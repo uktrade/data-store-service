@@ -201,7 +201,6 @@ class WorldBankTariffTransformL1(BaseModel):
 
 
 class ComtradeCountryCodeAndISOL1(BaseModel):
-
     __tablename__ = 'L1'
     __table_args__ = {'schema': ComtradeCountryCodeAndISOPipeline.schema}
 
@@ -219,7 +218,6 @@ class ComtradeCountryCodeAndISOL1(BaseModel):
 
 
 class DITEUCountryMembershipL1(BaseModel):
-
     __tablename__ = 'L1'
     __table_args__ = {'schema': DITEUCountryMembershipPipeline.schema}
 
@@ -232,7 +230,6 @@ class DITEUCountryMembershipL1(BaseModel):
 
 
 class DITBACIL1(BaseModel):
-
     __tablename__ = 'L1'
     __table_args__ = {'schema': DITBACIPipeline.schema}
 

@@ -117,7 +117,6 @@ class DataPipeline(metaclass=ABCMeta):
 
 
 class LDataPipeline(DataPipeline, metaclass=ABCMeta):
-
     L0_TABLE = 'L0'
     L1_TABLE = 'L1'
 

@@ -49,7 +49,6 @@ def request_mock(mocker, url_reponse_dict):
 
 
 def inspect_online_selenium_mock(mocker, url_reponse_dict):
-
     mock = mocker.patch.object(SeleniumOnlineInspector, 'get_all_data_urls', autospec=True)
     mock.inspected_urls = []
 

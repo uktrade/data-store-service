@@ -6,7 +6,6 @@ from app.etl.pipeline_type.base import classproperty, DataPipeline
 
 
 class RebuildSchemaPipeline(DataPipeline):
-
     csv_to_model_mapping = None
     null_values = ['null', 'NULL', '']
 
